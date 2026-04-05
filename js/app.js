@@ -83,8 +83,9 @@
         return `<a href="https://www.wowhead.com/${WH}/item=${id}" data-wowhead="item=${id}&domain=${WH}" data-wh-item="${id}" class="${cls||''}">${text}</a>`;
     }
 
-    function whSpell(id, text) {
-        return `<a href="https://www.wowhead.com/${WH}/spell=${id}" data-wowhead="spell=${id}&domain=${WH}" target="_blank" rel="noopener">${text}</a>`;
+    function whSpell(id, text, enchSrcData) {
+        const dataExtra = enchSrcData ? ` data-ench-src='${JSON.stringify(enchSrcData).replace(/'/g,"&#39;")}'` : '';
+        return `<a href="https://www.wowhead.com/${WH}/spell=${id}" data-wowhead="spell=${id}&domain=${WH}" data-wh-spell="${id}"${dataExtra}>${text}</a>`;
     }
 
     function refreshWH() {
@@ -761,7 +762,7 @@
         const enchant = enchantLookup[slot];
         const enchSrc = enchant ? getEnchantSource(enchant.spellId) : null;
         const enchantHtml = enchSrc
-            ? `<div class="slot-enchant">${whSpell(enchant.spellId, enchSrc.name)}</div>`
+            ? `<div class="slot-enchant">${whSpell(enchant.spellId, enchSrc.name, enchSrc)}</div>`
             : '';
 
         // "Cloned from MH" note for auto-generated OH
@@ -1392,11 +1393,24 @@
             });
         });
 
-        // Global delegation — intercept all [data-wh-item] clicks in the list
+        // Global delegation — intercept [data-wh-item] and [data-wh-spell] clicks
         slotList.addEventListener('click', e => {
+            // Enchant spell link?
+            const spellEl = e.target.closest('[data-wh-spell]');
+            if (spellEl) {
+                e.preventDefault();
+                e.stopPropagation();
+                const spellId = spellEl.dataset.whSpell;
+                const name = spellEl.textContent.trim();
+                let src = null;
+                try { src = JSON.parse(spellEl.dataset.enchSrc || 'null'); } catch(e2) {}
+                openEnchantModal(spellId, name, src);
+                return;
+            }
+            // Item / gem link?
             const el = e.target.closest('[data-wh-item]');
             if (!el) return;
-            e.preventDefault();   // stop Wowhead navigation
+            e.preventDefault();
             e.stopPropagation();
             const itemId = el.dataset.whItem;
             const gemName = el.dataset.gemName;
@@ -1539,6 +1553,34 @@
         }
 
         html += `<a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
+            View on Wowhead →
+        </a>`;
+
+        modalBody.innerHTML = html;
+        modalOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        refreshWH();
+    }
+
+    // ─── Enchant Modal ───────────────────────────────────────────────
+    function openEnchantModal(spellId, name, src) {
+        modalTitle.innerHTML = `<span style="font-size:1.4rem;margin-right:10px">✨</span><span>${name}</span>`;
+
+        let html = '';
+        if (src) {
+            html += `<div class="modal-section"><div class="modal-section-title">How to Get</div>
+                <div class="modal-row"><span class="modal-row-icon">${srcIcon(src.sourceType)}</span>
+                    <div><div class="modal-row-label">${src.sourceType}</div><div class="modal-row-value">${src.source || 'Unknown'}</div></div></div>`;
+            if (src.sourceLocation)
+                html += `<div class="modal-row"><span class="modal-row-icon">📍</span>
+                    <div><div class="modal-row-label">Location</div><div class="modal-row-value">${src.sourceLocation}</div></div></div>`;
+            html += '</div>';
+        } else {
+            html += `<div class="modal-section"><div class="modal-row"><span class="modal-row-icon">❓</span>
+                <div><div class="modal-row-value">Source not in database</div><div class="modal-row-label">Spell ID: ${spellId}</div></div></div></div>`;
+        }
+
+        html += `<a href="https://www.wowhead.com/${WH}/spell=${spellId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
             View on Wowhead →
         </a>`;
 
