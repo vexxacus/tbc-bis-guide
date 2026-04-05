@@ -309,9 +309,27 @@
     const SLOT_ORDER = [
         'Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist',
         'Hands', 'Waist', 'Legs', 'Feet',
-        'Ring', 'Trinket',
+        'Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2',
         'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
     ];
+
+    // ─── Weapon style per spec ──────────────────────────────────────
+    // 'dw'   = only show MH/OH (Fury, Rogue, Enh Shaman, Prot Warrior, Prot Pala, Holy Pala)
+    // '2h'   = only show Two Hand (Bear, Cat, Ret Pala)
+    // 'both' = show both sections (Arms Warrior, casters with both options, etc.)
+    // If not listed → auto-detect from data
+    const WEAPON_STYLE = {
+        'Warrior-Fury':         'dw',
+        'Warrior-Protection':   'dw',
+        'Rogue-Dps':            'dw',
+        'Shaman-Enhancement':   'dw',
+        'Paladin-Holy':         'dw',
+        'Paladin-Protection':   'dw',
+        'Druid-Bear':           '2h',
+        'Druid-Cat':            '2h',
+        'Paladin-Retribution':  '2h',
+        'Warrior-Arms':         'both',
+    };
 
     // ─── PvP gear overrides per class/phase ──────────────────────────
     const PVP_ITEMS = {
@@ -749,6 +767,9 @@
         const si = slotGroups[slot];
         if (!si || !si.length) return '';
 
+        // Display name: "Ring 1" → "Ring", "Trinket 2" → "Trinket" etc.
+        const slotDisplayName = slot.replace(/ [12]$/, '');
+
         const bis = si[0], alts = si.slice(1);
         const isPvPItem = bis.rank?.toLowerCase().includes('pvp');
         const badgeCls = isPvPItem ? 'bis' : (bis.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
@@ -758,8 +779,8 @@
         const src = getItemSource(bis.itemId);
         const srcText = src ? `${srcEmoji(src.sourceType)} ${src.source || src.sourceType}` : '';
 
-        // Enchant info — show name inline
-        const enchant = enchantLookup[slot];
+        // Enchant info — look up by both the full slot key and the base name
+        const enchant = enchantLookup[slot] || enchantLookup[slotDisplayName];
         const enchSrc = enchant ? getEnchantSource(enchant.spellId) : null;
         const enchantHtml = enchSrc
             ? `<div class="slot-enchant">${whSpell(enchant.spellId, enchSrc.name, enchSrc)}</div>`
@@ -784,7 +805,7 @@
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
                 <div class="slot-content">
-                    <div class="slot-name">${slot}</div>
+                    <div class="slot-name">${slotDisplayName}</div>
                     <div class="slot-bis-item">
                         <div class="slot-bis-name ${bisQuality}">${whItem(bis.itemId, bis.name || 'Item #'+bis.itemId, bisQuality)}</div>
                     </div>
@@ -1003,10 +1024,16 @@
         }
 
         // Group by slot, dedup
+        // Ring and Trinket are split into slot 1 and slot 2 (you wear two of each)
+        const _ringBuf = [], _trinketBuf = [];
         const slotGroups = {};
         for (const item of items) {
             let slot = item.slot;
             if (slot === 'Shoulders') slot = 'Shoulder';
+
+            // Buffer Ring and Trinket for later split into 1/2
+            if (slot === 'Ring')    { if (!_ringBuf.find(i => i.itemId === item.itemId))    _ringBuf.push(item);    continue; }
+            if (slot === 'Trinket') { if (!_trinketBuf.find(i => i.itemId === item.itemId)) _trinketBuf.push(item); continue; }
 
             // "Main Hand~Off Hand" means weapon usable in either hand
             if (slot === 'Main Hand~Off Hand') {
@@ -1025,6 +1052,39 @@
                 slotGroups[slot].push(item);
             }
         }
+
+        // ── Split Ring and Trinket into two independent slots ──
+        // BIS items 1 and 2 become the primary item for slot 1 and 2 respectively.
+        // Remaining items are alts for both slots.
+        function splitDualSlot(buf, slotName1, slotName2) {
+            if (!buf.length) return;
+            // Sort: BIS first (by original order which is already ranked)
+            const bisItems = buf.filter(i => i.rank?.toLowerCase().startsWith('bis') || i.rank?.toLowerCase().includes('pvp'));
+            const altItems = buf.filter(i => !bisItems.includes(i));
+            const allSorted = [...bisItems, ...altItems];
+
+            // Slot 1: first item is BIS, rest are alts
+            // Slot 2: second BIS item (or first alt) is primary, rest are alts
+            const primary1 = allSorted[0];
+            const primary2 = allSorted[1];
+            const altsFor1 = allSorted.slice(1); // everything else is alt for slot 1
+            const altsFor2 = allSorted.filter((_, i) => i !== 1); // remove primary2, keep others as alts
+
+            if (primary1) {
+                slotGroups[slotName1] = [
+                    { ...primary1, slot: slotName1 },
+                    ...altsFor1.map(i => ({ ...i, slot: slotName1 }))
+                ];
+            }
+            if (primary2) {
+                slotGroups[slotName2] = [
+                    { ...primary2, slot: slotName2 },
+                    ...altsFor2.map(i => ({ ...i, slot: slotName2 }))
+                ];
+            }
+        }
+        splitDualSlot(_ringBuf,    'Ring 1',    'Ring 2');
+        splitDualSlot(_trinketBuf, 'Trinket 1', 'Trinket 2');
 
         // ── Dual-wield fix: if MH exists but OH is empty, clone MH → OH ──
         // Only for PvE mode — PvP scraped data already has correct slots
@@ -1231,8 +1291,6 @@
             if (si && si.length) {
                 const il = GearScore.estimateItemLevel(si[0].itemId, gsPhase);
                 bisItems.push({ itemLevel: il, rarity: 4, slot });
-                if ((slot === 'Ring' || slot === 'Trinket') && si.length > 1)
-                    bisItems.push({ itemLevel: il, rarity: 4, slot });
             }
         }
         const gs = GearScore.calcTotalScore(bisItems);
@@ -1242,11 +1300,13 @@
         const paperdoll = $('paperdoll');
         const PD_ORDER = [
             'Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist',
-            'Legs', 'Feet', 'Ring', 'Trinket', 'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
+            'Legs', 'Feet', 'Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2',
+            'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
         ];
         const PD_LABELS = {
             Head:'Head', Neck:'Neck', Shoulder:'Shld', Back:'Back', Chest:'Chest', Wrist:'Wrist',
-            Hands:'Hands', Waist:'Waist', Legs:'Legs', Feet:'Feet', Ring:'Ring', Trinket:'Trkt',
+            Hands:'Hands', Waist:'Waist', Legs:'Legs', Feet:'Feet',
+            'Ring 1':'Ring1', 'Ring 2':'Ring2', 'Trinket 1':'Trkt1', 'Trinket 2':'Trkt2',
             'Main Hand':'MH', 'Off Hand':'OH', 'Two Hand':'2H', 'Ranged/Relic':'Rng'
         };
 
@@ -1329,8 +1389,21 @@
 
         // ── Category-based rendering ──
         const ARMOR_SLOTS   = ['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist', 'Legs', 'Feet'];
-        const JEWELRY_SLOTS = ['Ring', 'Trinket'];
+        const JEWELRY_SLOTS = ['Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2'];
         const WEAPON_SLOTS  = new Set(['Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic']);
+
+        // ── Determine which weapon sections to show ──
+        // Use WEAPON_STYLE config if available, else auto-detect from slot data
+        const weapStyle = WEAPON_STYLE[specKey] || 'auto';
+        let showDW, show2H;
+        if (weapStyle === 'dw')   { showDW = hasOneHanders; show2H = false; }
+        else if (weapStyle === '2h') { showDW = false; show2H = has2H; }
+        else if (weapStyle === 'both') { showDW = hasOneHanders; show2H = has2H; }
+        else {
+            // auto: show both if data has both; if only one type, show only that
+            showDW = hasOneHanders;
+            show2H = has2H;
+        }
 
         // Helper: render a category header
         function categoryHeader(icon, title, extraClass) {
@@ -1346,22 +1419,21 @@
             html += renderSlotGroup(slot, slotGroups, enchantLookup);
         }
 
-        // ── Jewelry ──
+        // ── Jewelry (Ring 1, Ring 2, Trinket 1, Trinket 2) ──
         html += categoryHeader('💎', 'Jewelry');
         for (const slot of JEWELRY_SLOTS) {
             html += renderSlotGroup(slot, slotGroups, enchantLookup);
         }
 
         // ── Weapons ──
-        if (hasOneHanders) {
+        if (showDW) {
             const oneHandTitle = isDualWield ? 'Dual-Wield' : 'Main Hand / Off Hand';
-            const oneHandIcon  = isDualWield ? '⚔️' : '⚔️';
-            html += categoryHeader(oneHandIcon, oneHandTitle);
+            html += categoryHeader('⚔️', oneHandTitle);
             if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup);
             if (hasOH) html += renderSlotGroup('Off Hand', slotGroups, enchantLookup);
         }
 
-        if (has2H) {
+        if (show2H) {
             html += categoryHeader('🗡️', 'Two-Handed');
             html += renderSlotGroup('Two Hand', slotGroups, enchantLookup);
         }
