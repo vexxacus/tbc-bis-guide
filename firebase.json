@@ -1,0 +1,44 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "parse-lua-data.js",
+      "fetch-icons.js",
+      "fetch-quality.js",
+      "fetch-sockets.js",
+      "data.json",
+      "package.json",
+      "package-lock.json",
+      "README.md",
+      "BACKLOG.md",
+      "PVP-SYSTEM-DESIGN.md",
+      "scraper/**",
+      ".icon-cache.json",
+      ".quality-cache.json",
+      ".socket-cache.json"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=604800" }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=300" }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

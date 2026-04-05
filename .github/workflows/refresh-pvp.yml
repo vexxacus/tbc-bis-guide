@@ -1,0 +1,76 @@
+name: Refresh PvP Data
+
+on:
+  # Kör varje söndag kl 03:00 UTC
+  schedule:
+    - cron: '0 3 * * 0'
+  # Tillåt manuell körning från Actions-fliken
+  workflow_dispatch:
+    inputs:
+      top:
+        description: 'Antal spelare att analysera (default: 200)'
+        required: false
+        default: '200'
+
+jobs:
+  refresh:
+    name: Fetch & Analyze PvP BiS Data
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Puppeteer browser
+        run: npx puppeteer browsers install chrome
+
+      - name: Fetch leaderboard
+        run: node scraper/fetch-leaderboard.js
+
+      - name: Fetch gear data
+        run: node scraper/fetch-gear.js --top ${{ github.event.inputs.top || '200' }}
+
+      - name: Analyze gear
+        run: node scraper/analyze-gear.js
+
+      - name: Convert to js/pvp-data.js
+        run: |
+          node -e "
+            const data = require('./scraper/output/pvp-bis-data.json');
+            const output = 'const PVP_DATA = ' + JSON.stringify(data) + ';';
+            require('fs').writeFileSync('js/pvp-data.js', output, 'utf-8');
+            console.log('Written js/pvp-data.js:', (output.length/1024).toFixed(1), 'KB');
+            console.log('Specs:', Object.keys(data.specs).length);
+            console.log('Players analyzed:', data.meta.totalPlayers);
+            console.log('Analyzed at:', data.meta.analyzedAt);
+          "
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet js/pvp-data.js && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit & push updated PvP data
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add js/pvp-data.js
+          git commit -m "chore: auto-refresh PvP BiS data $(date -u '+%Y-%m-%d')"
+          git push
+
+      - name: No changes detected
+        if: steps.changes.outputs.changed == 'false'
+        run: echo "PvP data unchanged — skipping commit."

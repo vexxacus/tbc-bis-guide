@@ -1,0 +1,8 @@
+node_modules/
+.icon-cache.json
+.quality-cache.json
+.socket-cache.json
+firebase-debug.log
+scraper/leaderboard-screenshot.png
+scraper/output/gear-progress.json
+scraper/output/gear-raw.json

@@ -1,0 +1,19 @@
+{
+  "name": "tbc-bis-app",
+  "version": "1.0.0",
+  "description": "TBC Classic Best in Slot Guide",
+  "main": "fetch-icons.js",
+  "scripts": {
+    "refresh-pvp": "node scraper/fetch-leaderboard.js && node scraper/fetch-gear.js --top 200 && node scraper/analyze-gear.js && node -e \"const d=require('./scraper/output/pvp-bis-data.json');require('fs').writeFileSync('js/pvp-data.js','const PVP_DATA='+JSON.stringify(d)+';')\" && node fetch-icons.js",
+    "deploy": "firebase deploy --only hosting",
+    "refresh-and-deploy": "npm run refresh-pvp && npm run deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^24.40.0"
+  }
+}

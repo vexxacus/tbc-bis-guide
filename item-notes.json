@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "description": "Gearing tips for alternative items. Notes explain WHY you'd pick an alt over the BiS piece. Spec-specific overrides take priority over global notes.",
+    "updated": "2026-04-05"
+  },
+
+  "global": {
+    "28034": "Easy to farm — drops from Shadow Labyrinth. Great until you get a raid trinket.",
+    "28288": "Drops from Mechanar — on-use haste is strong for burst windows.",
+    "28507": "Karazhan drop. Solid until you get T5/T6 gloves.",
+    "28780": "Prince drop. Great if you can't get tier gloves yet.",
+    "29381": "Badge vendor. Pick this if you still need spell hit.",
+    "28672": "Netherspite drop. Budget cloak — easy Kara farm.",
+    "27878": "Heroic Auchenai Crypts. Easiest Pre-BiS cloak to farm.",
+    "19379": "Classic Naxx item. Still competitive if you have it from vanilla.",
+    "23207": "Classic Naxx item. Still very strong if you kept it from vanilla.",
+    "21670": "Classic AQ40 item. Still competitive for physical DPS if you have it.",
+    "28509": "Attumen (Karazhan) — easy weekly farm. Good if you're unlucky on other necks.",
+    "28757": "Prince Malchezaar drop. Versatile ring — good for many specs.",
+    "29132": "Scryers rep trinket. Free if you're already Scryers — no farming needed.",
+    "29247": "Crafted (Leatherworking). Cheap to make, holds up well early on.",
+    "28545": "Moroes (Karazhan) — easy weekly farm. Reliable melee boots.",
+    "28734": "Nightbane (Karazhan). Versatile ring with stam + damage.",
+    "28797": "Gruul's Lair trash drop. Might drop while you farm DST.",
+    "29382": "Badge vendor. Quick to buy, solid physical DPS cloak.",
+    "29992": "Kael'thas (TK). Great if it drops on your kill.",
+    "27892": "Blackheart the Inciter (Shadow Lab). Easy dungeon farm.",
+    "28766": "Prince Malchezaar drop. Excellent caster cloak from Kara.",
+    "25686": "Crafted (Leatherworking). Very cheap — use while farming raid boots.",
+    "24259": "Crafted (Leatherworking). Budget option while waiting for raid cloak.",
+    "24250": "Crafted (Tailoring). Strong caster bracers — worth crafting early.",
+    "29273": "Badge vendor. Quick pickup if you need an off-hand fast.",
+    "29994": "Mag'theridon drop. Good cloak if you're running Mag weekly anyway.",
+    "30064": "Lady Vashj (SSC). Great caster belt if it drops.",
+    "27683": "Heroic Slave Pens. Very easy to farm — run it early and often.",
+    "28741": "Shade of Aran (Karazhan). Solid legs from weekly Kara clear.",
+    "28828": "Gruul drop. Good melee belt while farming your P2/P3 BiS.",
+    "30037": "Crafted (Tailoring). Good if you have a Tailor friend or alt.",
+    "30626": "Extremely strong when it procs — chase this from Serpentshrine.",
+    "29370": "Badge vendor. One of the best uses of your early badges.",
+    "29383": "Badge vendor. Strong physical DPS trinket — easy to get.",
+    "30723": "Kael'thas (TK). Excellent caster weapon if you don't need a staff.",
+    "30734": "Leotheras (SSC). Good legs if you haven't gotten your tier piece.",
+    "30898": "Sethekk Halls quest. Free and easy to get.",
+    "32587": "Crafted from Black Temple patterns. Best caster shoulders long-term.",
+    "30067": "High Astromancer (TK). Good caster boots from early T5 content.",
+    "24262": "Crafted (Tailoring). Spellstrike 2-set is very strong — keep both pieces.",
+    "24266": "Crafted (Tailoring). Spellstrike 2-set with pants gives +92 spell damage.",
+    "24116": "Crafted (Jewelcrafting). Requires JC to equip — strong if you have the profession.",
+    "24121": "Crafted (Jewelcrafting). Requires JC to equip.",
+    "29522": "Crafted (Leatherworking). Windhawk 3-set gives mp5 — good early on.",
+    "29524": "Crafted (Leatherworking). Part of Windhawk set.",
+    "29523": "Crafted (Leatherworking). Part of Windhawk set.",
+    "29515": "Crafted (Leatherworking). Ebon Netherscale — good for physical DPS.",
+    "29516": "Crafted (Leatherworking). Part of Ebon Netherscale set.",
+    "29527": "Crafted (Leatherworking). Primalstrike — competitive wrist slot.",
+    "30038": "Crafted (Tailoring). Expensive but best caster belt for a long time.",
+    "32586": "Crafted (Tailoring, BT pattern). Best caster bracers in the game.",
+    "32474": "Crafted (Engineering). Requires Engineering to equip.",
+    "32480": "Crafted (Engineering). Requires Engineering to equip.",
+    "29376": "Badge vendor. Amazing healer trinket — prioritize buying this.",
+    "24256": "Crafted (Tailoring). Girdle of Ruination — strong caster belt early.",
+    "31297": "BoE world drop. Can be expensive on AH but no farming needed.",
+    "28411": "PvP vendor. Easy to get if you have honor saved up.",
+    "28410": "PvP vendor. Quick to get — decent until raid boots.",
+    "28555": "Spirit Shard vendor. Easy to farm from Auchindoun heroics.",
+    "28343": "Sethekk Halls drop. Easy dungeon to run for this neck."
+  },
+
+  "spec": {
+    "Druid-Balance": {
+      "24262": "Spellstrike 2-set (Hood + Pants) gives +92 spell damage. Keep both until T6.",
+      "24266": "Spellstrike 2-set (Hood + Pants). Worth keeping over most upgrades.",
+      "29522": "Windhawk 3-set gives mp5. Pick this if mana is your bottleneck.",
+      "19379": "Classic Naxx trinket. Still top-tier for balance if you have it.",
+      "29132": "Scryers rep. Use this until you can buy the Badge trinket."
+    },
+    "Druid-Bear": {
+      "28034": "Solid avoidance trinket. Use this on fights where you need less spike damage.",
+      "23207": "Classic Naxx. The equip effect is enormous for bear threat + survivability.",
+      "28797": "Gruul trash drop. Extra stam is valuable — use as your stam cloak."
+    },
+    "Druid-Cat": {
+      "28034": "Good filler trinket. The crit proc helps with combo point generation.",
+      "25686": "Super cheap to craft. Use these until you get Edgewalker Longboots.",
+      "29247": "Cheap LW craft. Best early belt before raiding."
+    },
+    "Hunter-Beast Mastery": {
+      "28034": "Strong proc trinket. Use alongside Bloodlust Brooch for burst phases.",
+      "28228": "Beast Lord 2-set reduces trap CD by 4 sec. Keep 2pc even with better individual pieces.",
+      "28275": "Beast Lord 2-set. Pair with chest for the trap CD reduction.",
+      "29515": "Ebon Netherscale. Good pre-raid option if you have Leatherworking.",
+      "31303": "Quest reward bow. Easy to get — use until you get a raid weapon."
+    },
+    "Hunter-Survival": {
+      "28228": "Beast Lord 2-set is critical for Survival's CC rotation. Don't break it.",
+      "28275": "Keep for 2-set bonus — trap CD reduction is core to Survival gameplay.",
+      "28034": "Pairs well with your trap rotation. Good until raid trinkets."
+    },
+    "Mage-Fire": {
+      "24262": "Spellstrike 2-set. +92 spell damage is hard to beat — keep until T6.",
+      "24266": "Spellstrike 2-set. Keep both pieces together for the set bonus.",
+      "29132": "Free from Scryers rep. Use until you can afford Badge trinkets.",
+      "27683": "Easy heroic farm. Good filler trinket for spell haste."
+    },
+    "Mage-Arcane": {
+      "24262": "Spellstrike 2-set. The flat spell damage is even better for Arcane than Fire.",
+      "24266": "Spellstrike 2-set. Don't break it for minor upgrades.",
+      "30626": "Incredible when it procs — chase this drop."
+    },
+    "Warlock-Destruction": {
+      "24262": "Spellstrike 2-set is massive for Destro. Keep until Sunwell gear.",
+      "24266": "Spellstrike 2-set. The raw spell damage feeds your Shadow Bolts hard.",
+      "19379": "Classic trinket. Still BiS-level for Destro if you have it."
+    },
+    "Warlock-Affliction": {
+      "24262": "Spellstrike 2-set works well with DoTs. Keep for the flat spell damage.",
+      "19379": "Neltharion's Tear. Still strong for Affliction — spell pen is useful in PvP too."
+    },
+    "Priest-Shadow": {
+      "24262": "Spellstrike 2-set. Raw spell damage boosts all your DoTs + Mind Blast.",
+      "24266": "Spellstrike 2-set. Worth crafting early — stays relevant through T5.",
+      "29132": "Scryers Bloodgem. Free trinket — use until Badge of Justice options.",
+      "27683": "Quag's Eye. Easy heroic farm, and the haste helps with clipping."
+    },
+    "Rogue-Dps": {
+      "28034": "Hourglass. Solid crit proc — use alongside DST for double-proc burst.",
+      "28288": "Abacus. The haste on-use lines up with Blade Flurry nicely.",
+      "25686": "Cheap LW boots. Wear these until you get Edgewalker Longboots from Kara.",
+      "28509": "Easy Attumen farm. Good neck until you can get a T5/T6 necklace.",
+      "28545": "Moroes drop. Reliable melee boots from weekly Kara."
+    },
+    "Warrior-Fury": {
+      "28034": "Hourglass. Great crit proc — use as your second trinket slot.",
+      "28288": "Abacus. Haste on-use is amazing for Execute phase.",
+      "28509": "Attumen drop. Reliable neck from weekly Kara clear.",
+      "28828": "Gruul drop. Decent belt while farming for Vashj/BT belts."
+    },
+    "Warrior-Arms": {
+      "28034": "Hourglass. Crit proc synergizes with Mortal Strike crits.",
+      "28288": "Abacus. Use the on-use for burst windows with Sweeping Strikes."
+    },
+    "Warrior-Protection": {
+      "28034": "Pick this for threat-sensitive fights where you need DPS trinket.",
+      "28797": "Gruul trash. The stam makes it a solid mitigation cloak."
+    },
+    "Paladin-Holy": {
+      "29376": "Badge vendor. Best throughput trinket — prioritize buying this.",
+      "28766": "Prince drop. Good caster cloak with healing stats."
+    },
+    "Paladin-Retribution": {
+      "28034": "Hourglass. Great for melee — use until you get DST.",
+      "28288": "Abacus. Haste on-use synergizes with Seal of Command procs."
+    },
+    "Shaman-Enhancement": {
+      "28034": "Hourglass. Your second-best trinket option after DST.",
+      "28288": "Abacus. Haste is king for Enhancement — use on-use with Stormstrike.",
+      "25686": "Cheap LW craft. Use until you get Edgewalker Longboots.",
+      "28509": "Attumen drop. Easy to farm — solid neck."
+    },
+    "Shaman-Elemental": {
+      "29132": "Scryers rep. Free spell damage trinket — good starting point.",
+      "27683": "Quag's Eye. Easy heroic — spell haste is great for Ele."
+    },
+    "Shaman-Restoration": {
+      "29376": "Badge vendor. Amazing healer trinket — buy this first with badges.",
+      "28766": "Prince drop. Good healer cloak from Kara."
+    }
+  }
+}

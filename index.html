@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>TBC BiS Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://wow.zamimg.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
+    <!-- Wowhead Tooltip Script (TBC Classic) -->
+    <script>const whTooltips = {colorLinks: false, iconizeLinks: false, iconSize: 'small', renameLinks: false};</script>
+    <script src="https://wow.zamimg.com/js/tooltips.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <button class="back-btn hidden" id="backBtn" aria-label="Go back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="header-title">
+                <h1 id="headerTitle">TBC Best in Slot</h1>
+                <p class="header-sub" id="headerSub">Choose your class</p>
+            </div>
+            <div class="header-logo">⚔️</div>
+        </header>
+
+        <!-- Step 1: Class Select -->
+        <section class="step" id="stepClass">
+            <div class="ctx-hint" data-hint="class-pick" id="hintClass">
+                <span class="ctx-hint-icon">💡</span>
+                <div class="ctx-hint-body">Pick your <strong>class</strong> to see Best in Slot gear for every spec and content phase — from Pre-BiS dungeon gear all the way to Sunwell.</div>
+                <button class="ctx-hint-dismiss" data-dismiss="class-pick" aria-label="Dismiss">✕</button>
+            </div>
+            <div class="class-grid">
+                <button class="class-card" data-class="Warrior">
+                    <div class="class-icon warrior"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warrior.jpg" alt="Warrior"></div>
+                    <span>Warrior</span>
+                </button>
+                <button class="class-card" data-class="Paladin">
+                    <div class="class-icon paladin"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_paladin.jpg" alt="Paladin"></div>
+                    <span>Paladin</span>
+                </button>
+                <button class="class-card" data-class="Hunter">
+                    <div class="class-icon hunter"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_hunter.jpg" alt="Hunter"></div>
+                    <span>Hunter</span>
+                </button>
+                <button class="class-card" data-class="Rogue">
+                    <div class="class-icon rogue"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_rogue.jpg" alt="Rogue"></div>
+                    <span>Rogue</span>
+                </button>
+                <button class="class-card" data-class="Priest">
+                    <div class="class-icon priest"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_priest.jpg" alt="Priest"></div>
+                    <span>Priest</span>
+                </button>
+                <button class="class-card" data-class="Shaman">
+                    <div class="class-icon shaman"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_shaman.jpg" alt="Shaman"></div>
+                    <span>Shaman</span>
+                </button>
+                <button class="class-card" data-class="Mage">
+                    <div class="class-icon mage"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_mage.jpg" alt="Mage"></div>
+                    <span>Mage</span>
+                </button>
+                <button class="class-card" data-class="Warlock">
+                    <div class="class-icon warlock"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warlock.jpg" alt="Warlock"></div>
+                    <span>Warlock</span>
+                </button>
+                <button class="class-card" data-class="Druid">
+                    <div class="class-icon druid"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_druid.jpg" alt="Druid"></div>
+                    <span>Druid</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Step 2: Spec Select -->
+        <section class="step hidden" id="stepSpec">
+            <div class="spec-grid" id="specGrid"></div>
+        </section>
+
+        <!-- Step 3: Phase Select -->
+        <section class="step hidden" id="stepPhase">
+            <div class="phase-tabs" id="phaseTabs"></div>
+        </section>
+
+        <!-- Step 4: BiS List -->
+        <section class="step hidden" id="stepBis">
+            <!-- Phase Switcher (inline tabs for quick phase navigation) -->
+            <div class="phase-switcher hidden" id="phaseSwitcher"></div>
+            <!-- Paperdoll Overview -->
+            <div class="paperdoll" id="paperdoll"></div>
+            <!-- GearScore summary -->
+            <div class="gs-summary" id="gsSummary"></div>
+            <!-- Profession filter -->
+            <div class="profession-filter hidden" id="professionFilter"></div>
+            <!-- Slot list -->
+            <div class="slot-list" id="slotList"></div>
+        </section>
+
+        <!-- Item Detail Modal -->
+        <div class="modal-overlay hidden" id="modalOverlay">
+            <div class="modal" id="itemModal">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Item Name</h2>
+                    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+            </div>
+        </div>
+
+        <!-- Ad placeholder -->
+        <div class="ad-slot" id="adSlot1">
+            <div class="ad-placeholder">Ad Space</div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/item-quality.js"></script>
+    <script src="js/item-sockets.js"></script>
+    <script src="js/gem-colors.js"></script>
+    <script src="js/gearscore.js"></script>
+    <script src="js/item-notes.js"></script>
+    <script src="js/pvp-data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
