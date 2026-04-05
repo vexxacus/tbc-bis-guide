@@ -1134,17 +1134,58 @@ body {
 /* But show icons inside the modal */
 .modal-body .iconsmall { display: inline-block; margin-right: 4px; vertical-align: middle; }
 
-/* Icon links — wrapping item icons in <a> for Wowhead tooltip on hover */
+/* Icon links — wrapping item icons in <span> for click → modal */
 .icon-link {
     display: inline-flex;
     text-decoration: none !important;
     border: none !important;
     line-height: 0;
+    cursor: pointer;
 }
 .icon-link:hover img {
     filter: brightness(1.2);
     transform: scale(1.05);
     transition: all 0.15s ease;
+}
+
+/* Item name links — <a data-wh-item> → open modal on click, hover tooltip from Wowhead */
+a[data-wh-item] {
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px dotted currentColor;
+}
+a[data-wh-item]:hover {
+    opacity: 0.85;
+}
+
+/* Wowhead button at the bottom of the modal */
+.modal-wowhead-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, border-color 0.15s;
+}
+.modal-wowhead-btn:hover {
+    background: var(--bg-card);
+    border-color: var(--accent);
+}
+.modal-wowhead-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    opacity: 0.8;
 }
 
 /* Hide any Wowhead-injected icons/elements in icon areas (safety net) */
@@ -1163,7 +1204,8 @@ body {
 .icon-link ins { display: none !important; }
 
 /* Override wowhead link colors inside our cards */
-.slot-bis-name a, .alt-name a {
+.slot-bis-name a, .slot-bis-name .wh-item-link,
+.alt-name a, .alt-name .wh-item-link {
     color: inherit !important;
     text-decoration: none !important;
     border: none !important;

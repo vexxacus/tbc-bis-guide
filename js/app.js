@@ -80,7 +80,7 @@
     const WH_ICON_CDN = 'https://wow.zamimg.com/images/wow/icons';
 
     function whItem(id, text, cls) {
-        return `<a href="https://www.wowhead.com/${WH}/item=${id}" data-wowhead="item=${id}&domain=${WH}" class="${cls||''}" target="_blank" rel="noopener">${text}</a>`;
+        return `<a href="https://www.wowhead.com/${WH}/item=${id}" data-wowhead="item=${id}&domain=${WH}" data-wh-item="${id}" class="${cls||''}">${text}</a>`;
     }
 
     function whSpell(id, text) {
@@ -108,8 +108,8 @@
         cssClass = cssClass || '';
         const iconName = (typeof ICONS !== 'undefined' && ICONS[itemId]) || 'inv_misc_questionmark';
         const img = `<img src="${WH_ICON_CDN}/${size}/${iconName}.jpg" alt="" class="${cssClass}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/${size}/inv_misc_questionmark.jpg'">`;
-        // Wrap in a Wowhead tooltip link so hovering the icon shows stats
-        return `<a href="https://www.wowhead.com/${WH}/item=${itemId}" data-wowhead="item=${itemId}&domain=${WH}" class="icon-link" target="_blank" rel="noopener">${img}</a>`;
+        // Intercept click → open modal, keep data-wowhead for hover tooltip
+        return `<a href="https://www.wowhead.com/${WH}/item=${itemId}" data-wowhead="item=${itemId}&domain=${WH}" data-wh-item="${itemId}" class="icon-link">${img}</a>`;
     }
 
     // Spec icons mapping (Wowhead CDN icon names)
@@ -1199,7 +1199,7 @@
                     const gemIcon = (typeof ICONS !== 'undefined' && ICONS[bestGem.id]) || 'inv_misc_gem_01';
                     const isMeta = (typeof GEM_COLORS !== 'undefined' && GEM_COLORS[bestGem.id]) === 'm';
                     const metaCls = isMeta ? ' gem-icon-meta' : '';
-                    parts.push(`<a href="https://www.wowhead.com/${WH}/item=${bestGem.id}" data-wowhead="item=${bestGem.id}&domain=${WH}" class="gem-row-link" target="_blank" rel="noopener"><img src="${WH_ICON_CDN}/small/${gemIcon}.jpg" class="gem-row-img${metaCls}" alt="${bestGem.name}"></a>`);
+                    parts.push(`<a href="https://www.wowhead.com/${WH}/item=${bestGem.id}" data-wowhead="item=${bestGem.id}&domain=${WH}" data-wh-item="${bestGem.id}" data-gem-name="${bestGem.name}" class="gem-row-link"><img src="${WH_ICON_CDN}/small/${gemIcon}.jpg" class="gem-row-img${metaCls}" alt="${bestGem.name}"></a>`);
                 }
                 if (!parts.length) return '';
                 return `<div class="gem-row">${parts.join('')}</div>`;
@@ -1216,7 +1216,7 @@
                 if (!gem) continue;
                 const gemIcon = (typeof ICONS !== 'undefined' && ICONS[gem.itemId]) || 'inv_misc_gem_01';
                 const metaCls = gem.isMeta ? ' gem-icon-meta' : '';
-                parts.push(`<a href="https://www.wowhead.com/${WH}/item=${gem.itemId}" data-wowhead="item=${gem.itemId}&domain=${WH}" class="gem-row-link" target="_blank" rel="noopener"><img src="${WH_ICON_CDN}/small/${gemIcon}.jpg" class="gem-row-img${metaCls}" alt="${gem.name}"></a>`);
+                parts.push(`<a href="https://www.wowhead.com/${WH}/item=${gem.itemId}" data-wowhead="item=${gem.itemId}&domain=${WH}" data-wh-item="${gem.itemId}" data-gem-name="${gem.name}" class="gem-row-link"><img src="${WH_ICON_CDN}/small/${gemIcon}.jpg" class="gem-row-img${metaCls}" alt="${gem.name}"></a>`);
             }
             if (!parts.length) return '';
             return `<div class="gem-row">${parts.join('')}</div>`;
@@ -1373,21 +1373,41 @@
         slotList.innerHTML = html;
         bindHintDismiss(slotList);
 
-        // Events — expand/collapse
+        // Events — expand/collapse slot-header (but open modal if icon/name clicked)
         slotList.querySelectorAll('.slot-header').forEach(hdr => {
             hdr.addEventListener('click', e => {
-                if (e.target.closest('a')) return;
+                const whEl = e.target.closest('[data-wh-item]');
+                if (whEl) return; // handled by delegation below
                 const grp = hdr.closest('.slot-group');
                 if (grp.querySelector('.slot-alts')) grp.classList.toggle('open');
             });
         });
 
-        // Open modal on alt-item click (but not on link)
+        // Open modal on alt-item click
         slotList.querySelectorAll('.alt-item').forEach(el => {
             el.addEventListener('click', e => {
-                if (e.target.closest('a')) return;
+                const whEl = e.target.closest('[data-wh-item]');
+                if (whEl) return; // handled by delegation below
                 openItemModal(el.dataset.itemId, el.closest('.slot-group').dataset.slot);
             });
+        });
+
+        // Global delegation — intercept all [data-wh-item] clicks in the list
+        slotList.addEventListener('click', e => {
+            const el = e.target.closest('[data-wh-item]');
+            if (!el) return;
+            e.preventDefault();   // stop Wowhead navigation
+            e.stopPropagation();
+            const itemId = el.dataset.whItem;
+            const gemName = el.dataset.gemName;
+            if (gemName !== undefined) {
+                openGemModal(itemId, gemName || el.querySelector('img')?.alt || '');
+            } else {
+                const slotGrp = el.closest('.slot-group');
+                const altItem = el.closest('.alt-item');
+                const slot = slotGrp?.dataset.slot || '';
+                openItemModal(altItem ? altItem.dataset.itemId : itemId, slot);
+            }
         });
 
         refreshWH();
@@ -1411,9 +1431,9 @@
         const itemData = phaseData?.items.find(i => i.itemId === itemId);
         const itemName = itemData?.name || source?.name || `Item #${itemId}`;
 
-        // Modal title with icon
+        // Modal title with icon — plain text (Wowhead button is at the bottom)
         const modalIcon = itemIcon(itemId, 'large', 'modal-item-icon');
-        modalTitle.innerHTML = `${modalIcon}${whItem(itemId, itemName, qualityClass(itemId))}`;
+        modalTitle.innerHTML = `${modalIcon}<span class="${qualityClass(itemId)}">${itemName}</span>`;
 
         const enchant = phaseData?.enchants?.find(e => e.slot.split('~').some(s => s.trim() === slot));
         const enchSrc = enchant ? getEnchantSource(enchant.spellId) : null;
@@ -1434,8 +1454,9 @@
             <div class="modal-gs">
                 <div class="modal-gs-box"><div class="modal-gs-label">Item GS</div><div class="modal-gs-val" style="color:${gsColor}">${itemGS}</div></div>
                 <div class="modal-gs-box"><div class="modal-gs-label">Est. iLevel</div><div class="modal-gs-val">${iLvl}</div></div>
-            </div>
-            <div class="modal-section"><div class="modal-section-title">How to Get</div>`;
+            </div>`;
+
+        html += `<div class="modal-section"><div class="modal-section-title">How to Get</div>`;
 
         if (source) {
             html += `<div class="modal-row"><span class="modal-row-icon">${srcIcon(source.sourceType)}</span>
@@ -1448,11 +1469,6 @@
                 <div><div class="modal-row-value">Source not in database</div><div class="modal-row-label">Item ID: ${itemId}</div></div></div>`;
         }
         html += '</div>';
-
-        html += `<div class="modal-section"><div class="modal-section-title">External</div>
-            <div class="modal-row"><span class="modal-row-icon">🌐</span><div>
-                <a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">View on Wowhead →</a>
-            </div></div></div>`;
 
         if (enchSrc) {
             html += `<div class="modal-section"><div class="modal-section-title">Recommended Enchant for ${slot}</div>
@@ -1472,6 +1488,59 @@
             }
             html += '</div>';
         }
+
+        // Prominent Wowhead button at the bottom
+        html += `<a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
+            <img src="${WH_ICON_CDN}/small/inv_misc_note_01.jpg" alt="" class="modal-wowhead-icon" onerror="this.style.display='none'">
+            View on Wowhead →
+        </a>`;
+
+        modalBody.innerHTML = html;
+        // Wire up wh-item clicks inside the modal (gems in "Recommended Gems")
+        modalBody.addEventListener('click', e => {
+            const el = e.target.closest('[data-wh-item]');
+            if (!el) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const id = el.dataset.whItem;
+            const gemName = el.dataset.gemName;
+            if (gemName !== undefined) {
+                openGemModal(id, gemName || el.querySelector('img')?.alt || '');
+            } else {
+                openItemModal(id, '');
+            }
+        }, { once: true });
+        modalOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        refreshWH();
+    }
+
+    // ─── Gem Modal ───────────────────────────────────────────────────
+    function openGemModal(itemId, gemName) {
+        const source = getGemSource(itemId);
+        const iconName = (typeof ICONS !== 'undefined' && ICONS[itemId]) || 'inv_misc_gem_01';
+
+        modalTitle.innerHTML = `
+            <span class="icon-link"><img src="${WH_ICON_CDN}/large/${iconName}.jpg" alt="" class="modal-item-icon" onerror="this.src='${WH_ICON_CDN}/large/inv_misc_questionmark.jpg'"></span>
+            <span class="q-epic">${gemName || 'Gem #'+itemId}</span>`;
+
+        let html = '';
+        if (source) {
+            html += `<div class="modal-section"><div class="modal-section-title">How to Get</div>
+                <div class="modal-row"><span class="modal-row-icon">${srcIcon(source.sourceType)}</span>
+                    <div><div class="modal-row-label">${source.sourceType}</div><div class="modal-row-value">${source.source || 'Unknown'}</div></div></div>`;
+            if (source.sourceLocation)
+                html += `<div class="modal-row"><span class="modal-row-icon">📍</span>
+                    <div><div class="modal-row-label">Location</div><div class="modal-row-value">${source.sourceLocation}</div></div></div>`;
+            html += '</div>';
+        } else {
+            html += `<div class="modal-section"><div class="modal-row"><span class="modal-row-icon">❓</span>
+                <div><div class="modal-row-value">Source not in database</div><div class="modal-row-label">Item ID: ${itemId}</div></div></div></div>`;
+        }
+
+        html += `<a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
+            View on Wowhead →
+        </a>`;
 
         modalBody.innerHTML = html;
         modalOverlay.classList.remove('hidden');
