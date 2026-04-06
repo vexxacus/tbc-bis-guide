@@ -184,12 +184,10 @@ function main() {
     fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
     console.log(`\n✅ Written to ${outPath} (${(fs.statSync(outPath).size / 1024).toFixed(0)} KB)`);
 
-    // Also write a compact JS module version for the web app
-    const jsOut = `// Auto-generated from WoW addon Lua data\nconst DATA = ${JSON.stringify(data)};\n`;
-    const jsPath = path.join(__dirname, 'js', 'data.js');
-    fs.mkdirSync(path.join(__dirname, 'js'), { recursive: true });
-    fs.writeFileSync(jsPath, jsOut);
-    console.log(`✅ Written to ${jsPath} (${(fs.statSync(jsPath).size / 1024).toFixed(0)} KB)`);
+    // NOTE: js/data.js is no longer written here.
+    // Run `node sync-data.js` (or `npm run sync`) after this script to apply
+    // any manual fixes in data.json and update js/data.js for the web app.
+    console.log(`\n👉  Next step: run  node sync-data.js  to update js/data.js`);
 }
 
 main();

@@ -33107,7 +33107,7 @@
             {
               "itemId": "24557",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Gladiator's War Staff"
             },
             {
@@ -38299,10 +38299,10 @@
               "name": "Ring of Unyielding Force"
             },
             {
-              "itemId": "13503",
+              "itemId": "28830",
               "slot": "Trinket",
-              "rank": "BIS",
-              "name": "Alchemist's Stone"
+              "rank": "BIS Thrt",
+              "name": "Dragonspine Trophy"
             },
             {
               "itemId": "23206",
@@ -38311,10 +38311,10 @@
               "name": "Mark of the Champion"
             },
             {
-              "itemId": "28830",
+              "itemId": "13503",
               "slot": "Trinket",
-              "rank": "BIS Thrt",
-              "name": "Dragonspine Trophy"
+              "rank": "BIS",
+              "name": "Alchemist's Stone"
             },
             {
               "itemId": "19406",
@@ -61771,7 +61771,7 @@
             {
               "itemId": "34203",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Grip of Mannoroth"
             },
             {
@@ -64047,7 +64047,7 @@
             {
               "itemId": "30723",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Talon of the Tempest"
             },
             {
@@ -65551,7 +65551,7 @@
             {
               "itemId": "34182",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Grand Magister's Staff of Torrents"
             },
             {
@@ -69475,7 +69475,7 @@
             {
               "itemId": "34182",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Grand Magister's Staff of Torrents"
             },
             {
@@ -72439,7 +72439,7 @@
             {
               "itemId": "32053",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Spellblade"
             },
             {
@@ -72833,7 +72833,7 @@
             {
               "itemId": "32053",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Spellblade"
             },
             {
@@ -73291,7 +73291,7 @@
             {
               "itemId": "34182",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Grand Magister's Staff of Torrents"
             },
             {
@@ -78619,16 +78619,16 @@
               "name": "Gnomeregan Auto-Blocker 600"
             },
             {
-              "itemId": "32450",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Gladiator's Gavel"
-            },
-            {
               "itemId": "28802",
               "slot": "Main Hand",
               "rank": "BIS",
               "name": "Bloodmaw Magus-Blade"
+            },
+            {
+              "itemId": "32450",
+              "slot": "Main Hand",
+              "rank": "BIS",
+              "name": "Gladiator's Gavel"
             },
             {
               "itemId": "29155",
@@ -87213,7 +87213,7 @@
             {
               "itemId": "30908",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Apostle of Argus"
             },
             {
@@ -87849,7 +87849,7 @@
             {
               "itemId": "30908",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Apostle of Argus"
             },
             {
@@ -90517,7 +90517,7 @@
             {
               "itemId": "32963",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Gavel"
             },
             {
@@ -91083,7 +91083,7 @@
             {
               "itemId": "32963",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Gavel"
             },
             {
@@ -91883,7 +91883,7 @@
             {
               "itemId": "32374",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Zhar'doom, Greatstaff of the Devourer"
             },
             {
@@ -96085,7 +96085,7 @@
             {
               "itemId": "32450",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Gladiator's Gavel"
             },
             {
@@ -96853,7 +96853,7 @@
             {
               "itemId": "32237",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "The Maelstrom's Fury"
             },
             {
@@ -97723,7 +97723,7 @@
             {
               "itemId": "34009",
               "slot": "Main Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Hammer of Judgement"
             },
             {
@@ -99043,7 +99043,7 @@
             {
               "itemId": "32374",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Zhar'doom, Greatstaff of the Devourer"
             },
             {
@@ -99805,16 +99805,16 @@
               "name": "Felstalker Bracers"
             },
             {
-              "itemId": "29503",
-              "slot": "Hands",
-              "rank": "BIS",
-              "name": "Cobrascale Gloves"
-            },
-            {
               "itemId": "28776",
               "slot": "Hands",
               "rank": "BIS",
               "name": "Liar's Tongue Gloves"
+            },
+            {
+              "itemId": "29503",
+              "slot": "Hands",
+              "rank": "BIS",
+              "name": "Cobrascale Gloves"
             },
             {
               "itemId": "30644",
@@ -113455,6 +113455,12 @@
               "name": "Quagmirran's Eye"
             },
             {
+              "itemId": "29370",
+              "slot": "Trinket",
+              "rank": "BIS",
+              "name": "Icon of the Silver Crescent"
+            },
+            {
               "itemId": "23207",
               "slot": "Trinket",
               "rank": "BIS",
@@ -113465,12 +113471,6 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Scryer's Bloodgem"
-            },
-            {
-              "itemId": "29370",
-              "slot": "Trinket",
-              "rank": "BIS",
-              "name": "Icon of the Silver Crescent"
             },
             {
               "itemId": "19337",
@@ -113527,16 +113527,16 @@
               "name": "Eternium Runed Blade"
             },
             {
-              "itemId": "29272",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Orb of the Soul-Eater"
-            },
-            {
               "itemId": "29273",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Khadgar's Knapsack"
+            },
+            {
+              "itemId": "29272",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Orb of the Soul-Eater"
             },
             {
               "itemId": "28734",
@@ -124447,12 +124447,6 @@
               "name": "Ring of Reciprocity"
             },
             {
-              "itemId": "30834",
-              "slot": "Ring",
-              "rank": "BIS",
-              "name": "Shapeshifter's Signet"
-            },
-            {
               "itemId": "28757",
               "slot": "Ring",
               "rank": "BIS",
@@ -124463,6 +124457,12 @@
               "slot": "Ring",
               "rank": "BIS",
               "name": "Mithril Band of the Unscarred"
+            },
+            {
+              "itemId": "30834",
+              "slot": "Ring",
+              "rank": "BIS",
+              "name": "Shapeshifter's Signet"
             },
             {
               "itemId": "29379",
@@ -124513,6 +124513,12 @@
               "name": "Slayer's Crest"
             },
             {
+              "itemId": "28438",
+              "slot": "Main Hand",
+              "rank": "BIS",
+              "name": "Dragonmaw"
+            },
+            {
               "itemId": "31332",
               "slot": "Main Hand",
               "rank": "BIS",
@@ -124537,16 +124543,28 @@
               "name": "Spiteblade"
             },
             {
-              "itemId": "28438",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Dragonmaw"
-            },
-            {
               "itemId": "29124",
               "slot": "Main Hand",
               "rank": "Alt",
               "name": "Vindicator's Brand"
+            },
+            {
+              "itemId": "28295",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Gladiator's Slicer"
+            },
+            {
+              "itemId": "30733",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Hope Ender"
+            },
+            {
+              "itemId": "28729",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Spiteblade"
             },
             {
               "itemId": "28307",

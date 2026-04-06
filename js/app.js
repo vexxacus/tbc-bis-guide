@@ -1058,13 +1058,13 @@
         // Remaining items are alts for both slots.
         function splitDualSlot(buf, slotName1, slotName2) {
             if (!buf.length) return;
-            // Sort: BIS first (by original order which is already ranked)
-            const bisItems = buf.filter(i => i.rank?.toLowerCase().startsWith('bis') || i.rank?.toLowerCase().includes('pvp'));
-            const altItems = buf.filter(i => !bisItems.includes(i));
-            const allSorted = [...bisItems, ...altItems];
+            // Trust data.json order — it is already ranked correctly (BIS first).
+            // Do NOT re-sort by rank string, as some BIS items carry rank="Alt" due
+            // to how parse-lua-data.js assigns ranks.
+            const allSorted = buf;
 
             // Slot 1: first item is BIS, rest are alts
-            // Slot 2: second BIS item (or first alt) is primary, rest are alts
+            // Slot 2: second item is primary, rest are alts
             const primary1 = allSorted[0];
             const primary2 = allSorted[1];
             const altsFor1 = allSorted.slice(1); // everything else is alt for slot 1
@@ -1523,17 +1523,53 @@
 
         const enchant = phaseData?.enchants?.find(e => e.slot.split('~').some(s => s.trim() === slot));
         const enchSrc = enchant ? getEnchantSource(enchant.spellId) : null;
-        // Build effective gems including inherited meta gem
-        const modalGems = [...(phaseData?.gems || [])];
-        if (!modalGems.find(g => g.isMeta) && specData && state.selectedPhase != null) {
+        // Build effective gem list for this specific item, matched to its sockets.
+        // Only show gems that correspond to the item's actual socket colors — never
+        // show a meta gem for a non-head slot that has no meta socket.
+        const allPhaseGems = [...(phaseData?.gems || [])];
+        let modalMetaGem = allPhaseGems.find(g => g.isMeta) || null;
+        // Inherit meta gem from nearest phase if missing
+        if (!modalMetaGem && specData && state.selectedPhase != null) {
             const phases = Object.keys(specData.phases).map(Number).sort();
             const lower = phases.filter(p => p < state.selectedPhase).reverse();
             const higher = phases.filter(p => p > state.selectedPhase);
             for (const p of [...lower, ...higher]) {
                 const pg = specData.phases[p]?.gems || [];
                 const found = pg.find(g => g.isMeta);
-                if (found) { modalGems.unshift(found); break; }
+                if (found) { modalMetaGem = found; break; }
             }
+        }
+        const modalRegularGems = allPhaseGems.filter(g => !g.isMeta);
+
+        // Match gems to this item's actual sockets (same logic as inline gem overlay)
+        const itemSockets = (typeof ITEM_SOCKETS !== 'undefined' && ITEM_SOCKETS[itemId]) || null;
+        let modalGems = []; // gems to display in modal
+        if (itemSockets && itemSockets.length) {
+            const seen = new Set();
+            for (const socketColor of itemSockets) {
+                let gem = null;
+                if (socketColor === 'm') {
+                    gem = modalMetaGem;
+                } else {
+                    // Same priority logic as matchGemsToSockets: exact > multi-color > any
+                    let exact = null, multi = null;
+                    for (const g of modalRegularGems) {
+                        const gc = (typeof GEM_COLORS !== 'undefined' && GEM_COLORS[g.itemId]) || '';
+                        if (!gc) { if (!multi) multi = g; continue; }
+                        if (gc === socketColor) { exact = g; break; }
+                        if (gc.includes(socketColor) && !multi) multi = g;
+                    }
+                    gem = exact || multi || (modalRegularGems.length ? modalRegularGems[0] : null);
+                }
+                if (gem && !seen.has(gem.itemId)) {
+                    seen.add(gem.itemId);
+                    modalGems.push(gem);
+                }
+            }
+        } else {
+            // Item has no socket data — fall back to showing all phase gems except meta
+            // (don't assume there's a meta socket if we have no socket info)
+            modalGems = modalRegularGems;
         }
 
         let html = `
