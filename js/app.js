@@ -1056,6 +1056,7 @@
         // ── Split Ring and Trinket into two independent slots ──
         // BIS items 1 and 2 become the primary item for slot 1 and 2 respectively.
         // Remaining items are alts for both slots.
+        // Unique items cannot appear as primary in BOTH slot 1 and slot 2.
         function splitDualSlot(buf, slotName1, slotName2) {
             if (!buf.length) return;
             // Trust data.json order — it is already ranked correctly (BIS first).
@@ -1063,12 +1064,18 @@
             // to how parse-lua-data.js assigns ranks.
             const allSorted = buf;
 
-            // Slot 1: first item is BIS, rest are alts
-            // Slot 2: second item is primary, rest are alts
             const primary1 = allSorted[0];
-            const primary2 = allSorted[1];
+            // For slot 2: skip any item that is Unique AND same as primary1
+            // (you can't wear two of the same Unique ring/trinket)
+            const hasUnique = typeof ITEM_UNIQUE !== 'undefined';
+            const primary2 = allSorted.slice(1).find(i => {
+                if (!hasUnique) return true;
+                if (ITEM_UNIQUE.has(parseInt(i.itemId)) && i.itemId === primary1?.itemId) return false;
+                return true;
+            }) || allSorted[1]; // fallback to index 1 if no distinct item found
+
             const altsFor1 = allSorted.slice(1); // everything else is alt for slot 1
-            const altsFor2 = allSorted.filter((_, i) => i !== 1); // remove primary2, keep others as alts
+            const altsFor2 = allSorted.filter(i => i !== primary2); // remove primary2, keep others as alts
 
             if (primary1) {
                 slotGroups[slotName1] = [
@@ -1098,10 +1105,30 @@
         const isDualWield = DUAL_WIELD_SPECS[specKey];
 
         if (!pvpSpecData && isDualWield && slotGroups['Main Hand']?.length && !slotGroups['Off Hand']?.length) {
-            // Clone MH items as OH recommendations
-            slotGroups['Off Hand'] = slotGroups['Main Hand'].map(i => ({
-                ...i, slot: 'Off Hand', _clonedFromMH: true
-            }));
+            // Clone MH items as OH recommendations, but filter out:
+            // 1. Items that are Main Hand only (cannot be equipped in OH)
+            // 2. Items that are Unique (cannot wear two of the same)
+            const isRestricted = typeof ITEM_MAIN_HAND_ONLY !== 'undefined' && typeof ITEM_UNIQUE !== 'undefined';
+            slotGroups['Off Hand'] = slotGroups['Main Hand']
+                .filter(i => {
+                    const id = parseInt(i.itemId);
+                    if (!isRestricted) return true;
+                    if (ITEM_MAIN_HAND_ONLY.has(id)) return false; // MH only — can't go in OH
+                    if (ITEM_UNIQUE.has(id)) return false;         // Unique — can't dual-wield same item
+                    return true;
+                })
+                .map(i => ({ ...i, slot: 'Off Hand', _clonedFromMH: true }));
+            // If nothing is valid for OH after filtering, remove the empty group
+            if (!slotGroups['Off Hand'].length) delete slotGroups['Off Hand'];
+        }
+
+        // ── Also filter MH slot: remove MH-only items that snuck into OH from data ──
+        if (!pvpSpecData && slotGroups['Off Hand']?.length) {
+            const isRestricted = typeof ITEM_MAIN_HAND_ONLY !== 'undefined';
+            if (isRestricted) {
+                slotGroups['Off Hand'] = slotGroups['Off Hand'].filter(i => !ITEM_MAIN_HAND_ONLY.has(parseInt(i.itemId)));
+                if (!slotGroups['Off Hand'].length) delete slotGroups['Off Hand'];
+            }
         }
 
         // ── Profession filter: discover which professions appear in BIS items ──
