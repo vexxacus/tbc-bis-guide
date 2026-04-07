@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-07T06:24:14.386Z",
+  "generatedAt": "2026-04-07T12:18:50.619Z",
   "itemSources": {
     "8345": {
       "name": "Wolfshead Helm",
@@ -37902,7 +37902,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             }
           ]
         },
@@ -41144,7 +41144,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             }
           ]
         },
@@ -42114,7 +42114,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             }
           ]
         },
@@ -43242,7 +43242,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             }
           ]
         },
@@ -43806,7 +43806,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             }
           ]
         }
@@ -49104,7 +49104,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -52524,7 +52524,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -53124,7 +53124,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -53678,7 +53678,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -57092,7 +57092,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -57688,7 +57688,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30252",
@@ -58866,7 +58866,7 @@
             },
             {
               "spellId": "27977",
-              "slot": "Main Hand"
+              "slot": "Two Hand"
             },
             {
               "spellId": "30260",
@@ -124513,10 +124513,10 @@
               "name": "Slayer's Crest"
             },
             {
-              "itemId": "31332",
+              "itemId": "28438",
               "slot": "Main Hand",
               "rank": "BIS",
-              "name": "Blinkstrike"
+              "name": "Dragonmaw"
             },
             {
               "itemId": "28295",
@@ -124537,10 +124537,10 @@
               "name": "Spiteblade"
             },
             {
-              "itemId": "28438",
+              "itemId": "31332",
               "slot": "Main Hand",
               "rank": "Alt",
-              "name": "Dragonmaw"
+              "name": "Blinkstrike"
             },
             {
               "itemId": "29124",
