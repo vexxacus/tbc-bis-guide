@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-07T12:18:50.619Z",
+  "generatedAt": "2026-04-07T13:13:39.168Z",
   "itemSources": {
     "8345": {
       "name": "Wolfshead Helm",
@@ -80551,28 +80551,10 @@
               "name": "Tide-stomper's Greaves"
             },
             {
-              "itemId": "32362",
-              "slot": "Feet",
-              "rank": "BIS",
-              "name": "Pendant of Titans"
-            },
-            {
               "itemId": "33523",
               "slot": "Feet",
               "rank": "BIS Thrt",
               "name": "Sabatons of the Righteous Defender"
-            },
-            {
-              "itemId": "30007",
-              "slot": "Feet",
-              "rank": "BIS Mit",
-              "name": "The Darkener's Grasp"
-            },
-            {
-              "itemId": "33921",
-              "slot": "Feet",
-              "rank": "BIS Thrt",
-              "name": "Vindicator's Pendant of Dominance"
             },
             {
               "itemId": "30894",
@@ -80591,6 +80573,24 @@
               "slot": "Feet",
               "rank": "Alt Mit",
               "name": "Jungle Stompers"
+            },
+            {
+              "itemId": "32362",
+              "slot": "Neck",
+              "rank": "BIS",
+              "name": "Pendant of Titans"
+            },
+            {
+              "itemId": "30007",
+              "slot": "Neck",
+              "rank": "BIS Mit",
+              "name": "The Darkener's Grasp"
+            },
+            {
+              "itemId": "33921",
+              "slot": "Neck",
+              "rank": "BIS Thrt",
+              "name": "Vindicator's Pendant of Dominance"
             },
             {
               "itemId": "30083",
@@ -129723,6 +129723,126 @@
               "slot": "Neck",
               "rank": "Alt Mit",
               "name": "Shattered Sun Pendant of Resolve"
+            },
+            {
+              "itemId": "34213",
+              "slot": "Ring",
+              "rank": "BIS",
+              "name": "Ring of Hardened Resolve"
+            },
+            {
+              "itemId": "34888",
+              "slot": "Ring",
+              "rank": "BIS Mit",
+              "name": "Ring of the Stalwart Protector"
+            },
+            {
+              "itemId": "32261",
+              "slot": "Ring",
+              "rank": "Alt Mit",
+              "name": "Band of the Abyssal Lord"
+            },
+            {
+              "itemId": "32307",
+              "slot": "Ring",
+              "rank": "Alt Mit",
+              "name": "Band of Eternity"
+            },
+            {
+              "itemId": "29279",
+              "slot": "Ring",
+              "rank": "Alt Mit",
+              "name": "Violet Signet of the Great Protector"
+            },
+            {
+              "itemId": "30083",
+              "slot": "Ring",
+              "rank": "Alt Mit",
+              "name": "Ring of Sundered Souls"
+            },
+            {
+              "itemId": "34362",
+              "slot": "Ring",
+              "rank": "BIS Thrt",
+              "name": "Hard Khorium Band"
+            },
+            {
+              "itemId": "34889",
+              "slot": "Ring",
+              "rank": "Alt Thrt",
+              "name": "Angelista's Revenge"
+            },
+            {
+              "itemId": "32259",
+              "slot": "Ring",
+              "rank": "Alt Thrt",
+              "name": "Ring of Deceitful Intent"
+            },
+            {
+              "itemId": "34473",
+              "slot": "Trinket",
+              "rank": "BIS Mit",
+              "name": "Commendation of Kael'thas"
+            },
+            {
+              "itemId": "33830",
+              "slot": "Trinket",
+              "rank": "BIS",
+              "name": "Ancient Aqir Artifact"
+            },
+            {
+              "itemId": "31858",
+              "slot": "Trinket",
+              "rank": "BIS Stam",
+              "name": "Darkmoon Card: Vengeance"
+            },
+            {
+              "itemId": "31859",
+              "slot": "Trinket",
+              "rank": "Alt Stam",
+              "name": "Darkmoon Card: Madness"
+            },
+            {
+              "itemId": "32501",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Shadowmoon Insignia"
+            },
+            {
+              "itemId": "28528",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Moroes' Lucky Pocket Watch"
+            },
+            {
+              "itemId": "34428",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Steely Naaru Sliver"
+            },
+            {
+              "itemId": "28573",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Shard of Contempt"
+            },
+            {
+              "itemId": "29391",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Icon of Unyielding Courage"
+            },
+            {
+              "itemId": "28579",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Romulo's Poison Vial"
+            },
+            {
+              "itemId": "28830",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Abacus of Violent Odds"
             },
             {
               "itemId": "34164",
