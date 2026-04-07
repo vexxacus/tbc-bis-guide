@@ -458,6 +458,36 @@ body {
     background: var(--border);
 }
 
+/* ─── SEO Description ────────────────────────────────────────────── */
+.seo-description {
+    margin-bottom: 12px;
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.seo-desc-inner {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.seo-desc-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.seo-desc-text {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
 /* ─── Paperdoll Overview ─────────────────────────────────────────── */
 .paperdoll {
     position: relative;
@@ -623,6 +653,16 @@ body {
 
 .prof-chip:not(.active) .prof-chip-icon {
     filter: grayscale(100%) brightness(0.6);
+}
+
+.pvp-rating-chip .prof-chip-pvp-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.pvp-rating-chip:not(.active) .prof-chip-pvp-icon {
+    filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 /* ─── Slot List ───────────────────────────────────────────────────── */

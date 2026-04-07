@@ -13,8 +13,424 @@
         isPvP: false,
         pvpKey: null,   // e.g. "Rogue|Subtlety" — key into PVP_DATA.specs
         history: [],
-        excludedProfessions: new Set()  // professions to hide from BiS list
+        excludedProfessions: new Set(),  // professions to hide from BiS list
+        hidePvpRating: false,            // hide rating-gated PvP items (Merciless/Vengeful/Brutal weapons & shoulders)
+        _pvpRatingLoaded: false
     };
+
+    // ─── SEO / URL routing ───────────────────────────────────────────
+
+    /** Convert display names to URL-friendly slugs */
+    function toSlug(str) {
+        return str.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '');
+    }
+
+    /** Reverse-map slug → class name */
+    const CLASS_SLUG_MAP = {};
+    const SPEC_SLUG_MAP  = {};   // "warrior-fury" → {cls, spec}
+    const PHASE_SLUG_MAP = {
+        'pre-bis': 0, 'phase-1': 1, 'phase-2': 2,
+        'phase-3': 3, 'phase-4': 4, 'phase-5': 5
+    };
+    const PHASE_TO_SLUG = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
+
+    // Populated after CLASS_META is defined (see below)
+    function buildSlugMaps() {
+        for (const cls of Object.keys(CLASS_META)) {
+            CLASS_SLUG_MAP[toSlug(cls)] = cls;
+            for (const spec of CLASS_META[cls].specs) {
+                SPEC_SLUG_MAP[`${toSlug(cls)}-${toSlug(spec)}`] = { cls, spec };
+            }
+        }
+    }
+
+    /**
+     * Build the canonical path for the current state.
+     * /warrior/fury/phase-2  |  /warrior/fury/pre-bis  |  /warrior/fury  |  /warrior  |  /
+     */
+    function buildPath() {
+        if (!state.selectedClass) return '/';
+        const cls = toSlug(state.selectedClass);
+        if (!state.selectedSpec || state.isPvP) return `/${cls}`;
+        const spec = toSlug(state.selectedSpec);
+        if (state.selectedPhase == null) return `/${cls}/${spec}`;
+        const phase = PHASE_TO_SLUG[state.selectedPhase] || `phase-${state.selectedPhase}`;
+        return `/${cls}/${spec}/${phase}`;
+    }
+
+    /** Push a new browser history entry matching current state */
+    function pushRoute() {
+        const path = buildPath();
+        if (location.pathname !== path) {
+            history.pushState({ ...state, excludedProfessions: [...state.excludedProfessions] }, '', path);
+        }
+    }
+
+    /** Replace current history entry (for in-place updates like phase switcher) */
+    function replaceRoute() {
+        const path = buildPath();
+        history.replaceState({ ...state, excludedProfessions: [...state.excludedProfessions] }, '', path);
+    }
+
+    /** Try to parse the current URL path and restore state */
+    function restoreFromUrl() {
+        const parts = location.pathname.replace(/^\//, '').split('/').filter(Boolean);
+        if (!parts.length) return false;
+
+        const clsSlug = parts[0];
+        const cls = CLASS_SLUG_MAP[clsSlug];
+        if (!cls) return false;
+
+        if (parts.length === 1) {
+            // /warrior — show spec select
+            state.selectedClass = cls;
+            headerTitle.textContent = cls;
+            headerTitle.style.color = CLASS_META[cls].color;
+            headerSub.textContent = 'Choose your spec';
+            renderSpecGrid(cls);
+            state.history.push('class');
+            showStep(stepSpec);
+            return true;
+        }
+
+        const specSlug = parts[1];
+        const specEntry = SPEC_SLUG_MAP[`${clsSlug}-${specSlug}`];
+        if (!specEntry) return false;
+
+        state.selectedClass = specEntry.cls;
+        state.selectedSpec = specEntry.spec;
+
+        if (parts.length === 2) {
+            // /warrior/fury — show phase select
+            headerTitle.textContent = `${cls} — ${specEntry.spec}`;
+            headerTitle.style.color = CLASS_META[cls].color;
+            headerSub.textContent = 'Choose phase';
+            renderSpecGrid(cls);      // needed so spec grid exists
+            renderPhaseGrid();
+            state.history.push('class', 'spec');
+            showStep(stepPhase);
+            return true;
+        }
+
+        const phaseSlug = parts[2];
+        const phase = PHASE_SLUG_MAP[phaseSlug];
+        if (phase === undefined) return false;
+
+        state.selectedPhase = phase;
+        const phInfo = PHASE_NAMES[phase] || { label: `Phase ${phase}`, desc: '' };
+        headerTitle.innerHTML = `${specEntry.spec} — ${phInfo.label}`;
+        headerTitle.style.color = CLASS_META[cls].color;
+        headerSub.textContent = phInfo.desc;
+        renderSpecGrid(cls);         // spec grid must exist for other flows
+        renderBisList();
+        state.history.push('class', 'spec', 'phase');
+        showStep(stepBis);
+        return true;
+    }
+
+    // ─── Meta tag updater ────────────────────────────────────────────
+
+    const BASE_URL = 'https://tbc-bis-guide.web.app';
+
+    /**
+     * Update <title>, meta description, canonical and OG tags to reflect
+     * the currently selected class/spec/phase.
+     */
+    function updateSeoMeta() {
+        const titleEl        = document.querySelector('title');
+        const descEl         = document.getElementById('metaDescription');
+        const canonicalEl    = document.getElementById('canonicalLink');
+        const ogUrlEl        = document.getElementById('ogUrl');
+        const ogTitleEl      = document.getElementById('ogTitle');
+        const ogDescEl       = document.getElementById('ogDescription');
+        const twTitleEl      = document.getElementById('twTitle');
+        const twDescEl       = document.getElementById('twDescription');
+
+        let pageTitle, metaDesc, path;
+
+        if (!state.selectedClass) {
+            pageTitle = 'TBC Classic BiS Guide — Best in Slot for Every Class & Spec';
+            metaDesc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell. Includes enchants, gems, and phase-by-phase progression.';
+            path      = '/';
+        } else if (!state.selectedSpec || state.isPvP) {
+            pageTitle = `${state.selectedClass} BiS Guide — TBC Classic`;
+            metaDesc  = `Best in Slot gear lists for every ${state.selectedClass} spec in TBC Classic — from Pre-BiS dungeons to Sunwell Plateau.`;
+            path      = `/${toSlug(state.selectedClass)}`;
+        } else if (state.selectedPhase == null) {
+            pageTitle = `${state.selectedSpec} ${state.selectedClass} BiS Guide — TBC Classic`;
+            metaDesc  = `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic. Choose a phase to see the full gear list.`;
+            path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}`;
+        } else {
+            const phInfo  = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
+            const phSlug  = PHASE_TO_SLUG[state.selectedPhase] || `phase-${state.selectedPhase}`;
+            const specDesc = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
+            pageTitle = `${state.selectedSpec} ${state.selectedClass} ${phInfo.label} BiS — TBC Classic`;
+            metaDesc  = specDesc || `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic ${phInfo.label}. Full gear list with enchants, gems, and item sources.`;
+            path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/${phSlug}`;
+        }
+
+        const fullUrl = `${BASE_URL}${path}`;
+
+        if (titleEl)     titleEl.textContent        = pageTitle;
+        if (descEl)      descEl.setAttribute('content', metaDesc);
+        if (canonicalEl) canonicalEl.setAttribute('href', fullUrl);
+        if (ogUrlEl)     ogUrlEl.setAttribute('content', fullUrl);
+        if (ogTitleEl)   ogTitleEl.setAttribute('content', pageTitle);
+        if (ogDescEl)    ogDescEl.setAttribute('content', metaDesc);
+        if (twTitleEl)   twTitleEl.setAttribute('content', pageTitle);
+        if (twDescEl)    twDescEl.setAttribute('content', metaDesc);
+    }
+
+    // ─── Spec/phase contextual descriptions ──────────────────────────
+
+    /**
+     * Static descriptions per spec×phase covering stat priorities, key items, and raid context.
+     * Used both for the in-page description block and for meta tags.
+     */
+    const SPEC_PHASE_DESCRIPTIONS = {
+        'Warrior-Fury': {
+            0: "Pre-raid Fury Warriors build around Dragonmaw and Blinkstrike for dual-wield, pushing hit rating to cap and raw Attack Power from crafted Ragesteel gear and dungeon drops. Trinkets like Bloodlust Brooch and Abacus of Violent Odds carry your burst until Karazhan.",
+            1: "Phase 1 Fury BiS revolves around Dragonspine Trophy for the haste proc and fast weapons like Gladiator's Slicer and Hope Ender from Karazhan and the Arena vendor. Warbringer T4 pieces provide strong Strength itemisation, with Badge of the Swarmguard remaining a solid trinket.",
+            2: "Phase 2 Fury Warriors prioritise Dragonstrike and Talon of Azshara from SSC/TK for fast dual-wield damage. Destroyer Breastplate and Belt of One-Hundred Deaths are key gear targets. Dragonspine Trophy, Tsunami Talisman, and Solarian's Sapphire define the trinket setup.",
+            3: "In Phase 3 (Black Temple & Hyjal) Fury Warriors upgrade to Warglaives of Azzinoth or Vengeful Gladiator's weapons. Onslaught Breastplate plus Belt of One-Hundred Deaths form the core of the set, with Dragonspine Trophy and Madness of the Betrayer as the top trinkets.",
+            4: "Phase 4 adds Cursed Vision of Sargeras and the Onslaught Battle-Helm. Warglaives remain the best weapons. Dragonspine Trophy, Berserker's Call, and Madness of the Betrayer trinkets combine to maximise sustained Attack Power and haste.",
+            5: "Sunwell Fury BiS centres on Warglaives of Azzinoth paired with Onslaught and crafted Sunwell pieces. Shard of Contempt and Dragonspine Trophy are the top trinkets. Hard Khorium Choker and Band of Ruinous Delight round out the jewellery."
+        },
+        'Warrior-Arms': {
+            0: "Pre-raid Arms Warriors wield Lionheart Champion (Blacksmithing BoP) or Dragonmaw as top two-hand options. Vengeance Wrap and crafted Ragesteel pieces establish the stat base, with Bloodlust Brooch and Abacus of Violent Odds as key trinkets.",
+            1: "Phase 1 Arms BiS features Lionheart Champion or Blinkstrike as top weapons alongside Dragonspine Trophy as the standout trinket. Warbringer T4 set pieces provide strong Strength, and Terrorweave Tunic slots in as a non-set chest option.",
+            2: "Phase 2 Arms Warriors upgrade to Twinblade of the Phoenix or Lionheart Executioner. Destroyer Breastplate and Belt of One-Hundred Deaths are central pieces. Dragonspine Trophy and Tsunami Talisman dominate the trinket slots.",
+            3: "Black Temple Arms Warriors pursue Cataclysm's Edge or Soul Cleaver as two-handed upgrades. Onslaught Breastplate and Belt of One-Hundred Deaths remain staples. Dragonspine Trophy and Madness of the Betrayer define the Phase 3 trinket setup.",
+            4: "Phase 4 adds Onslaught Battle-Helm and Cursed Vision of Sargeras. Cataclysm's Edge or Twinblade of the Phoenix remain the weapon choices. Dragonspine Trophy, Berserker's Call, and Madness of the Betrayer keep the Attack Power ceiling high.",
+            5: "Sunwell Arms BiS peaks with Apolyon, the Soul-Render or Cataclysm's Edge as weapons. Warglaives of Azzinoth in main/off-hand become an option. Shard of Contempt and Dragonspine Trophy are the premier trinkets."
+        },
+        'Warrior-Protection': {
+            0: "Pre-raid Protection Warriors focus on defense cap (490) with pieces like Faceguard of Determination and crafted Felsteel. Dragonmaw provides threat while Azure-Shield of Coldarra and Crest of the Sha'tar fill the off-hand shield slot.",
+            1: "Phase 1 Prot BiS centres on the Warbringer T4 set from Karazhan/Gruul/Mag. King's Defender and Dragonmaw are top one-handers; Aldori Legacy Defender is the best-in-slot shield. Moroes' Lucky Pocket Watch is a key threat-and-avoidance trinket.",
+            2: "Phase 2 upgrades include Destroyer Shoulderguards, Destroyer Chestguard, and Destroyer Legguards from SSC/TK. Mallet of the Tides is a strong threat weapon; Aldori Legacy Defender remains the shield. Royal Cloak of Arathi Kings fills the back slot.",
+            3: "Black Temple Prot Warriors acquire Vengeful Gladiator's Plate set pieces and The Brutalizer or Blade of Savagery for threat. Bulwark of Azzinoth is the iconic Phase 3 shield. Pendant of Titans improves threat through spell damage.",
+            4: "Phase 4 adds Dory's Embrace and Brooch of Deftness. The weapon and shield setup remains The Brutalizer plus Bulwark of Azzinoth. Bracers of the Ancient Phalanx provide a strong wrist upgrade.",
+            5: "Sunwell Prot BiS features Brutal Gladiator's Plate shoulders and chest, Onslaught Wristguards and Waistguard, and Dragonscale-Encrusted Longblade as a threat weapon. Sword Breaker's Bulwark is the top shield. Collar of the Pit Lord bolsters the neck slot."
+        },
+        'Rogue-Dps': {
+            0: "Pre-raid Rogues wield Dragonmaw in the main hand and pair it with Latro's Shifting Sword or Searing Sunblade. Wastewalker set pieces from Slave Pens and Shattered Halls form the armor core. Mark of the Champion, Bloodlust Brooch, and Abacus of Violent Odds are the key trinkets.",
+            1: "Phase 1 Rogue BiS centres on Dragonspine Trophy as the premier trinket. Dragonmaw or Gladiator's Slicer in main hand plus Latro's Shifting Sword or Gladiator's Quickblade in off-hand. Netherblade T4 pieces from Karazhan anchor the set.",
+            2: "Phase 2 Rogues upgrade to Talon of Azshara in the main hand and Merciless Gladiator's Quickblade off-hand. Deathmantle T5 set from SSC/TK is the core armor. Dragonspine Trophy and Warp-Spring Coil are the top trinkets.",
+            3: "Black Temple Rogues aim for Warglaives of Azzinoth — one in each hand — as the pinnacle weapons. Slayer's T6 set from BT anchors the armor. Dragonspine Trophy and Warp-Spring Coil remain top trinkets, joined by Cursed Vision of Sargeras for the head.",
+            4: "Phase 4 adds Signet of Primal Wrath and Nyn'jah's Tabi Boots. Warglaives remain the weapon setup. Berserker's Call joins Dragonspine Trophy as a top trinket. Slayer's set continues to dominate.",
+            5: "Sunwell Rogue BiS peaks with Warglaives of Azzinoth paired with Crux of the Apocalypse or Fang of Kalecgos. Slayer's Bracers, Belt, and Boots from Sunwell replace earlier T6 pieces. Blackened Naaru Sliver and Dragonspine Trophy are the premier trinkets."
+        },
+        'Druid-Balance': {
+            0: "Pre-raid Balance Druids build around crafted Spellstrike Pants and Hood for hit rating. Staff of Infinite Mysteries or Talon of the Tempest plus Sapphiron's Wing Bone are strong weapon options. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets.",
+            1: "Phase 1 Moonkin BiS centres on Karazhan cloth and Icon of the Silver Crescent plus Quagmirran's Eye as trinkets. Talon of the Tempest and Nathrezim Mindblade compete for the main-hand slot. Eye of the Night and Violet Signet of the Archmage are strong ring choices.",
+            2: "Phase 2 Balance Druids upgrade to T5 Nordrassil Regalia from SSC/TK for the Starfire mana efficiency set bonus. Belt of Blasting and Mindstorm Wristbands are high-value off-set pieces. Fang of the Leviathan or The Nexus Key carries the weapon slot.",
+            3: "Black Temple Moonkin gear focuses on T6 Thunderheart set pieces with high spell damage. Zhar'doom, Greatstaff of the Devourer is the pinnacle two-hander. Leggings of Channeled Elements and Slippers of the Seacaller are the best legs and boots from BT.",
+            4: "Phase 4 adds Translucent Spellthread Necklace and Hex Shrunken Head trinket. Zhar'doom remains the best staff. Fetish of the Primal Gods and Chronicle of Dark Secrets compete for the off-hand slot alongside any staff upgrades.",
+            5: "Sunwell Balance Druids equip Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Amice of the Convoker replace earlier head and shoulder pieces. Shifting Naaru Sliver and The Skull of Gul'dan are the top trinkets."
+        },
+        'Druid-Bear': {
+            0: "Pre-raid Bear Druids stack stamina and armor from leather dungeon gear to become uncrittable. The Wastewalker set from heroic Slave Pens and Shattered Halls forms the backbone, supplemented by Faceguard of Determination for the head slot.",
+            1: "Phase 1 Bear tanks use Karazhan leather to push stamina. Dragonmaw is the best weapon for threat from Karazhan. Moroes' Lucky Pocket Watch is an excellent avoidance trinket. Violet Signet of the Grand Restorer improves healing received.",
+            2: "Phase 2 Bear gear from SSC/TK focuses on Destroyer Shoulderguards-equivalent leather and stamina stacking. Mallet of the Tides provides strong threat. Aldori Legacy Defender can serve as a threat-enhancing off-hand option.",
+            3: "Black Temple Bear Druids acquire Cursed Vision of Sargeras for the head and Onslaught Breastplate-equivalent leather. Belt of One-Hundred Deaths and Bindings of Lightning Reflexes fill peripheral slots. Shadowmaster's Boots round out the feet slot.",
+            4: "Phase 4 Bear BiS adds Onslaught Battle-Helm and Signet of Primal Wrath. Dragonspine Trophy and Berserker's Call are strong trinkets for physical threat generation. Insidious Bands provide strong wrist stats.",
+            5: "Sunwell Bear BiS uses Bladed Chaos Tunic and Carapace of Sun and Shadow for the chest. Leggings of the Immortal Night and Gloves of Immortal Dusk are peak leather pieces. Blackened Naaru Sliver and Shard of Contempt are the top trinkets."
+        },
+        'Druid-Cat': {
+            0: "Pre-raid Feral Cat Druids wear the Wastewalker set from heroics and wield Dragonmaw for Attack Power. Primalstrike Vest (Leatherworking BoP) is a strong chest alternative. Mark of the Champion, Bloodlust Brooch, and Abacus of Violent Odds drive burst damage.",
+            1: "Phase 1 Cat BiS centres on Karazhan leather with Attack Power and critical strike. Dragonspine Trophy is the defining trinket. Liar's Tongue Gloves and Grips of Deftness compete for the hands slot. Bladespire Warbands provide a strong wrist piece.",
+            2: "Phase 2 Cat Druids upgrade to Shoulderpads of the Stranger, Bloodsea Brigand's Vest, and Belt of One-Hundred Deaths from SSC/TK. Talon of Azshara steps up as the main weapon. Dragonspine Trophy and Warp-Spring Coil are the top trinkets.",
+            3: "Black Temple Cat BiS includes Cursed Vision of Sargeras, Onslaught Breastplate-equivalent leather, and Belt of One-Hundred Deaths. Warglaive of Azzinoth or Vengeful Gladiator's weapons top the weapon list. Dragonspine Trophy and Madness of the Betrayer define the trinket setup.",
+            4: "Phase 4 adds Signet of Primal Wrath and Nyn'jah's Tabi Boots. Berserker's Call joins Dragonspine Trophy in the trinket slots. Bow-stitched Leggings provide an excellent leg option from Zul'Aman.",
+            5: "Sunwell Cat BiS peaks with Bladed Chaos Tunic, Carapace of Sun and Shadow, and Leggings of the Immortal Night. Warglaive of Azzinoth or Crux of the Apocalypse are top weapons. Blackened Naaru Sliver and Shard of Contempt are the premier trinkets."
+        },
+        'Druid-Restoration': {
+            0: "Pre-raid Resto Druids use Primal Mooncloth set (Tailoring BoP) for shoulders and robe, paired with Lifegiving Cloak and Serpentcrest Life-Staff. Essence of the Martyr and Scarab Brooch are the key healing trinkets to pursue from heroics.",
+            1: "Phase 1 Resto Druid BiS centres on Karazhan cloth pieces like Light-Collar of the Incarnate and Gilded Trousers of Benediction. Primal Mooncloth set pieces carry over. Essence of the Martyr and Eye of Gruul are strong trinkets. Light's Justice is the premier main-hand mace.",
+            2: "Phase 2 upgrades include Cowl of the Avatar, Vestments of the Avatar, and Breeches of the Avatar from SSC/TK. Lightfathom Scepter is the top mace; Ethereum Life-Staff is the top staff. Essence of the Martyr and Direbrew Hops fill the trinket slots.",
+            3: "Black Temple Resto Druids equip Cowl of Absolution, Vestments of Absolution, and Swiftheal Wraps (Tailoring BoP). Crystal Spire of Karabor is the pinnacle main-hand mace. Memento of Tyrande joins Essence of the Martyr as a top trinket.",
+            4: "Phase 4 adds Achromic Trousers of the Naaru and Brooch of Nature's Mercy. Crystal Spire of Karabor and Scepter of Purification compete for the weapon. Memento of Tyrande, Direbrew Hops, and Essence of the Martyr keep the trinket setup strong.",
+            5: "Sunwell Resto Druid BiS features Robe of Eternal Light, Cuffs of Absolution, and Belt of Absolution. Hammer of Sanctification is the top main-hand. Ring of Flowing Life and Blessed Band of Karabor anchor the ring slots. Essence of the Martyr and Darkmoon Card: Blue Dragon are key trinkets."
+        },
+        'Paladin-Holy': {
+            0: "Pre-raid Holy Paladins build around Primal Mooncloth pieces (if Tailoring), Windhawk Hauberk, and dungeon plate healing gear. Hand of Eternity or Shockwave Truncheon provide the main-hand; Light-Bearer's Faith Shield fills the off-hand. Essence of the Martyr and Lower City Prayerbook are key trinkets.",
+            1: "Phase 1 Holy Paladin BiS centres on Justicar T4 set pieces from Karazhan/Gruul/Mag. Light's Justice is the premier main-hand mace; Aegis of the Vindicator is the top shield. Essence of the Martyr and Pendant of the Violet Eye are the key trinkets.",
+            2: "Phase 2 upgrades include Crystalforge T5 pieces from SSC/TK, Lightfathom Scepter, and Ring of Flowing Light (JC BoP). Ribbon of Sacrifice is a strong Phase 2 trinket; Essence of the Martyr remains a staple.",
+            3: "Black Temple Holy Paladins equip Lightbringer T6 Greathelm, Pauldrons, Chestpiece, and Leggings. Crystal Spire of Karabor is the top main-hand; Felstone Bulwark and Bastion of Light compete for the shield. Memento of Tyrande and Essence of the Martyr are top trinkets.",
+            4: "Phase 4 adds Girdle of Stromgarde's Hope and Libram of the Lightbringer. Crystal Spire of Karabor and Scepter of Purification remain the top weapons. Memento of Tyrande, Direbrew Hops, and Essence of the Martyr define the trinket setup.",
+            5: "Sunwell Holy Paladin BiS features Helm of Burning Righteousness, Garments of Serene Shores, and Sunblessed Gauntlets (BS BoP). Hammer of Sanctification is the top main-hand; Aegis of Angelic Fortune is the best shield. Glimmering Naaru Sliver and Redeemer's Alchemist Stone are the key trinkets."
+        },
+        'Paladin-Protection': {
+            0: "Pre-raid Prot Paladins stack defense from Faceguard of Determination, Timewarden's Leggings, and dungeon plate. Gladiator's Gavel or Blade of the Archmage provide main-hand threat; Crest of the Sha'tar is the top shield. Figurine of the Colossus and Icon of the Silver Crescent fill the trinket slots.",
+            1: "Phase 1 Prot Pala BiS centres on Justicar T4 and Bloodmaw Magus-Blade for spell damage threat. Aldori Legacy Defender is the best shield. Moroes' Lucky Pocket Watch, Figurine of the Colossus, and Eye of Magtheridon are key trinkets for avoidance and threat.",
+            2: "Phase 2 upgrades include Crystalforge Faceguard, Royal Gauntlets of Silvermoon, and Girdle of the Invulnerable from SSC/TK. Merciless Gladiator's Gavel or Fang of the Leviathan provide strong main-hand options. Aldori Legacy Defender remains the best shield.",
+            3: "Black Temple Prot Paladins acquire Vengeful Gladiator's Plate pieces, Tempest of Chaos for main-hand threat, and Bulwark of Azzinoth as the peak shield. Pendant of Titans improves spell power for Consecration threat. Shadowmoon Insignia is a strong tanking trinket.",
+            4: "Phase 4 adds Brooch of Deftness and Dory's Embrace. The weapon remains Tempest of Chaos or Vengeful Gladiator's Gavel. Bulwark of Azzinoth continues as the best shield. Shadowmoon Insignia remains the top tanking trinket.",
+            5: "Sunwell Prot Paladin BiS features Brutal Gladiator's Plate shoulders and chest, Onslaught Wristguards and Waistguard. Tempest of Chaos or Brutal Gladiator's Gavel provide main-hand threat. Sword Breaker's Bulwark is the top Phase 5 shield. Hex Shrunken Head and Shadowmoon Insignia fill the trinket slots."
+        },
+        'Paladin-Retribution': {
+            0: "Pre-raid Ret Paladins wield Gladiator's Greatsword (Arena) or the crafted Lionheart Champion-equivalent. Mask of the Deceiver fills the head slot; Scrolls of Blinding Light, Bloodlust Brooch, and Abacus of Violent Odds carry the trinket setup. Shapeshifter's Signet and A'dal's Command are strong rings.",
+            1: "Phase 1 Ret BiS centres on Ethereum Nexus-Reaver as the top two-handed weapon. Dragonspine Trophy is the must-have trinket. Justicar Crown and T4 Breastplate from Karazhan/Gruul anchor the set. Choker of Vile Intent remains a strong neck option.",
+            2: "Phase 2 Ret Paladins upgrade to Lionheart Executioner or Twinblade of the Phoenix. Crystalforge Breastplate from SSC/TK is a key armor piece. Dragonspine Trophy and Bloodlust Brooch are the top trinkets. Belt of One-Hundred Deaths and Bracers of Eradication fill out the set.",
+            3: "Black Temple Ret BiS peaks with Torch of the Damned as the weapon. Cloak of Darkness (LW BoP), Midnight Chestguard, and Bow-stitched Leggings form the leather-heavy non-plate BiS. Dragonspine Trophy and Bloodlust Brooch remain top trinkets.",
+            4: "Phase 4 adds Cloak of Fiends, Berserker's Call, and Choker of Endless Nightmares. Torch of the Damned remains the weapon. Dragonspine Trophy and Berserker's Call define the trinket setup. Band of Devastation provides a strong ring upgrade.",
+            5: "Sunwell Ret BiS peaks with Apolyon, the Soul-Render or Shivering Felspine as weapons. Duplicitous Guise replaces the head slot. Shard of Contempt and Blackened Naaru Sliver are the top trinkets. Hard Khorium Choker (JC BoP) anchors the neck slot."
+        },
+        'Hunter-Beast Mastery': {
+            0: "Pre-raid BM Hunters aim for Marksman's Bow or Veteran's Musket as the ranged weapon while wearing mail drops from Ramparts and Blood Furnace. Bloodlust Brooch, Mark of the Champion, and Abacus of Violent Odds fuel burst damage. Shapeshifter's Signet and Shaffar's Band of Brutality fill the rings.",
+            1: "Phase 1 BM BiS features Sunfury Bow of the Phoenix as the premier ranged weapon from Karazhan. Cyclone T4 pieces from Karazhan/Gruul form the armor core. Dragonspine Trophy and Bloodlust Brooch are the key trinkets. Adornment of Stolen Souls or Emberspur Talisman fills the neck slot.",
+            2: "Phase 2 BM Hunters upgrade to Gronnstalker T5 from SSC/TK. Serpent Spine Longbow or Barrel-Blade Longrifle are strong ranged upgrades. Dragonspine Trophy stays top trinket; The Lightning Capacitor offers a unique burst alternative.",
+            3: "Black Temple BM BiS centres on Gronnstalker T6 pieces and top-tier ranged weapons. Sunfury Bow of the Phoenix may still appear but higher-ilvl options from BT vendors become available. Belt of One-Hundred Deaths anchors the waist slot.",
+            4: "Phase 4 adds Ancient Amani Longbow from Zul'Aman alongside Shard of Contempt for the trinket slot. Cursed Vision of Sargeras remains a top head piece for Hunters. Stormrage Signet Ring and Signet of Primal Wrath fill the rings.",
+            5: "Sunwell BM Hunter BiS peaks with Thori'dal, the Stars' Fury or Golden Bow of Quel'Thalas as the ranged weapon. Bladed Chaos Tunic and Leggings of the Immortal Night replace earlier tier pieces. Blackened Naaru Sliver and Shard of Contempt are the premier trinkets."
+        },
+        'Hunter-Marksmanship': {
+            0: "Pre-raid MM Hunters prioritise Marksman's Bow or Veteran's Musket while wearing Wastewalker set pieces from heroics. Bloodlust Brooch, Mark of the Champion, and Abacus of Violent Odds provide the trinket base. Choker of Vile Intent and Braided Eternium Chain fill the neck slot.",
+            1: "Phase 1 MM BiS centres on Sunfury Bow of the Phoenix or Barrel-Blade Longrifle as the ranged weapon. Netherblade T4 or Cyclone pieces from Karazhan anchor the set. Dragonspine Trophy and Bloodlust Brooch are the top trinkets. Ring of a Thousand Marks is a key ring.",
+            2: "Phase 2 MM Hunters equip Gronnstalker T5 from SSC/TK and upgrade to Arcanite Steam-Pistol or Serpent Spine Longbow. Dragonspine Trophy and Warp-Spring Coil define the trinket setup. Belt of One-Hundred Deaths fills the waist slot.",
+            3: "Black Temple MM BiS adds Cursed Vision of Sargeras for the head, Slayer's T6 set pieces, and Arcanite Steam-Pistol remaining in the ranged slot. Dragonspine Trophy and Warp-Spring Coil stay top trinkets alongside Choker of Endless Nightmares at the neck.",
+            4: "Phase 4 upgrades include Ancient Amani Longbow and Signet of Primal Wrath. Shard of Contempt is a key new trinket. Berserker's Call joins the trinket rotation. Nyn'jah's Tabi Boots provide a foot upgrade.",
+            5: "Sunwell MM Hunter BiS peaks with Thori'dal, the Stars' Fury or Golden Bow of Quel'Thalas. Bladed Chaos Tunic, Carapace of Sun and Shadow, and Leggings of the Immortal Night are peak armor pieces. Blackened Naaru Sliver and Shard of Contempt are the top trinkets."
+        },
+        'Hunter-Survival': {
+            0: "Pre-raid Survival Hunters wear Wastewalker set pieces and carry Marksman's Bow or Veteran's Musket. Bloodlust Brooch, Mark of the Champion, and Abacus of Violent Odds are the core trinkets. Choker of Vile Intent and Braided Eternium Chain fill the neck.",
+            1: "Phase 1 Survival BiS focuses on Agility-heavy Cyclone T4 pieces. Sunfury Bow of the Phoenix or Barrel-Blade Longrifle are the ranged weapons. Dragonspine Trophy is the best trinket. Liar's Tongue Gloves and Cobrascale Gloves provide strong Agility from hands.",
+            2: "Phase 2 Survival Hunters equip Cataclysm T5 from SSC/TK for Agility stacking. Belt of One-Hundred Deaths and True-Aim Stalker Bands fill the waist and wrist slots. Dragonspine Trophy and Bloodlust Brooch remain the top trinket pair. Boots of Utter Darkness (LW BoP) are a key boot option.",
+            3: "Black Temple Survival BiS includes Cursed Vision of Sargeras, Midnight Chestguard, and Bow-stitched Leggings. Belt of One-Hundred Deaths and Shadowmaster's Boots anchor the waist and feet. Dragonspine Trophy and Bloodlust Brooch remain top trinkets.",
+            4: "Phase 4 adds Signet of Primal Wrath and Nyn'jah's Tabi Boots. Shard of Contempt joins the trinket setup. Band of the Ranger-General and Stormrage Signet Ring are strong ring choices. Ancient Amani Longbow provides a ranged upgrade.",
+            5: "Sunwell Survival BiS peaks with Thori'dal, the Stars' Fury or Golden Bow of Quel'Thalas. Bladed Chaos Tunic and Carapace of Sun and Shadow are peak chest pieces. Blackened Naaru Sliver and Shard of Contempt are the premier trinkets."
+        },
+        'Mage-Arcane': {
+            0: "Pre-raid Arcane Mages build around the crafted Spellstrike Hood and Spellstrike Pants for spell hit. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets. Talon of the Tempest or Nathrezim Mindblade plus Sapphiron's Wing Bone handle the weapon setup.",
+            1: "Phase 1 Arcane BiS centres on Karazhan cloth like Cowl of Naaru Blessings and Mantle of the Avatar-equivalent pieces. Quagmirran's Eye and Icon of the Silver Crescent remain top trinkets. Talon of the Tempest and Nathrezim Mindblade compete for the main hand; Sapphiron's Wing Bone fills the off-hand.",
+            2: "Phase 2 Arcane Mages upgrade to Cowl of Tirisfal and T5 Tirisfal set pieces from SSC/TK. Fang of the Leviathan is the best main-hand; Fathomstone fills the off-hand. Quagmirran's Eye and Serpent-Coil Braid are the top trinkets.",
+            3: "Black Temple Arcane BiS centres on Cowl and Mantle of the Illidari High Lord plus Robes of the Tempest. The Skull of Gul'dan and Ashtongue Talisman of Insight are the top trinkets. Merciless Gladiator's Spellblade remains competitive for the main hand; Chronicle of Dark Secrets fills the off-hand.",
+            4: "Phase 4 adds Mana Attuned Band, Loop of Cursed Bones, and Hex Shrunken Head trinket. Zhar'doom, Greatstaff of the Devourer becomes available as a staff option. Fetish of the Primal Gods competes for the off-hand slot.",
+            5: "Sunwell Arcane BiS peaks with Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar replaces the head; Tattered Cape of Antonidas fills the back. Shifting Naaru Sliver and The Skull of Gul'dan are the top trinkets."
+        },
+        'Mage-Fire': {
+            0: "Pre-raid Fire Mages wear crafted Spellstrike Hood and Pants for hit rating. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets. Talon of the Tempest or Nathrezim Mindblade main-hand, with Sapphiron's Wing Bone in the off-hand.",
+            1: "Phase 1 Fire BiS uses Karazhan cloth and the Spellfire BoP Tailoring set (Hood, Robe, Belt) if you have Tailoring. Quagmirran's Eye and Icon of the Silver Crescent are top trinkets. Talon of the Tempest and Sapphiron's Wing Bone fill the weapons.",
+            2: "Phase 2 Fire Mages equip Cowl of Tirisfal and T5 Tirisfal set pieces. Fang of the Leviathan is the top main-hand; Fathomstone the off-hand. Serpent-Coil Braid and Quagmirran's Eye remain the premier trinkets. Band of Eternity and Ring of Endless Coils anchor the rings.",
+            3: "Black Temple Fire BiS adds Cowl of the Illidari High Lord and Robes of the Tempest. The Skull of Gul'dan and Ashtongue Talisman of Insight are the defining trinkets. Merciless Gladiator's Spellblade remains viable; Chronicle of Dark Secrets fills the off-hand.",
+            4: "Phase 4 adds Hex Shrunken Head and Loop of Cursed Bones. Zhar'doom, Greatstaff of the Devourer is available as a staff option. Fetish of the Primal Gods competes for the off-hand alongside Chronicle of Dark Secrets.",
+            5: "Sunwell Fire BiS peaks with Sunflare plus Heart of the Pit or Grand Magister's Staff of Torrents. Dark Conjuror's Collar and Tattered Cape of Antonidas fill head and back. Shifting Naaru Sliver and The Skull of Gul'dan are the top trinkets."
+        },
+        'Mage-Frost': {
+            0: "Pre-raid Frost Mages build around crafted Spellstrike Hood and Pants for hit rating. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets. Talon of the Tempest or Nathrezim Mindblade main-hand, Sapphiron's Wing Bone off-hand.",
+            1: "Phase 1 Frost BiS uses Karazhan cloth alongside Quagmirran's Eye and Icon of the Silver Crescent as trinkets. Talon of the Tempest and Nathrezim Mindblade compete for main-hand; Sapphiron's Wing Bone fills the off-hand. Violet Signet of the Archmage and Band of Crimson Fury are solid rings.",
+            2: "Phase 2 Frost Mages equip Cowl of Tirisfal and T5 Tirisfal set pieces from SSC/TK. Fang of the Leviathan is the top main-hand; Fathomstone fills the off-hand. Quagmirran's Eye and Serpent-Coil Braid remain premier trinkets.",
+            3: "Black Temple Frost BiS features Cowl of the Illidari High Lord, Robes of the Tempest, and Zhar'doom, Greatstaff of the Devourer. The Skull of Gul'dan and Ashtongue Talisman of Insight are the top trinkets. Slippers of the Seacaller are best-in-slot boots.",
+            4: "Phase 4 adds Hex Shrunken Head and Mana Attuned Band. Zhar'doom continues as the staff of choice; Fetish of the Primal Gods competes for off-hand. Carved Witch Doctor's Stick fills the ranged/wand slot.",
+            5: "Sunwell Frost BiS peaks with Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Tattered Cape of Antonidas replace head and back pieces. Shifting Naaru Sliver and The Skull of Gul'dan are the top trinkets."
+        },
+        'Priest-Holy': {
+            0: "Pre-raid Holy Priests use Primal Mooncloth set (Tailoring BoP), Bands of the Benevolent, and dungeon healing cloth. Hand of Eternity or Shockwave Truncheon fills the main-hand; Windcaller's Orb is the off-hand. Essence of the Martyr and Scarab Brooch are the key trinkets.",
+            1: "Phase 1 Holy BiS centres on Karazhan cloth like Light-Collar of the Incarnate and Gilded Trousers of Benediction. Primal Mooncloth carries over. Light's Justice is the top mace; Windcaller's Orb or Tears of Heaven fill the off-hand. Essence of the Martyr and Eye of Gruul are key trinkets.",
+            2: "Phase 2 upgrades include Cowl of the Avatar, Vestments of the Avatar, and Gloves of the Avatar from SSC/TK. Lightfathom Scepter is the top main-hand; Ethereum Life-Staff is the staff option. Essence of the Martyr, Direbrew Hops, and Eye of Gruul fill the trinket slots.",
+            3: "Black Temple Holy Priests equip Cowl and Vestments of Absolution, Swiftheal Wraps (Tailoring BoP), and Crystal Spire of Karabor. Memento of Tyrande and Essence of the Martyr are the top trinkets. Nadina's Pendant of Purity fills the neck.",
+            4: "Phase 4 adds Brooch of Nature's Mercy and Achromic Trousers of the Naaru. Crystal Spire of Karabor and Scepter of Purification compete for the weapon. Direbrew Hops and Memento of Tyrande keep the trinket setup strong.",
+            5: "Sunwell Holy Priest BiS features Robe of Eternal Light, Cuffs of Absolution, and Handguards of the Dawn. Hammer of Sanctification is the top main-hand. Ring of Flowing Life and Blessed Band of Karabor anchor the rings. Essence of the Martyr, Redeemer's Alchemist Stone, and Memento of Tyrande fill trinket slots."
+        },
+        'Priest-Shadow': {
+            0: "Pre-raid Shadow Priests core the set around Frozen Shadoweave (Tailoring BoP) for shoulders, robe, and boots, plus crafted Spellstrike Hood. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets. Orb of the Soul-Eater fills the off-hand.",
+            1: "Phase 1 Shadow BiS keeps Frozen Shadoweave shoulders and robe while adding Karazhan cloth like Handwraps of Flowing Thought and Leggings of the Seventh Circle. Nathrezim Mindblade and Talon of the Tempest compete for main-hand. Quagmirran's Eye, Icon of the Silver Crescent, and Eye of Magtheridon fill trinket slots.",
+            2: "Phase 2 Shadow Priests upgrade to T5 Avatar set pieces from SSC/TK and swap to Merciless Gladiator's Gavel or Nathrezim Mindblade. The Nexus Key becomes the top staff option. Quagmirran's Eye, Icon of the Silver Crescent, and Eye of Magtheridon remain the top trinkets.",
+            3: "Black Temple Shadow BiS centres on T6 Absolution Cowl, Shoulderpads, and Shroud of Absolution. Bracers of Nimble Thought (Tailoring BoP) fill the wrist slot. The Skull of Gul'dan and Darkmoon Card: Crusade are the defining trinkets. Zhar'doom, Greatstaff of the Devourer is the top staff.",
+            4: "Phase 4 adds Hex Shrunken Head and Loop of Cursed Bones. Zhar'doom continues as the staff; Fetish of the Primal Gods competes for off-hand. Carved Witch Doctor's Stick is the top wand.",
+            5: "Sunwell Shadow Priest BiS peaks with Zhar'doom, Greatstaff of the Devourer or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Amice of the Convoker replace head and shoulder pieces. Shifting Naaru Sliver and Hex Shrunken Head are the top trinkets."
+        },
+        'Shaman-Elemental': {
+            0: "Pre-raid Elemental Shamans stack spell hit with Spellstrike Pants and crafted Netherstrike or Windhawk mail. Gladiator's Gavel fills the main-hand; Khadgar's Knapsack or Mazthoril Honor Shield serve as off-hands. Totem of the Void is the core relic. Icon of the Silver Crescent and Quagmirran's Eye are key trinkets.",
+            1: "Phase 1 Elemental BiS centres on Cyclone T4 mail from Karazhan/Gruul, Totem of the Void, and Talon of the Tempest or Nathrezim Mindblade for main-hand. The Lightning Capacitor and Icon of the Silver Crescent are top trinkets. Adornment of Stolen Souls provides a strong neck upgrade.",
+            2: "Phase 2 Elemental Shamans equip Cyclone/Cataclysm T5 from SSC/TK. The Nexus Key becomes available as a staff; Gladiator's Gavel remains a competitive main-hand. The Lightning Capacitor and Icon of the Silver Crescent define the trinket setup. Totem of the Void carries into this phase.",
+            3: "Black Temple Elemental BiS centres on Skyshatter T6 pieces and Zhar'doom, Greatstaff of the Devourer. The Skull of Gul'dan and The Lightning Capacitor are the top trinkets. Slippers of the Seacaller and Leggings of Channeled Elements are best-in-slot feet and legs.",
+            4: "Phase 4 adds Hex Shrunken Head and Skycall Totem. Zhar'doom remains the top staff; Hammer of Judgement and Antonidas's Aegis compete for the weapon slot. Brooch of Nature's Mercy provides a strong neck upgrade.",
+            5: "Sunwell Elemental BiS peaks with Sunflare plus Heart of the Pit or Zhar'doom, Greatstaff of the Devourer. Cowl of Gul'dan and Skyshatter Mantle fill head and shoulder slots. Shifting Naaru Sliver and The Skull of Gul'dan are the top trinkets. Totem of Ancestral Guidance and Skycall Totem compete for the relic."
+        },
+        'Shaman-Enhancement': {
+            0: "Pre-raid Enhancement Shamans wield Gladiator's Right Ripper or Dragonmaw in the main hand and Reflex Blades or The Bladefist in the off-hand. Primalstrike Vest and Ebon Netherscale Breastplate (LW BoP) fill the chest. Bloodlust Brooch, Mark of the Champion, and Abacus of Violent Odds are the key trinkets.",
+            1: "Phase 1 Enhancement BiS centres on Dragonspine Trophy as the defining trinket. Gladiator's Right Ripper, Gladiator's Cleaver, and The Decapitator compete for the main-hand. Cyclone T4 and Ebon Netherscale pieces fill out the armor. Liar's Tongue Gloves and Cobrascale Gloves are top hand options.",
+            2: "Phase 2 Enhancement Shamans upgrade to Rod of the Sun King, Dragonstrike, or Wicked Edge of the Planes. Cataclysm T5 provides armor upgrades. Belt of One-Hundred Deaths anchors the waist. Dragonspine Trophy and Bloodlust Brooch remain the top trinkets. Boots of Utter Darkness (LW BoP) are a key boot option.",
+            3: "Black Temple Enhancement BiS centres on Vengeful Gladiator's Cleaver or Syphon of the Nathrezim as weapons. Cursed Vision of Sargeras fills the head slot; Midnight Chestguard is the chest. Dragonspine Trophy, Madness of the Betrayer, and Bloodlust Brooch are top trinkets. Swiftstrike Shoulders (LW BoP) fill the shoulder slot.",
+            4: "Phase 4 adds Signet of Primal Wrath, Berserker's Call, and Nyn'jah's Tabi Boots. Shard of Contempt is a key new trinket. Dragonspine Trophy and Madness of the Betrayer remain strong. Band of the Ranger-General provides a top ring option.",
+            5: "Sunwell Enhancement BiS peaks with Hand of the Deceiver main-hand and Mounting Vengeance off-hand. Bladed Chaos Tunic and Carapace of Sun and Shadow fill the chest. Skyshatter T6 shoulders and wristguards round out the set. Blackened Naaru Sliver and Shard of Contempt are the top trinkets."
+        },
+        'Shaman-Restoration': {
+            0: "Pre-raid Resto Shamans wear Primal Mooncloth and Whitemend cloth alongside Windhawk mail pieces. Hand of Eternity or Gladiator's Salvation fills the main-hand; Tears of Heaven or Light-Bearer's Faith Shield fill the off-hand. Essence of the Martyr and Lower City Prayerbook are the key healing trinkets.",
+            1: "Phase 1 Resto Shaman BiS centres on Karazhan healing mail like Fathom-Helm of the Deeps and Cyclone Headdress. Light's Justice is the top main-hand mace; Aegis of the Vindicator fills the off-hand. Essence of the Martyr and Ribbon of Sacrifice are the top trinkets. Totem of Healing Rains is the best-in-slot relic.",
+            2: "Phase 2 upgrades include Cataclysm T5 healing mail from SSC/TK, Lightfathom Scepter, and Band of Eternity. Essence of the Martyr, Direbrew Hops, and Scarab of the Infinite Cycle fill trinket slots. Aegis of the Vindicator remains the top off-hand shield.",
+            3: "Black Temple Resto Shaman BiS centres on Skyshatter T6 pieces, Living Earth Bindings (LW BoP), and Crystal Spire of Karabor. Memento of Tyrande and Essence of the Martyr are the top trinkets. Nadina's Pendant of Purity fills the neck slot. Totem of Healing Rains remains the best relic.",
+            4: "Phase 4 adds Brooch of Nature's Mercy, Two-toed Sandals, and Treads of the Life Path. Crystal Spire of Karabor and Bastion of Light compete for the weapon slot. Memento of Tyrande, Direbrew Hops, and Essence of the Martyr define the trinket setup.",
+            5: "Sunwell Resto Shaman BiS features Sun-Drenched Scale Chestguard (LW BoP) and Leather Gauntlets of the Sun as non-mail BiS pieces. Hammer of Sanctification is the top main-hand. Glimmering Naaru Sliver and Redeemer's Alchemist Stone are key trinkets. Totem of Healing Rains continues as the best relic."
+        },
+        'Warlock-Affliction': {
+            0: "Pre-raid Affliction Warlocks core around Frozen Shadoweave (Tailoring BoP) robe and boots plus crafted Spellstrike Hood and Pants. Blade of Wizardry fills the main-hand; Khadgar's Knapsack or Lamp of Peaceful Radiance fill the off-hand. Icon of the Silver Crescent and Quagmirran's Eye are the key dungeon trinkets.",
+            1: "Phase 1 Affliction BiS centres on Voidheart T4 pieces from Karazhan/Gruul. Talon of the Tempest is the top main-hand; Khadgar's Knapsack fills the off-hand. Quagmirran's Eye and Icon of the Silver Crescent remain top trinkets. Violet Signet of the Archmage and Band of Crimson Fury fill the rings.",
+            2: "Phase 2 Affliction Warlocks upgrade to T5 Corruptor Regalia from SSC/TK and swap to Merciless Gladiator's Spellblade or Fang of the Leviathan. Fathomstone and Orb of the Soul-Eater fill the off-hand. The Nexus Key is the top staff option. Mark of the Champion, Quagmirran's Eye, and Icon of the Silver Crescent define the trinket setup.",
+            3: "Black Temple Affliction BiS centres on T6 Malefic set pieces and Zhar'doom, Greatstaff of the Devourer. The Skull of Gul'dan is the top trinket. Leggings of Channeled Elements and Slippers of the Seacaller are best-in-slot legs and feet.",
+            4: "Phase 4 adds Hex Shrunken Head and Translucent Spellthread Necklace. Zhar'doom remains the top staff; Chronicle of Dark Secrets competes for the off-hand. Carved Witch Doctor's Stick is the top wand.",
+            5: "Sunwell Affliction BiS peaks with Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Amice of the Convoker replace head and shoulder pieces. Shifting Naaru Sliver and The Skull of Gul'dan are the premier trinkets."
+        },
+        'Warlock-Demonology': {
+            0: "Pre-raid Demonology Warlocks wear Frozen Shadoweave (Tailoring BoP) robe and boots plus crafted Spellstrike Hood. Blade of Wizardry fills the main-hand; Khadgar's Knapsack or Lamp of Peaceful Radiance serve as off-hands. Icon of the Silver Crescent, Quagmirran's Eye, and The Black Book (Demonology-specific trinket) fill the trinket slots.",
+            1: "Phase 1 Demo BiS centres on Voidheart T4 pieces from Karazhan/Gruul. Talon of the Tempest or Nathrezim Mindblade fill the main-hand; Khadgar's Knapsack or Orb of the Soul-Eater fill the off-hand. Quagmirran's Eye, Icon of the Silver Crescent, and Scryer's Bloodgem are the top trinkets.",
+            2: "Phase 2 Demonology upgrades to T5 Corruptor Regalia from SSC/TK and swaps to Merciless Gladiator's Spellblade or Fang of the Leviathan for main-hand. Fathomstone or Orb of the Soul-Eater fill the off-hand. The Nexus Key is the top staff option. Void Star Talisman joins Icon of the Silver Crescent as a key trinket.",
+            3: "Black Temple Demo BiS centres on T6 Malefic set pieces and Zhar'doom, Greatstaff of the Devourer. The Skull of Gul'dan is the defining trinket. Leggings of Channeled Elements and Slippers of the Seacaller are best-in-slot legs and feet. Chronicle of Dark Secrets fills the off-hand.",
+            4: "Phase 4 adds Hex Shrunken Head and Translucent Spellthread Necklace. Zhar'doom continues as the top staff; Chronicle of Dark Secrets remains in the off-hand. Carved Witch Doctor's Stick is the best wand. Mana Attuned Band and Ring of Ancient Knowledge anchor the rings.",
+            5: "Sunwell Demonology BiS peaks with Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Amice of the Convoker fill head and shoulder slots. Shifting Naaru Sliver and The Skull of Gul'dan are the premier trinkets."
+        },
+        'Warlock-Destruction': {
+            0: "Pre-raid Destruction Warlocks build around Spellfire (Tailoring BoP) robe, belt, and gloves plus crafted Spellstrike Hood and Pants. Blade of Wizardry fills the main-hand; Khadgar's Knapsack or Lamp of Peaceful Radiance the off-hand. Icon of the Silver Crescent and Quagmirran's Eye are the key trinkets.",
+            1: "Phase 1 Destruction BiS centres on Voidheart T4 pieces alongside the Spellfire BoP set (robe, belt, gloves). Talon of the Tempest fills the main-hand; Flametongue Seal or Khadgar's Knapsack fill the off-hand. Quagmirran's Eye and Icon of the Silver Crescent remain top trinkets.",
+            2: "Phase 2 Destruction upgrades to T5 Corruptor Regalia from SSC/TK and swaps to Merciless Gladiator's Spellblade or Fang of the Leviathan. Fathomstone or Flametongue Seal fill the off-hand. The Nexus Key is the top staff option. Mark of the Champion and Quagmirran's Eye define the trinket setup.",
+            3: "Black Temple Destruction BiS centres on T6 Malefic set pieces and Zhar'doom, Greatstaff of the Devourer. The Skull of Gul'dan is the defining trinket. Leggings of Channeled Elements and Slippers of the Seacaller fill legs and feet. Chronicle of Dark Secrets serves as the off-hand.",
+            4: "Phase 4 adds Hex Shrunken Head and Translucent Spellthread Necklace. Zhar'doom remains the top staff; Chronicle of Dark Secrets fills the off-hand. Carved Witch Doctor's Stick is the best wand. Mana Attuned Band and Ring of Ancient Knowledge anchor the rings.",
+            5: "Sunwell Destruction BiS peaks with Grand Magister's Staff of Torrents or Sunflare plus Heart of the Pit. Dark Conjuror's Collar and Amice of the Convoker fill head and shoulder slots. Shifting Naaru Sliver and The Skull of Gul'dan are the premier trinkets."
+        }
+    };
+
+    /**
+     * Generate a contextual description for a given class/spec/phase.
+     * Returns a short paragraph suitable for an in-page blurb and meta description.
+     */
+    function generateSpecDescription(cls, spec, phase) {
+        const key = `${cls}-${spec}`;
+        const phaseDesc = SPEC_PHASE_DESCRIPTIONS[key];
+        if (!phaseDesc) return null;
+        return phaseDesc[phase] || null;
+    }
+
+    /**
+     * Render the SEO description block below the GS summary.
+     * Only shows in PvE BiS view with a known class/spec/phase.
+     */
+    function renderSeoDescription() {
+        const el = $('seoDescription');
+        if (!el) return;
+
+        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+
+        const text = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
+        if (!text) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+
+        const phInfo = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
+        el.innerHTML = `<div class="seo-desc-inner">
+            <span class="seo-desc-icon">📖</span>
+            <p class="seo-desc-text">${text}</p>
+        </div>`;
+        el.classList.remove('hidden');
+    }
 
     // ─── DOM refs ────────────────────────────────────────────────────
     const $ = id => document.getElementById(id);
@@ -211,6 +627,9 @@
         Warlock:  { color: '#9482C9', specs: ['Affliction', 'Demonology', 'Destruction'] },
         Druid:    { color: '#FF7D0A', specs: ['Balance', 'Bear', 'Cat', 'Restoration'] }
     };
+
+    // Build slug ↔ class/spec maps now that CLASS_META is defined
+    buildSlugMaps();
 
     // Legacy fallback PvP spec map (used when PVP_DATA not available)
     const PVP_SPEC_MAP_FALLBACK = {
@@ -485,6 +904,23 @@
         return prof && state.excludedProfessions.has(prof);
     }
 
+    // Rating-gated PvP items: ALL Gladiator-season weapons & shoulders require
+    // an arena rating to purchase (S1 plain Gladiator included).
+    // Grand Marshal / High Warlord are vanilla rank items — not matched.
+    const RATING_GATED_PREFIXES = /^(Merciless Gladiator|Vengeful Gladiator|Brutal Gladiator|Deadly Gladiator|Gladiator)'s\s/i;
+    const RATING_GATED_SLOTS = new Set(['Main Hand', 'Off Hand', 'Two Hand', 'One Hand', 'Weapon', 'Shoulder', 'Shoulders']);
+
+    function isItemRatingGated(itemId, itemName, itemSlot) {
+        if (!itemName) {
+            const src = DATA.itemSources[itemId];
+            if (!src) return false;
+            itemName = src.name || '';
+        }
+        // Only weapons and shoulders require a rating to purchase
+        if (itemSlot && !RATING_GATED_SLOTS.has(itemSlot)) return false;
+        return RATING_GATED_PREFIXES.test(itemName);
+    }
+
     // Get the PvE spec name for the current PvP selection
     function getPveSpecForCurrentState() {
         if (!state.isPvP) return state.selectedSpec;
@@ -523,6 +959,8 @@
             headerTitle.style.color = '';
             headerSub.textContent = 'Choose your class';
             showStep(stepClass);
+            replaceRoute();
+            updateSeoMeta();
         } else if (prev === 'spec') {
             // If we came from PvP (skipped phase), reset PvP state
             state.selectedSpec = null; state.isPvP = false; state.pvpKey = null;
@@ -531,6 +969,8 @@
             headerTitle.style.color = CLASS_META[state.selectedClass].color;
             headerSub.textContent = 'Choose your spec';
             showStep(stepSpec);
+            replaceRoute();
+            updateSeoMeta();
         } else if (prev === 'phase') {
             // Phase switcher is now inline — go back to spec select directly
             state.selectedPhase = null;
@@ -545,6 +985,8 @@
             headerTitle.style.color = CLASS_META[state.selectedClass].color;
             headerSub.textContent = 'Choose your spec';
             showStep(stepSpec);
+            replaceRoute();
+            updateSeoMeta();
         }
     }
     backBtn.addEventListener('click', goBack);
@@ -560,6 +1002,8 @@
             renderSpecGrid(cls);
             state.history.push('class');
             showStep(stepSpec);
+            pushRoute();
+            updateSeoMeta();
         });
     });
 
@@ -654,11 +1098,15 @@
                     renderBisList();
                     state.history.push('spec');
                     showStep(stepBis);
+                    pushRoute();
+                    updateSeoMeta();
                 } else {
                     headerSub.textContent = 'Choose phase';
                     renderPhaseGrid();
                     state.history.push('spec');
                     showStep(stepPhase);
+                    pushRoute();
+                    updateSeoMeta();
                 }
             });
         });
@@ -707,6 +1155,8 @@
                 renderBisList();
                 state.history.push('phase');
                 showStep(stepBis);
+                pushRoute();
+                updateSeoMeta();
             });
         });
     }
@@ -749,6 +1199,8 @@
                 headerTitle.innerHTML = `${lbl} — ${info.label}${pvpTag}`;
                 headerSub.textContent = info.desc;
                 renderBisList();
+                replaceRoute();
+                updateSeoMeta();
             });
         });
 
@@ -934,8 +1386,8 @@
         Enchanting:          'trade_engraving',
     };
 
-    function renderProfessionFilter(professions) {
-        if (!professions.length || state.isPvP) {
+    function renderProfessionFilter(professions, hasPvpRatingItems) {
+        if ((!professions.length && !hasPvpRatingItems) || state.isPvP) {
             professionFilter.classList.add('hidden');
             professionFilter.innerHTML = '';
             return;
@@ -951,12 +1403,15 @@
             state._profsLoaded = true;
         }
 
-        let html = '<div class="prof-filter-label">🔨 Professions</div>';
+        let html = '<div class="prof-filter-label">🔨 Professions &amp; PvP</div>';
         html += hintHtml('prof-filter', '🔧',
-            `Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes). ` +
-            `Tap a profession to <strong>toggle it off</strong> — the list will update to show the next-best alternative for that slot.`
+            `Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes), ` +
+            `or a <strong>PvP arena rating</strong> to purchase (e.g. Merciless/Vengeful/Brutal Gladiator weapons &amp; shoulders). ` +
+            `Tap a button to <strong>toggle it off</strong> — the list will update to show the next-best alternative for that slot.`
         );
         html += '<div class="prof-filter-chips">';
+
+        // Profession chips
         for (const prof of professions) {
             const active = !state.excludedProfessions.has(prof);
             const icon = PROFESSION_ICONS[prof] || 'inv_misc_questionmark';
@@ -965,12 +1420,30 @@
                 <span>${prof}</span>
             </button>`;
         }
+
+        // PvP Rating chip (only when there are rating-gated items in the list)
+        if (hasPvpRatingItems) {
+            const pvpActive = !state.hidePvpRating;
+            html += `<button class="prof-chip pvp-rating-chip${pvpActive ? ' active' : ''}" id="pvpRatingToggle">
+                <span class="prof-chip-pvp-icon">⚔️</span>
+                <span>PvP Rating</span>
+            </button>`;
+        }
+
         html += '</div>';
         professionFilter.innerHTML = html;
         professionFilter.classList.remove('hidden');
         bindHintDismiss(professionFilter);
 
         professionFilter.querySelectorAll('.prof-chip').forEach(chip => {
+            if (chip.id === 'pvpRatingToggle') {
+                chip.addEventListener('click', () => {
+                    state.hidePvpRating = !state.hidePvpRating;
+                    localStorage.setItem('tbc-bis-hide-pvp-rating', state.hidePvpRating ? '1' : '0');
+                    renderBisList();
+                });
+                return;
+            }
             chip.addEventListener('click', () => {
                 const prof = chip.dataset.prof;
                 if (state.excludedProfessions.has(prof)) {
@@ -1135,20 +1608,45 @@
         // Only show toggles for professions that have a BIS item (rank #1 in slot),
         // not for professions that only appear among alternatives.
         const professionSet = new Set();
+        let hasPvpRatingItems = false;
         if (!pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 if (!items.length) continue;
                 const bisItem = items[0];
                 const prof = itemProfession(bisItem.itemId);
                 if (prof) professionSet.add(prof);
+                // Check any item in the slot (BIS or alt) for rating-gated PvP
+                if (!hasPvpRatingItems) {
+                    for (const it of items) {
+                        if (isItemRatingGated(it.itemId, it.name, slot)) {
+                            hasPvpRatingItems = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
-        renderProfessionFilter([...professionSet].sort());
+
+        // Restore persistent hidePvpRating from localStorage (once per session)
+        if (!state._pvpRatingLoaded) {
+            state.hidePvpRating = localStorage.getItem('tbc-bis-hide-pvp-rating') === '1';
+            state._pvpRatingLoaded = true;
+        }
+
+        renderProfessionFilter([...professionSet].sort(), hasPvpRatingItems);
 
         // ── Apply profession filter: remove excluded profession items ──
         if (state.excludedProfessions.size && !pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 slotGroups[slot] = items.filter(i => !isItemExcluded(i.itemId));
+                if (!slotGroups[slot].length) delete slotGroups[slot];
+            }
+        }
+
+        // ── Apply PvP rating filter: remove Merciless/Vengeful/Brutal items ──
+        if (state.hidePvpRating && !pvpSpecData) {
+            for (const [slot, items] of Object.entries(slotGroups)) {
+                slotGroups[slot] = items.filter(i => !isItemRatingGated(i.itemId, i.name, slot));
                 if (!slotGroups[slot].length) delete slotGroups[slot];
             }
         }
@@ -1374,6 +1872,9 @@
             <div class="gs-divider"></div>
             <div class="gs-stat"><div class="gs-label">Slots</div>
                 <div class="gs-value">${Object.keys(slotGroups).length}</div></div>`;
+
+        // ── SEO contextual description ──
+        renderSeoDescription();
 
         // ── Build slot HTML ──
         let html = '';
@@ -1737,6 +2238,30 @@
         return { Drop:'💀', Quest:'❗', Profession:'🔨', PvP:'⚔️', Vendor:'🏪', Reputation:'⭐', Badge:'🎖️' }[t] || '📦';
     }
 
+    // ─── Browser back/forward (popstate) ────────────────────────────
+    // When the user presses the browser's Back/Forward buttons, re-read the URL
+    // and restore state accordingly.
+    window.addEventListener('popstate', () => {
+        // Reset all navigation state before re-applying from URL
+        state.selectedClass = null;
+        state.selectedSpec  = null;
+        state.selectedPhase = null;
+        state.isPvP         = false;
+        state.pvpKey        = null;
+        state.history       = [];
+        state.excludedProfessions = new Set();
+
+        headerTitle.textContent = 'TBC Best in Slot';
+        headerTitle.style.color = '';
+        headerSub.textContent = 'Choose your class';
+
+        const restored = restoreFromUrl();
+        if (!restored) {
+            showStep(stepClass);
+        }
+        updateSeoMeta();
+    });
+
     // ─── Initialise hints ────────────────────────────────────────────
     // Hide the static class-pick hint if already dismissed
     if (_dismissed.has('class-pick')) {
@@ -1744,4 +2269,16 @@
         if (h) h.remove();
     }
     bindHintDismiss(document);
+
+    // ─── URL-based initialisation ────────────────────────────────────
+    // If the page was loaded with a deep URL (e.g. /warrior/fury/phase-2),
+    // restore state from it instead of showing the class-select screen.
+    {
+        const didRestore = restoreFromUrl();
+        if (!didRestore) {
+            // Replace the current history entry with the canonical root path
+            history.replaceState({}, '', '/');
+        }
+        updateSeoMeta();
+    }
 })();

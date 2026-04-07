@@ -9,6 +9,8 @@
     "refresh-pvp": "node scraper/fetch-leaderboard.js && node scraper/fetch-gear.js --top 200 && node scraper/analyze-gear.js && node -e \"const d=require('./scraper/output/pvp-bis-data.json');require('fs').writeFileSync('js/pvp-data.js','const PVP_DATA='+JSON.stringify(d)+';')\" && node fetch-icons.js",
     "deploy": "firebase deploy --only hosting",
     "refresh-and-deploy": "npm run refresh-pvp && npm run deploy",
+    "prerender": "python3 -m http.server 8080 & sleep 2 && node scraper/prerender.js; kill %1",
+    "prerender-and-deploy": "npm run prerender && npm run deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
