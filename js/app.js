@@ -15,7 +15,9 @@
         history: [],
         excludedProfessions: new Set(),  // professions to hide from BiS list
         hidePvpRating: false,            // hide rating-gated PvP items (Merciless/Vengeful/Brutal weapons & shoulders)
-        _pvpRatingLoaded: false
+        _pvpRatingLoaded: false,
+        hideWorldBoss: false,            // hide items that drop from outdoor world bosses
+        _worldBossLoaded: false
     };
 
     // ─── SEO / URL routing ───────────────────────────────────────────
@@ -904,6 +906,20 @@
         return prof && state.excludedProfessions.has(prof);
     }
 
+    // Outdoor world bosses in TBC — items from these sources can be optionally hidden
+    const WORLD_BOSS_SOURCES = new Set([
+        'Doom Lord Kazzak',
+        'Doomwalker',
+        'Lord Kazzak',
+        'World Drop',
+    ]);
+
+    function isItemWorldBoss(itemId) {
+        const src = getItemSource(itemId);
+        if (!src) return false;
+        return WORLD_BOSS_SOURCES.has(src.source);
+    }
+
     // Rating-gated PvP items: ALL Gladiator-season weapons & shoulders require
     // an arena rating to purchase (S1 plain Gladiator included).
     // Grand Marshal / High Warlord are vanilla rank items — not matched.
@@ -1386,8 +1402,8 @@
         Enchanting:          'trade_engraving',
     };
 
-    function renderProfessionFilter(professions, hasPvpRatingItems) {
-        if ((!professions.length && !hasPvpRatingItems) || state.isPvP) {
+    function renderProfessionFilter(professions, hasPvpRatingItems, hasWorldBossItems) {
+        if ((!professions.length && !hasPvpRatingItems && !hasWorldBossItems) || state.isPvP) {
             professionFilter.classList.add('hidden');
             professionFilter.innerHTML = '';
             return;
@@ -1406,7 +1422,8 @@
         let html = '<div class="prof-filter-label">🔨 Professions &amp; PvP</div>';
         html += hintHtml('prof-filter', '🔧',
             `Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes), ` +
-            `or a <strong>PvP arena rating</strong> to purchase (e.g. Merciless/Vengeful/Brutal Gladiator weapons &amp; shoulders). ` +
+            `a <strong>PvP arena rating</strong> to purchase (e.g. Merciless/Vengeful/Brutal Gladiator weapons &amp; shoulders), ` +
+            `or drop from <strong>outdoor world bosses</strong> (Doom Lord Kazzak, Doomwalker) which have a weekly respawn and may be camped or controlled by the opposite faction. ` +
             `Tap a button to <strong>toggle it off</strong> — the list will update to show the next-best alternative for that slot.`
         );
         html += '<div class="prof-filter-chips">';
@@ -1430,6 +1447,15 @@
             </button>`;
         }
 
+        // World Boss chip (only when there are world boss items in the list)
+        if (hasWorldBossItems) {
+            const wbActive = !state.hideWorldBoss;
+            html += `<button class="prof-chip world-boss-chip${wbActive ? ' active' : ''}" id="worldBossToggle">
+                <span class="prof-chip-pvp-icon">🌍</span>
+                <span>World Bosses</span>
+            </button>`;
+        }
+
         html += '</div>';
         professionFilter.innerHTML = html;
         professionFilter.classList.remove('hidden');
@@ -1440,6 +1466,14 @@
                 chip.addEventListener('click', () => {
                     state.hidePvpRating = !state.hidePvpRating;
                     localStorage.setItem('tbc-bis-hide-pvp-rating', state.hidePvpRating ? '1' : '0');
+                    renderBisList();
+                });
+                return;
+            }
+            if (chip.id === 'worldBossToggle') {
+                chip.addEventListener('click', () => {
+                    state.hideWorldBoss = !state.hideWorldBoss;
+                    localStorage.setItem('tbc-bis-hide-world-boss', state.hideWorldBoss ? '1' : '0');
                     renderBisList();
                 });
                 return;
@@ -1609,20 +1643,22 @@
         // not for professions that only appear among alternatives.
         const professionSet = new Set();
         let hasPvpRatingItems = false;
+        let hasWorldBossItems = false;
         if (!pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 if (!items.length) continue;
                 const bisItem = items[0];
                 const prof = itemProfession(bisItem.itemId);
                 if (prof) professionSet.add(prof);
-                // Check any item in the slot (BIS or alt) for rating-gated PvP
-                if (!hasPvpRatingItems) {
-                    for (const it of items) {
-                        if (isItemRatingGated(it.itemId, it.name, slot)) {
-                            hasPvpRatingItems = true;
-                            break;
-                        }
+                // Check any item in the slot (BIS or alt) for rating-gated PvP or world boss
+                for (const it of items) {
+                    if (!hasPvpRatingItems && isItemRatingGated(it.itemId, it.name, slot)) {
+                        hasPvpRatingItems = true;
                     }
+                    if (!hasWorldBossItems && isItemWorldBoss(it.itemId)) {
+                        hasWorldBossItems = true;
+                    }
+                    if (hasPvpRatingItems && hasWorldBossItems) break;
                 }
             }
         }
@@ -1633,7 +1669,13 @@
             state._pvpRatingLoaded = true;
         }
 
-        renderProfessionFilter([...professionSet].sort(), hasPvpRatingItems);
+        // Restore persistent hideWorldBoss from localStorage (once per session)
+        if (!state._worldBossLoaded) {
+            state.hideWorldBoss = localStorage.getItem('tbc-bis-hide-world-boss') === '1';
+            state._worldBossLoaded = true;
+        }
+
+        renderProfessionFilter([...professionSet].sort(), hasPvpRatingItems, hasWorldBossItems);
 
         // ── Apply profession filter: remove excluded profession items ──
         if (state.excludedProfessions.size && !pvpSpecData) {
@@ -1647,6 +1689,14 @@
         if (state.hidePvpRating && !pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 slotGroups[slot] = items.filter(i => !isItemRatingGated(i.itemId, i.name, slot));
+                if (!slotGroups[slot].length) delete slotGroups[slot];
+            }
+        }
+
+        // ── Apply world boss filter: remove items from outdoor world bosses ──
+        if (state.hideWorldBoss && !pvpSpecData) {
+            for (const [slot, items] of Object.entries(slotGroups)) {
+                slotGroups[slot] = items.filter(i => !isItemWorldBoss(i.itemId));
                 if (!slotGroups[slot].length) delete slotGroups[slot];
             }
         }

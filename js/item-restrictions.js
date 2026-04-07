@@ -58,6 +58,7 @@ const ITEM_MAIN_HAND_ONLY = new Set([
     34331,  // Hand of the Deceiver
     28432,  // Black Planar Edge
     28433,  // Wicked Edge of the Planes
+    28657,  // Fool's Bane (Main Hand only)
     29962,  // Heartrazor
     32236,  // Rising Tide
     32262,  // Syphon of the Nathrezim
