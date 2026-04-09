@@ -6,3 +6,9 @@ firebase-debug.log
 scraper/leaderboard-screenshot.png
 scraper/output/gear-progress.json
 scraper/output/gear-raw.json
+sim-prototype/
+.firebase/
+0
+audit_fury.py
+data.backup-*.json
+community feedback.md

@@ -4,6 +4,8 @@ Prioritet: 🔴 Hög | 🟡 Medium | 🟢 Låg
 
 ---
 
+# NUMMER 1 - MÅSTE SYNAS 2 ringar och 2 trinkets per specc som rekommendation, nu har vi bara en ring (med alts) och 1 trinket. SEN VILL JAG ATT VI BARA VISAR DEN VAPENTYP SOM ÄR REKOMMENDERAD PER SPEC, NÄR DET ÄR TYDLIGT. Exempelvis fury warrior har aldrig 2hander. Gäller både pve speccs och pvp speccs!
+
 ## ✅ Klart
 
 ### ~~3. Vissa epic items visas med blå (rare) färg~~ | # | Uppgift | Prioritet || 8 | ~~PvP BiS-data~~ → ersatt av #14 | 🟡 | ✅ Ersatt |

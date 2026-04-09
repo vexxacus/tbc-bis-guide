@@ -193,7 +193,7 @@
      */
     const SPEC_PHASE_DESCRIPTIONS = {
         'Warrior-Fury': {
-            0: "Pre-raid Fury Warriors build around Dragonmaw and Blinkstrike for dual-wield, pushing hit rating to cap and raw Attack Power from crafted Ragesteel gear and dungeon drops. Trinkets like Bloodlust Brooch and Abacus of Violent Odds carry your burst until Karazhan.",
+            0: "Pre-raid Fury Warriors build around Dragonmaw and Latro's Shifting sword for dual-wield, pushing hit rating to cap and raw Attack Power from crafted Ragesteel gear and dungeon drops. Trinkets like Bloodlust Brooch and Abacus of Violent Odds carry your burst until Karazhan.",
             1: "Phase 1 Fury BiS revolves around Dragonspine Trophy for the haste proc and fast weapons like Gladiator's Slicer and Hope Ender from Karazhan and the Arena vendor. Warbringer T4 pieces provide strong Strength itemisation, with Badge of the Swarmguard remaining a solid trinket.",
             2: "Phase 2 Fury Warriors prioritise Dragonstrike and Talon of Azshara from SSC/TK for fast dual-wield damage. Destroyer Breastplate and Belt of One-Hundred Deaths are key gear targets. Dragonspine Trophy, Tsunami Talisman, and Solarian's Sapphire define the trinket setup.",
             3: "In Phase 3 (Black Temple & Hyjal) Fury Warriors upgrade to Warglaives of Azzinoth or Vengeful Gladiator's weapons. Onslaught Breastplate plus Belt of One-Hundred Deaths form the core of the set, with Dragonspine Trophy and Madness of the Betrayer as the top trinkets.",
@@ -234,7 +234,7 @@
         },
         'Druid-Bear': {
             0: "Pre-raid Bear Druids stack stamina and armor from leather dungeon gear to become uncrittable. The Wastewalker set from heroic Slave Pens and Shattered Halls forms the backbone, supplemented by Faceguard of Determination for the head slot.",
-            1: "Phase 1 Bear tanks use Karazhan leather to push stamina. Dragonmaw is the best weapon for threat from Karazhan. Moroes' Lucky Pocket Watch is an excellent avoidance trinket. Violet Signet of the Grand Restorer improves healing received.",
+            1: "Phase 1 Bear tanks use Karazhan leather to push stamina. Terestian's Stranglestaff from Karazhan is the best weapon for threat. Moroes' Lucky Pocket Watch is an excellent avoidance trinket. Violet Signet of the Grand Restorer improves healing received.",
             2: "Phase 2 Bear gear from SSC/TK focuses on Destroyer Shoulderguards-equivalent leather and stamina stacking. Mallet of the Tides provides strong threat. Aldori Legacy Defender can serve as a threat-enhancing off-hand option.",
             3: "Black Temple Bear Druids acquire Cursed Vision of Sargeras for the head and Onslaught Breastplate-equivalent leather. Belt of One-Hundred Deaths and Bindings of Lightning Reflexes fill peripheral slots. Shadowmaster's Boots round out the feet slot.",
             4: "Phase 4 Bear BiS adds Onslaught Battle-Helm and Signet of Primal Wrath. Dragonspine Trophy and Berserker's Call are strong trinkets for physical threat generation. Insidious Bands provide strong wrist stats.",
@@ -840,60 +840,9 @@
         return sourceStr.replace(/\s*\(\d+\)\s*/g, '').trim();
     }
 
-    // BoP profession items — REQUIRE the profession to equip.
-    // BoE crafted items (Vengeance Wrap, Spellstrike, Bracers of Havok, etc.)
-    // are NOT included because anyone can wear them.
-    const BOP_PROFESSION_IDS = new Set([
-        // ─ Tailoring BoP specialty sets ─
-        21846,21847,21848,          // Spellfire Belt / Gloves / Robe
-        21869,21870,21871,          // Frozen Shadoweave Shoulders / Boots / Robe
-        21873,21874,21875,          // Primal Mooncloth Belt / Shoulders / Robe
-        // Tailoring BoP (BT/Sunwell patterns)
-        32584,32585,                // Swiftheal Wraps / Mantle
-        32586,32587,                // Bracers of Nimble Thought / Mantle of Nimble Thought
-        34364,34365,                // Sunfire Robe / Robe of Eternal Light
-        34367,                      // Hands of Eternal Light
-
-        // ─ Leatherworking BoP specialty sets ─
-        29515,29516,29517,          // Ebon Netherscale Breastplate / Belt / Bracers
-        29519,29520,29521,          // Netherstrike Breastplate / Belt / Bracers
-        29522,29523,29524,          // Windhawk Hauberk / Bracers / Belt
-        29525,29526,29527,          // Primalstrike Vest / Belt / Bracers
-        // LW BoP (BT/Sunwell patterns)
-        32574,32575,                // Bindings / Shoulders of Lightning Reflexes
-        32577,                      // Living Earth Bindings
-        32581,32582,                // Swiftstrike Shoulders / Bracers of Renewed Life
-        34369,34370,                // Carapace of Sun and Shadow / Gloves of Immortal Dusk
-        34371,34372,                // Leather Chestguard / Gauntlets of the Sun
-        34375,                      // Sun-Drenched Scale Chestguard
-        30039,30040,30041,          // Boots of Utter Darkness / Belt of Deep Shadow / Boots of Natural Grace
-        33122,                      // Cloak of Darkness
-
-        // ─ Blacksmithing BoP weapons ─
-        28429,28430,                // Lionheart Champion / Executioner
-        28433,                      // Wicked Edge of the Planes
-        28435,28436,                // Mooncleaver / Bloodmoon
-        28438,28439,                // Dragonmaw / Dragonstrike
-        // BS BoP (BT/Sunwell patterns)
-        32570,                      // Swiftsteel Shoulders
-        34377,                      // Hard Khorium Battleplate
-        34380,                      // Sunblessed Gauntlets
-
-        // ─ Engineering BoP goggles ─
-        32461,32474,32475,32479,32480,32494,
-
-        // ─ Jewelcrafting BoP necks & rings ─
-        24114,24116,24121,          // Braided Eternium Chain / Eye of the Night / Chain of Twilight Owl
-        34358,34359,34360,          // Hard Khorium Choker / Pendant of Sunfire / Amulet of Flowing Life
-        34361,34362,34363,          // Hard Khorium Band / Loop of Forged Power / Ring of Flowing Life
-
-        // ─ Alchemy BoP trinkets ─
-        13503,35750,                // Alchemist's Stone / Redeemer's Alchemist Stone
-    ]);
-
-    // Returns the profession name if this item is BoP and REQUIRES that profession, else null
+    // Returns the profession name if this item requires a profession to craft/use, else null.
+    // Uses DATA.itemSources directly — any item with sourceType 'Profession' is filtered.
     function itemProfession(itemId) {
-        if (!BOP_PROFESSION_IDS.has(Number(itemId))) return null;
         const src = getItemSource(itemId);
         if (!src || src.sourceType !== 'Profession') return null;
         return extractProfession(src.source);
@@ -1638,27 +1587,24 @@
             }
         }
 
-        // ── Profession filter: discover which professions appear in BIS items ──
-        // Only show toggles for professions that have a BIS item (rank #1 in slot),
-        // not for professions that only appear among alternatives.
+        // ── Profession filter: discover which professions appear in any item in the slot ──
+        // Show toggles for all professions present (BIS or Alt) so the user can filter them all out.
         const professionSet = new Set();
         let hasPvpRatingItems = false;
         let hasWorldBossItems = false;
         if (!pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 if (!items.length) continue;
-                const bisItem = items[0];
-                const prof = itemProfession(bisItem.itemId);
-                if (prof) professionSet.add(prof);
-                // Check any item in the slot (BIS or alt) for rating-gated PvP or world boss
+                // Check every item in the slot (BIS or alt) for profession, rating-gated PvP or world boss
                 for (const it of items) {
+                    const prof = itemProfession(it.itemId);
+                    if (prof) professionSet.add(prof);
                     if (!hasPvpRatingItems && isItemRatingGated(it.itemId, it.name, slot)) {
                         hasPvpRatingItems = true;
                     }
                     if (!hasWorldBossItems && isItemWorldBoss(it.itemId)) {
                         hasWorldBossItems = true;
                     }
-                    if (hasPvpRatingItems && hasWorldBossItems) break;
                 }
             }
         }

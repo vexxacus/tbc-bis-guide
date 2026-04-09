@@ -6,6 +6,10 @@
   "scripts": {
     "sync": "node sync-data.js",
     "parse": "node parse-lua-data.js && node sync-data.js",
+    "fetch-wowhead-bis": "node scraper/fetch-wowhead-bis.js",
+    "fetch-wowhead-bis-resume": "node scraper/fetch-wowhead-bis.js --resume",
+    "merge-p3-lua": "node scraper/merge-p3-lua.js",
+    "apply-scraped-bis": "node scraper/apply-scraped-bis.js && node sync-data.js",
     "refresh-pvp": "node scraper/fetch-leaderboard.js && node scraper/fetch-gear.js --top 200 && node scraper/analyze-gear.js && node -e \"const d=require('./scraper/output/pvp-bis-data.json');require('fs').writeFileSync('js/pvp-data.js','const PVP_DATA='+JSON.stringify(d)+';')\" && node fetch-icons.js",
     "deploy": "firebase deploy --only hosting",
     "refresh-and-deploy": "npm run refresh-pvp && npm run deploy",
