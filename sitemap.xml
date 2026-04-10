@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home / Class Picker -->
+  <url>
+    <loc>https://tbc-bis-guide.web.app/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Druid -->
+  <url><loc>https://tbc-bis-guide.web.app/druid</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/balance/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/bear/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/cat/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/restoration/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Hunter -->
+  <url><loc>https://tbc-bis-guide.web.app/hunter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Mage -->
+  <url><loc>https://tbc-bis-guide.web.app/mage</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/fire/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/frost/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Paladin -->
+  <url><loc>https://tbc-bis-guide.web.app/paladin</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/holy/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/protection/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Priest -->
+  <url><loc>https://tbc-bis-guide.web.app/priest</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/shadow/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Rogue -->
+  <url><loc>https://tbc-bis-guide.web.app/rogue</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Shaman -->
+  <url><loc>https://tbc-bis-guide.web.app/shaman</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Warlock -->
+  <url><loc>https://tbc-bis-guide.web.app/warlock</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/destruction/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Warrior -->
+  <url><loc>https://tbc-bis-guide.web.app/warrior</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/arms/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-1</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-2</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warrior/protection/phase-5</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+</urlset>
