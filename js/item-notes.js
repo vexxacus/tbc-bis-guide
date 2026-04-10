@@ -9,7 +9,7 @@ const ITEM_NOTES = (function () {
     // Try to load synchronously via XHR (works for local dev & simple hosting)
     try {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'item-notes.json', false); // synchronous
+        xhr.open('GET', '/item-notes.json', false); // synchronous
         xhr.send();
         if (xhr.status === 200) {
             _data = JSON.parse(xhr.responseText);

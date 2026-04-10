@@ -149,7 +149,7 @@ let _simReadyCallbacks = [];
 
 function getSimBridge() {
     if (_simBridge) return _simBridge;
-    _simBridge = new WowSimBridge('sim_worker.js');
+    _simBridge = new WowSimBridge('/sim_worker.js');
     _simBridge.onReady = () => {
         _simReady = true;
         _simReadyCallbacks.forEach(fn => fn());
