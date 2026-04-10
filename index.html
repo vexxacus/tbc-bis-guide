@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-store">
+    <!-- Force reload if browser has cached an old version of this file -->
+    <script>
+        (function() {
+            var BUILD = '20260410c';
+            if (sessionStorage.getItem('bis-build') !== BUILD) {
+                sessionStorage.setItem('bis-build', BUILD);
+                if (performance.navigation ? performance.navigation.type !== 1 : !performance.getEntriesByType('navigation').some(function(n){return n.type==='reload';})) {
+                    location.reload(true);
+                }
+            }
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
