@@ -24,13 +24,13 @@
       {
         "source": "**/*.@(js|css)",
         "headers": [
-          { "key": "Cache-Control", "value": "max-age=604800" }
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
         ]
       },
       {
         "source": "**/*.html",
         "headers": [
-          { "key": "Cache-Control", "value": "max-age=300" }
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
         ]
       }
     ],

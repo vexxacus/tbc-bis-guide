@@ -1558,6 +1558,11 @@
             return;
         }
 
+        // ── Apply world boss filter FIRST, before any slot grouping ──
+        if (state.hideWorldBoss && !pvpSpecData) {
+            items = items.filter(i => !isItemWorldBoss(i.itemId));
+        }
+
         // Group by slot, dedup
         // Ring and Trinket are split into slot 1 and slot 2 (you wear two of each)
         const _ringBuf = [], _trinketBuf = [];
@@ -1635,14 +1640,6 @@
                     ...altsFor2.map(i => ({ ...i, slot: slotName2 }))
                 ];
             }
-        }
-
-        // ── Apply world boss filter to ring/trinket buffers BEFORE splitting into slots ──
-        // This ensures splitDualSlot sees the already-filtered list so it won't
-        // assign the same unique item as primary in both slot 1 and slot 2.
-        if (state.hideWorldBoss && !pvpSpecData) {
-            _ringBuf.splice(0, _ringBuf.length, ..._ringBuf.filter(i => !isItemWorldBoss(i.itemId)));
-            _trinketBuf.splice(0, _trinketBuf.length, ..._trinketBuf.filter(i => !isItemWorldBoss(i.itemId)));
         }
 
         splitDualSlot(_ringBuf,    'Ring 1',    'Ring 2');
@@ -1734,14 +1731,6 @@
         if (state.hidePvpRating && !pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 slotGroups[slot] = items.filter(i => !isItemRatingGated(i.itemId, i.name, slot));
-                if (!slotGroups[slot].length) delete slotGroups[slot];
-            }
-        }
-
-        // ── Apply world boss filter: remove items from outdoor world bosses ──
-        if (state.hideWorldBoss && !pvpSpecData) {
-            for (const [slot, items] of Object.entries(slotGroups)) {
-                slotGroups[slot] = items.filter(i => !isItemWorldBoss(i.itemId));
                 if (!slotGroups[slot].length) delete slotGroups[slot];
             }
         }
