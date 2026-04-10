@@ -6,12 +6,12 @@
     <!-- Force reload if browser has cached an old version of this file -->
     <script>
         (function() {
-            var BUILD = '20260410c';
-            if (sessionStorage.getItem('bis-build') !== BUILD) {
+            var BUILD = '20260410d';
+            var stored = sessionStorage.getItem('bis-build');
+            if (stored !== BUILD) {
                 sessionStorage.setItem('bis-build', BUILD);
-                if (performance.navigation ? performance.navigation.type !== 1 : !performance.getEntriesByType('navigation').some(function(n){return n.type==='reload';})) {
-                    location.reload(true);
-                }
+                // location.reload(true) bypasses cache and fetches fresh HTML
+                window.location.reload(true);
             }
         })();
     </script>
