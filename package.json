@@ -4,6 +4,7 @@
   "description": "TBC Classic Best in Slot Guide",
   "main": "fetch-icons.js",
   "scripts": {
+    "dev": "npx serve . --single --listen 5500",
     "sync": "node sync-data.js",
     "parse": "node parse-lua-data.js && node sync-data.js",
     "fetch-wowhead-bis": "node scraper/fetch-wowhead-bis.js",

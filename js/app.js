@@ -17,8 +17,51 @@
         hidePvpRating: false,            // hide rating-gated PvP items (Merciless/Vengeful/Brutal weapons & shoulders)
         _pvpRatingLoaded: false,
         hideWorldBoss: false,            // hide items that drop from outdoor world bosses
-        _worldBossLoaded: false
+        _worldBossLoaded: false,
+        selectedItems: {},              // { "warrior-fury|3": { "Head": 29021 } } — user-chosen item overrides per slot
     };
+
+    // ─── Item Selection helpers ──────────────────────────────────────
+    /** Key into selectedItems for current spec+phase */
+    function selectionKey() {
+        const cls   = (state.selectedClass  || '').toLowerCase().replace(/\s+/g, '-');
+        const spec  = (state.selectedSpec   || '').toLowerCase().replace(/\s+/g, '-');
+        const phase = state.selectedPhase ?? 'x';
+        return `${cls}-${spec}|${phase}`;
+    }
+
+    /** Return the user-selected item for a slot, or si[0] (BiS) as default */
+    function getActiveItem(slot, slotItems) {
+        const key = selectionKey();
+        const overrideId = state.selectedItems[key]?.[slot];
+        if (overrideId == null) return slotItems[0];
+        const found = slotItems.find(i => String(i.itemId) === String(overrideId));
+        return found || slotItems[0]; // fallback to BiS if item no longer in list (e.g. filtered out)
+    }
+
+    /** Set user selection for a slot; pass null to reset to BiS */
+    function setSelectedItem(slot, itemId) {
+        const key = selectionKey();
+        if (!state.selectedItems[key]) state.selectedItems[key] = {};
+        if (itemId == null) {
+            delete state.selectedItems[key][slot];
+        } else {
+            state.selectedItems[key][slot] = String(itemId);
+        }
+        // Persist to localStorage
+        try {
+            localStorage.setItem('tbc-bis-selected-items', JSON.stringify(state.selectedItems));
+        } catch (_) {}
+    }
+
+    /** Load persisted selections from localStorage */
+    function loadSelectedItems() {
+        try {
+            const raw = localStorage.getItem('tbc-bis-selected-items');
+            if (raw) state.selectedItems = JSON.parse(raw);
+        } catch (_) { state.selectedItems = {}; }
+    }
+    loadSelectedItems();
 
     // ─── SEO / URL routing ───────────────────────────────────────────
 
@@ -740,7 +783,7 @@
     // 'both' = show both sections (Arms Warrior, casters with both options, etc.)
     // If not listed → auto-detect from data
     const WEAPON_STYLE = {
-        'Warrior-Fury':         'dw',
+        'Warrior-Fury':         'both',   // DW is BiS but user can toggle to 2H
         'Warrior-Protection':   'dw',
         'Rogue-Dps':            'dw',
         'Shaman-Enhancement':   'dw',
@@ -751,6 +794,24 @@
         'Paladin-Retribution':  '2h',
         'Warrior-Arms':         'both',
     };
+
+    // Specs where the user can explicitly toggle between DW and 2H
+    const WEAPON_TOGGLE_SPECS = new Set(['Warrior-Fury']);
+
+    // weaponMode: per selectionKey() → 'dw' | '2h' (default 'dw')
+    const weaponModeState = {};
+    function getWeaponMode() {
+        return weaponModeState[selectionKey()] || 'dw';
+    }
+    function setWeaponMode(mode) {
+        weaponModeState[selectionKey()] = mode;
+        try { localStorage.setItem('tbc-bis-weapon-mode', JSON.stringify(weaponModeState)); } catch(_) {}
+    }
+    // Load persisted weapon modes
+    try {
+        const wm = localStorage.getItem('tbc-bis-weapon-mode');
+        if (wm) Object.assign(weaponModeState, JSON.parse(wm));
+    } catch(_) {}
 
     // ─── PvP gear overrides per class/phase ──────────────────────────
     const PVP_ITEMS = {
@@ -1180,14 +1241,18 @@
     let _buildGemOverlay = () => '';
 
     // ─── Render a single slot group ──────────────────────────────────
-    function renderSlotGroup(slot, slotGroups, enchantLookup) {
+    function renderSlotGroup(slot, slotGroups, enchantLookup, isPvPMode = false) {
         const si = slotGroups[slot];
         if (!si || !si.length) return '';
 
         // Display name: "Ring 1" → "Ring", "Trinket 2" → "Trinket" etc.
         const slotDisplayName = slot.replace(/ [12]$/, '');
 
-        const bis = si[0], alts = si.slice(1);
+        // ── Active item: user selection or BiS (index 0) ──
+        const bis = getActiveItem(slot, si);
+        const isOverridden = String(bis.itemId) !== String(si[0].itemId);
+        const alts = si.filter(i => String(i.itemId) !== String(bis.itemId));
+
         const isPvPItem = bis.rank?.toLowerCase().includes('pvp');
         const badgeCls = isPvPItem ? 'bis' : (bis.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
         const badgeStyle = isPvPItem ? ' style="background:#c41e3a"' : '';
@@ -1218,11 +1283,11 @@
         // PvP popularity meta
         const bisPvpHtml = pvpMetaHtml(bis);
 
-        let html = `<div class="slot-group" data-slot="${slot}">
+        let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}">
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
                 <div class="slot-content">
-                    <div class="slot-name">${slotDisplayName}</div>
+                    <div class="slot-name">${slotDisplayName}${isOverridden ? ' <span class="slot-custom-tag">Custom</span>' : ''}</div>
                     <div class="slot-bis-item">
                         <div class="slot-bis-name ${bisQuality}">${whItem(bis.itemId, bis.name || 'Item #'+bis.itemId, bisQuality)}</div>
                     </div>
@@ -1232,15 +1297,25 @@
                     ${clonedNote}
                 </div>
                 <div class="slot-meta">
-                    <span class="slot-badge ${badgeCls}"${badgeStyle}>${bis.rank}</span>
+                    ${isOverridden ? `<button class="slot-reset-btn" data-slot="${slot}" title="Återställ till BiS">✕</button>` : `<span class="slot-badge ${badgeCls}"${badgeStyle}>${bis.rank}</span>`}
                     ${alts.length ? `<span class="slot-alt-count">+${alts.length}</span>` : ''}
                     ${alts.length ? '<span class="slot-expand">▾</span>' : ''}
                 </div>
             </div>`;
 
         if (alts.length) {
+            // In PvP mode: no selection UI — items are read-only
+            const showSelectUI = !isPvPMode;
+
             html += '<div class="slot-alts">';
-            alts.forEach((alt, i) => {
+            // Also show the original BiS (si[0]) at top when an override is active, so user can revert easily
+            const displayItems = (isOverridden && showSelectUI)
+                ? [si[0], ...alts]
+                : alts;
+
+            displayItems.forEach((alt) => {
+                const isBisFallback = isOverridden && String(alt.itemId) === String(si[0].itemId);
+                const isActive = String(alt.itemId) === String(bis.itemId);
                 const ap = alt.rank?.toLowerCase().includes('pvp');
                 const ac = ap ? 'bis' : (alt.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
                 const as = ap ? ' style="background:#c41e3a"' : '';
@@ -1249,15 +1324,19 @@
                 const altQuality = pvpQualityClass(alt);
                 const altIconHtml = itemIcon(alt.itemId, 'small', 'alt-icon ' + altQuality);
                 const altPvpHtml = pvpMetaHtml(alt);
-                html += `<div class="alt-item" data-item-id="${alt.itemId}">
+                const bisLabel = isBisFallback ? ' <span class="alt-bis-label">BiS</span>' : '';
+                const selectBtn = showSelectUI
+                    ? `<button class="alt-select-btn${isActive ? ' active' : ''}" data-slot="${slot}" data-item-id="${alt.itemId}" title="${isActive ? 'Selected' : 'Use this item'}">${isActive ? '✓' : 'Use'}</button>`
+                    : '';
+                html += `<div class="alt-item${isActive ? ' alt-item-active' : ''}" data-item-id="${alt.itemId}">
                     ${altIconHtml}
                     <div class="slot-content">
-                        <span class="alt-name ${altQuality}">${whItem(alt.itemId, alt.name || 'Item #'+alt.itemId, altQuality)}</span>
+                        <span class="alt-name ${altQuality}">${whItem(alt.itemId, alt.name || 'Item #'+alt.itemId, altQuality)}${bisLabel}</span>
                         ${altSrcText ? `<div class="slot-source">${altSrcText}</div>` : ''}
                         ${altPvpHtml}
                         ${getNote(alt.itemId)}
                     </div>
-                    <span class="slot-badge ${ac}"${as}>${alt.rank}</span>
+                    ${showSelectUI ? selectBtn : `<span class="slot-badge ${ac}"${as}>${alt.rank}</span>`}
                 </div>`;
             });
             html += '</div>';
@@ -1528,7 +1607,18 @@
                 if (!hasUnique) return true;
                 if (ITEM_UNIQUE.has(parseInt(i.itemId)) && i.itemId === primary1?.itemId) return false;
                 return true;
-            }) || allSorted[1]; // fallback to index 1 if no distinct item found
+            });
+            // If no valid second item exists (e.g. only one unique ring in filtered data),
+            // skip slot 2 entirely rather than showing a duplicate.
+            if (!primary2) {
+                if (primary1) {
+                    slotGroups[slotName1] = [
+                        { ...primary1, slot: slotName1 },
+                        ...allSorted.slice(1).map(i => ({ ...i, slot: slotName1 }))
+                    ];
+                }
+                return;
+            }
 
             const altsFor1 = allSorted.slice(1); // everything else is alt for slot 1
             const altsFor2 = allSorted.filter(i => i !== primary2); // remove primary2, keep others as alts
@@ -1546,6 +1636,15 @@
                 ];
             }
         }
+
+        // ── Apply world boss filter to ring/trinket buffers BEFORE splitting into slots ──
+        // This ensures splitDualSlot sees the already-filtered list so it won't
+        // assign the same unique item as primary in both slot 1 and slot 2.
+        if (state.hideWorldBoss && !pvpSpecData) {
+            _ringBuf.splice(0, _ringBuf.length, ..._ringBuf.filter(i => !isItemWorldBoss(i.itemId)));
+            _trinketBuf.splice(0, _trinketBuf.length, ..._trinketBuf.filter(i => !isItemWorldBoss(i.itemId)));
+        }
+
         splitDualSlot(_ringBuf,    'Ring 1',    'Ring 2');
         splitDualSlot(_trinketBuf, 'Trinket 1', 'Trinket 2');
 
@@ -1817,6 +1916,21 @@
         const gs = GearScore.calcTotalScore(bisItems);
         const pvpLabel = state.isPvP ? '<span class="pvp-tag" style="margin-left:6px">PvP</span>' : '';
 
+        // ── Determine which weapon sections to show ──
+        // Use WEAPON_STYLE config if available, else auto-detect from slot data
+        const weapStyle = WEAPON_STYLE[specKey] || 'auto';
+        let showDW, show2H;
+        if (weapStyle === 'dw')        { showDW = hasOneHanders; show2H = false; }
+        else if (weapStyle === '2h')   { showDW = false;         show2H = has2H; }
+        else if (weapStyle === 'both') { showDW = hasOneHanders; show2H = has2H; }
+        else { showDW = hasOneHanders; show2H = has2H; } // auto
+
+        // ── Weapon mode — computed early, used by both paperdoll and slot rendering ──
+        const showWeaponToggle = WEAPON_TOGGLE_SPECS.has(specKey) && hasOneHanders && has2H && !pvpSpecData;
+        const weaponMode = showWeaponToggle ? getWeaponMode() : null;
+        const effectiveDW = showWeaponToggle ? (weaponMode === 'dw') : showDW;
+        const effective2H = showWeaponToggle ? (weaponMode === '2h') : show2H;
+
         // ── Paperdoll overview ──
         const paperdoll = $('paperdoll');
         const PD_ORDER = [
@@ -1835,12 +1949,25 @@
         for (const slot of PD_ORDER) {
             const si = slotGroups[slot];
             if (!si || !si.length) continue;
-            const bis = si[0];
+            const bis = getActiveItem(slot, si);
+            const isOverridden = String(bis.itemId) !== String(si[0].itemId);
             const hasEnchant = !!enchantLookup[slot];
-            pdHtml += `<div class="pd-slot" data-pd-slot="${slot}" title="${bis.name || slot}">
+            const pdTitle = (bis.name || slot).replace(/"/g, '&quot;');
+
+            // Weapon mode: dim inactive weapon slots
+            const isMHOrOH = slot === 'Main Hand' || slot === 'Off Hand';
+            const is2H     = slot === 'Two Hand';
+            const isWeaponDimmed = showWeaponToggle && (
+                (weaponMode === '2h' && isMHOrOH) ||
+                (weaponMode === 'dw' && is2H)
+            );
+
+            pdHtml += `<div class="pd-slot${isOverridden ? ' pd-slot-overridden' : ''}${isWeaponDimmed ? ' pd-slot-dimmed' : ''}" data-pd-slot="${slot}" title="${pdTitle}">
                 ${itemIcon(bis.itemId, 'medium', 'pd-slot-icon ' + qualityClass(bis.itemId))}
                 <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
                 ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
+                ${isOverridden ? '<span class="pd-custom-dot"></span>' : ''}
+                ${isWeaponDimmed ? '<span class="pd-dimmed-x">✕</span>' : ''}
             </div>`;
         }
         paperdoll.innerHTML = pdHtml;
@@ -1916,59 +2043,94 @@
         const JEWELRY_SLOTS = ['Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2'];
         const WEAPON_SLOTS  = new Set(['Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic']);
 
-        // ── Determine which weapon sections to show ──
-        // Use WEAPON_STYLE config if available, else auto-detect from slot data
-        const weapStyle = WEAPON_STYLE[specKey] || 'auto';
-        let showDW, show2H;
-        if (weapStyle === 'dw')   { showDW = hasOneHanders; show2H = false; }
-        else if (weapStyle === '2h') { showDW = false; show2H = has2H; }
-        else if (weapStyle === 'both') { showDW = hasOneHanders; show2H = has2H; }
-        else {
-            // auto: show both if data has both; if only one type, show only that
-            showDW = hasOneHanders;
-            show2H = has2H;
-        }
-
         // Helper: render a category header
-        function categoryHeader(icon, title, extraClass) {
+        function categoryHeader(icon, title, extraClass, note) {
+            const noteHtml = note ? `<span class="weapon-section-note">${note}</span>` : '';
             return `<div class="weapon-section-header ${extraClass || ''}">
                 <span class="weapon-section-icon">${icon}</span>
                 <span class="weapon-section-title">${title}</span>
+                ${noteHtml}
             </div>`;
         }
 
         // ── Armor ──
         html += categoryHeader('🛡️', 'Armor', 'first-category');
         for (const slot of ARMOR_SLOTS) {
-            html += renderSlotGroup(slot, slotGroups, enchantLookup);
+            html += renderSlotGroup(slot, slotGroups, enchantLookup, !!pvpSpecData);
         }
 
         // ── Jewelry (Ring 1, Ring 2, Trinket 1, Trinket 2) ──
         html += categoryHeader('💎', 'Jewelry');
         for (const slot of JEWELRY_SLOTS) {
-            html += renderSlotGroup(slot, slotGroups, enchantLookup);
+            html += renderSlotGroup(slot, slotGroups, enchantLookup, !!pvpSpecData);
         }
 
         // ── Weapons ──
-        if (showDW) {
-            const oneHandTitle = isDualWield ? 'Dual-Wield' : 'Main Hand / Off Hand';
-            html += categoryHeader('⚔️', oneHandTitle);
-            if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup);
-            if (hasOH) html += renderSlotGroup('Off Hand', slotGroups, enchantLookup);
+        if (effectiveDW || effective2H) {
+            const toggleHtml = showWeaponToggle ? `
+                <div class="weapon-toggle">
+                    <button class="weapon-toggle-btn${weaponMode === 'dw' ? ' active' : ''}" data-weapon-mode="dw">⚔️ Dual-Wield</button>
+                    <button class="weapon-toggle-btn${weaponMode === '2h' ? ' active' : ''}" data-weapon-mode="2h">🗡️ Two-Handed</button>
+                </div>` : '';
+            html += `<div class="weapon-section-header">
+                <span class="weapon-section-icon">⚔️</span>
+                <span class="weapon-section-title">Weapons</span>
+                ${toggleHtml}
+            </div>`;
         }
 
-        if (show2H) {
+        if (effectiveDW) {
+            if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup, !!pvpSpecData);
+            if (hasOH) html += renderSlotGroup('Off Hand',  slotGroups, enchantLookup, !!pvpSpecData);
+        }
+        if (showWeaponToggle && weaponMode === '2h' && hasOneHanders) {
+            // Show MH/OH dimmed so user can still browse/switch
+            html += `<div class="slot-group-inactive-wrap">`;
+            if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup, !!pvpSpecData);
+            if (hasOH) html += renderSlotGroup('Off Hand',  slotGroups, enchantLookup, !!pvpSpecData);
+            html += `</div>`;
+        }
+
+        if (effective2H) {
+            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
+        }
+        if (showWeaponToggle && weaponMode === 'dw' && has2H) {
+            html += `<div class="slot-group-inactive-wrap">`;
+            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
+            html += `</div>`;
+        }
+
+        // Non-toggle specs with 2H (Arms etc) — use old-style header
+        if (!showWeaponToggle && show2H) {
             html += categoryHeader('🗡️', 'Two-Handed');
-            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup);
+            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
+        }
+
+        // Non-toggle specs with DW only (no 2H in data)
+        if (!showWeaponToggle && showDW && !show2H) {
+            const oneHandTitle = isDualWield ? 'Dual-Wield' : 'Main Hand / Off Hand';
+            html += categoryHeader('⚔️', oneHandTitle);
+            if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup, !!pvpSpecData);
+            if (hasOH) html += renderSlotGroup('Off Hand',  slotGroups, enchantLookup, !!pvpSpecData);
         }
 
         if (slotGroups['Ranged/Relic']?.length) {
             html += categoryHeader('🏹', 'Ranged / Relic');
-            html += renderSlotGroup('Ranged/Relic', slotGroups, enchantLookup);
+            html += renderSlotGroup('Ranged/Relic', slotGroups, enchantLookup, !!pvpSpecData);
         }
 
         slotList.innerHTML = html;
         bindHintDismiss(slotList);
+
+        // ── Weapon toggle buttons ──
+        slotList.querySelectorAll('.weapon-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const scrollY = window.scrollY;
+                setWeaponMode(btn.dataset.weaponMode);
+                renderBisList();
+                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+            });
+        });
 
         // Events — expand/collapse slot-header (but open modal if icon/name clicked)
         slotList.querySelectorAll('.slot-header').forEach(hdr => {
@@ -1980,12 +2142,36 @@
             });
         });
 
-        // Open modal on alt-item click
+        // Open modal on alt-item click (but not on select-btn or wh-item clicks)
         slotList.querySelectorAll('.alt-item').forEach(el => {
             el.addEventListener('click', e => {
                 const whEl = e.target.closest('[data-wh-item]');
-                if (whEl) return; // handled by delegation below
+                if (whEl) return;
+                const selBtn = e.target.closest('.alt-select-btn');
+                if (selBtn) return; // handled separately below
                 openItemModal(el.dataset.itemId, el.closest('.slot-group').dataset.slot);
+            });
+        });
+
+        // ── Item selection: Välj-knapp ──
+        slotList.querySelectorAll('.alt-select-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const scrollY = window.scrollY;
+                setSelectedItem(btn.dataset.slot, btn.dataset.itemId);
+                renderBisList();
+                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+            });
+        });
+
+        // ── Item selection: Reset-knapp (✕) ──
+        slotList.querySelectorAll('.slot-reset-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const scrollY = window.scrollY;
+                setSelectedItem(btn.dataset.slot, null);
+                renderBisList();
+                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
             });
         });
 
@@ -2021,9 +2207,122 @@
         });
 
         refreshWH();
+
+        // Uppdatera stats-panel om spec har sim-stöd
+        scheduleSimStats(slotGroups, enchantLookup, gems);
     }
 
-    // Compact source emoji
+    // ─── Sim Stats Panel ─────────────────────────────────────────────
+    // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
+    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury']);
+
+    const simPanel = document.getElementById('simPanel');
+    const simStats = document.getElementById('simStats');
+    let _simStatsDebounce = null;
+    let _simStatsReqId = 0;
+
+    function scheduleSimStats(slotGroups, enchantLookup, gems) {
+        const specKey = `${state.selectedClass}-${state.selectedSpec}`;
+        if (state.isPvP || !SIM_SUPPORTED_SPECS.has(specKey) || typeof WowSimBridge === 'undefined') {
+            if (simPanel) simPanel.style.display = 'none';
+            return;
+        }
+        if (simPanel) simPanel.style.display = 'block';
+        _lastSlotGroups    = slotGroups;
+        _lastEnchantLookup = enchantLookup;
+        _lastGems          = gems;
+
+        clearTimeout(_simStatsDebounce);
+        _simStatsDebounce = setTimeout(async () => {
+            const reqId = ++_simStatsReqId;
+            simStats.innerHTML = '<div class="sim-stat-loading">Computing stats…</div>';
+
+            // Capture slotGroups + weaponMode at this moment
+            const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
+            const stats = await computeStatsForBis(slotGroups, getActiveItem, wMode, enchantLookup, gems);
+            if (reqId !== _simStatsReqId) return; // stale
+
+            if (!stats) {
+                simStats.innerHTML = '<div class="sim-stat-loading">Stats unavailable — WASM loading…</div>';
+                // Retry when WASM is ready
+                onSimReady(() => scheduleSimStats(slotGroups, enchantLookup, gems));
+                return;
+            }
+            renderSimStats(stats);
+        }, 300);
+    }
+
+    function renderSimStats(stats) {
+        const rows = SIM_STAT_ORDER.map(idx => {
+            const def = SIM_STAT_LABELS[idx];
+            if (!def) return '';
+            const val = stats[idx] || 0;
+            return `<div class="sim-stat-row">
+                <span class="sim-stat-label">${def.label}</span>
+                <span class="sim-stat-value">${def.fmt(val)}</span>
+            </div>`;
+        }).join('');
+        simStats.innerHTML = `<div class="sim-stat-grid">${rows}</div>`;
+    }
+
+    // ─── Sim DPS Button ──────────────────────────────────────────────
+    const simDpsBtn      = document.getElementById('simDpsBtn');
+    const simDpsProgress = document.getElementById('simDpsProgress');
+    const simDpsFill     = document.getElementById('simDpsFill');
+    const simDpsStatus   = document.getElementById('simDpsStatus');
+    const simDpsResult   = document.getElementById('simDpsResult');
+    const simDpsNumber   = document.getElementById('simDpsNumber');
+    const simDpsStdev    = document.getElementById('simDpsStdev');
+
+    // Keep a reference to the latest slotGroups so the sim button can use them
+    let _lastSlotGroups    = null;
+    let _lastEnchantLookup = null;
+    let _lastGems          = null;
+
+    if (simDpsBtn) {
+        simDpsBtn.addEventListener('click', async () => {
+            if (!_lastSlotGroups || !_simReady) return;
+
+            simDpsBtn.disabled = true;
+            simDpsBtn.textContent = 'Simulating…';
+            simDpsProgress.style.display = 'block';
+            simDpsResult.style.display = 'none';
+            simDpsFill.style.width = '0%';
+
+            const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
+
+            try {
+                const result = await simulateFuryWarrior(
+                    _lastSlotGroups,
+                    getActiveItem,
+                    wMode,
+                    _lastEnchantLookup,
+                    _lastGems,
+                    p => {
+                        const pct = p.totalIterations > 0
+                            ? Math.round(p.completedIterations / p.totalIterations * 100) : 0;
+                        simDpsFill.style.width = pct + '%';
+                        simDpsStatus.textContent = `${p.completedIterations} / ${p.totalIterations}`;
+                        if (p.dps > 0) simDpsNumber.textContent = Math.round(p.dps);
+                    }
+                );
+                simDpsNumber.textContent = Math.round(result.avg);
+                simDpsStdev.textContent  = `±${Math.round(result.stdev)} stdev`;
+                simDpsResult.style.display = 'flex';
+                simDpsProgress.style.display = 'none';
+            } catch (e) {
+                simDpsStatus.textContent = 'Error: ' + e.message.split('\n')[0];
+            }
+
+            simDpsBtn.disabled = false;
+            simDpsBtn.textContent = '▶ Simulate DPS';
+        });
+    }
+
+    // Trigger WASM init early (before user gets to the BiS list)
+    if (typeof WowSimBridge !== 'undefined') {
+        onSimReady(() => {}); // just warms up the worker
+    }
     function srcEmoji(t) {
         return { Drop:'💀', Quest:'❗', Profession:'🔨', PvP:'⚔️', Vendor:'🏪', Reputation:'⭐',
                  Badge:'🎖️', 'Dungeon Token':'🎖️', Crafted:'🔨' }[t] || '📦';

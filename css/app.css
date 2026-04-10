@@ -557,6 +557,66 @@ body {
     border: 1px solid var(--bg-card);
 }
 
+/* Custom-dot på paperdoll — visar att ett item är user-valt */
+.pd-slot .pd-custom-dot {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 1px solid var(--bg-card);
+}
+
+/* Paperdoll-slot med override — subtil accent-border */
+.pd-slot.pd-slot-overridden img {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-radius: 4px;
+}
+
+/* Paperdoll-slot som är inaktiv pga weapon mode */
+.pd-slot.pd-slot-dimmed {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.pd-slot .pd-dimmed-x {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #f85149;
+    font-weight: 700;
+    text-shadow: 0 0 4px #000;
+}
+
+/* Slot-grupper som är inaktiva pga weapon mode toggle */
+.slot-group-inactive-wrap {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: grayscale(60%);
+    position: relative;
+}
+.slot-group-inactive-wrap::after {
+    content: 'Not used in current weapon mode';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.75);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
 /* Gem dots on paperdoll */
 .pd-slot .pd-gem-dots {
     position: absolute;
@@ -794,6 +854,92 @@ body {
 .slot-badge.bis { background: var(--bis-badge); color: #fff; }
 .slot-badge.alt { background: var(--alt-badge); color: #fff; }
 
+/* ─── Item Selection UI ───────────────────────────────────────────── */
+
+/* Slot with a user-chosen override — subtle left accent */
+.slot-overridden > .slot-header {
+    border-left: 3px solid var(--accent);
+    padding-left: 5px;
+}
+
+/* "Custom" label next to slot name */
+.slot-custom-tag {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    background: rgba(255, 200, 100, 0.12);
+    border: 1px solid rgba(255, 200, 100, 0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Reset-knapp (✕) — visas bara när ett override är aktivt */
+.slot-reset-btn {
+    background: none;
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    color: #f85149;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    padding: 3px 7px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: background 0.15s, border-color 0.15s;
+}
+.slot-reset-btn:hover {
+    background: rgba(248, 81, 73, 0.15);
+    border-color: #f85149;
+}
+
+/* Alt-item markerad som aktivt vald */
+.alt-item-active {
+    background: rgba(255, 200, 100, 0.07);
+}
+
+/* "Välj"-knapp på varje alt-rad */
+.alt-select-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-secondary);
+    border-radius: 5px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.alt-select-btn:hover {
+    background: rgba(255, 200, 100, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.alt-select-btn.active {
+    background: rgba(255, 200, 100, 0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+    cursor: default;
+}
+
+/* "BiS"-etikett bredvid itemnamn i alt-listan (visas när override är aktivt) */
+.alt-bis-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--bis-badge, #4caf50);
+    background: rgba(76, 175, 80, 0.12);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
 /* ─── Category / Weapon Section Headers ───────────────────────────── */
 .weapon-section-header {
     display: flex;
@@ -802,6 +948,37 @@ body {
     padding: 10px 4px 6px;
     margin-top: 12px;
     border-top: 1px solid rgba(255,255,255,0.06);
+    flex-wrap: wrap;
+}
+
+/* Weapon mode toggle (DW / 2H) */
+.weapon-toggle {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+.weapon-toggle-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.weapon-toggle-btn:hover {
+    background: rgba(255, 200, 100, 0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.weapon-toggle-btn.active {
+    background: rgba(255, 200, 100, 0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+    cursor: default;
 }
 
 .weapon-section-header.first-category {
@@ -833,6 +1010,144 @@ body {
     color: var(--text-muted);
     font-style: italic;
     margin-top: 1px;
+}
+
+/* ─── Sim Stats Panel ─────────────────────────────────────────────── */
+.sim-panel {
+    margin-top: 16px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+}
+
+.sim-panel-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.sim-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 16px;
+}
+
+.sim-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.8rem;
+}
+
+.sim-stat-row:last-child { border-bottom: none; }
+
+.sim-stat-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.sim-stat-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.sim-stat-loading {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 8px 0;
+}
+
+.sim-panel-subtitle {
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: 4px;
+}
+
+/* ── DPS Sim section ── */
+.sim-dps-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sim-dps-btn {
+    width: 100%;
+    background: #238636;
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.sim-dps-btn:hover:not(:disabled) { background: #2ea043; }
+.sim-dps-btn:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+
+.sim-dps-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+.sim-dps-fill {
+    height: 100%;
+    background: #238636;
+    width: 0%;
+    transition: width 0.2s;
+    border-radius: 2px;
+}
+.sim-dps-status {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 5px;
+}
+
+.sim-dps-result {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+.sim-dps-number {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.sim-dps-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+.sim-dps-stdev {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.sim-disclaimer {
+    margin: 10px 0 0;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 8px;
 }
 
 /* Item notes / gearing tips */

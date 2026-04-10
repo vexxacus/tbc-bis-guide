@@ -114,6 +114,27 @@
             <div class="profession-filter hidden" id="professionFilter"></div>
             <!-- Slot list -->
             <div class="slot-list" id="slotList"></div>
+
+            <!-- ── Stats panel (PvE specs with sim support) ── -->
+            <div class="sim-panel" id="simPanel" style="display:none">
+                <div class="sim-panel-title">📊 Character Stats <span class="sim-panel-subtitle">incl. buffs & consumables</span></div>
+                <div class="sim-panel-stats" id="simStats">
+                    <div class="sim-stat-loading">Loading stats…</div>
+                </div>
+                <div class="sim-dps-section">
+                    <button class="sim-dps-btn" id="simDpsBtn">▶ Simulate DPS</button>
+                    <div class="sim-dps-progress" id="simDpsProgress" style="display:none">
+                        <div class="sim-dps-bar"><div class="sim-dps-fill" id="simDpsFill"></div></div>
+                        <div class="sim-dps-status" id="simDpsStatus"></div>
+                    </div>
+                    <div class="sim-dps-result" id="simDpsResult" style="display:none">
+                        <span class="sim-dps-number" id="simDpsNumber">—</span>
+                        <span class="sim-dps-label">DPS</span>
+                        <span class="sim-dps-stdev" id="simDpsStdev"></span>
+                    </div>
+                    <p class="sim-disclaimer">Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target. Results reflect gear + gems + enchants + buffs.</p>
+                </div>
+            </div>
         </section>
 
         <!-- Item Detail Modal -->
@@ -142,6 +163,8 @@
     <script src="js/item-notes.js?v=20260407"></script>
     <script src="js/item-restrictions.js?v=20260407"></script>
     <script src="js/pvp-data.js?v=20260407"></script>
+    <script src="js/sim-bridge.js"></script>
+    <script src="js/sim.js"></script>
     <script src="js/app.js?v=20260407"></script>
 </body>
 </html>
