@@ -1559,6 +1559,8 @@
         }
 
         // ── Apply world boss filter FIRST, before any slot grouping ──
+        // Check if any world boss items exist BEFORE filtering (so the toggle button stays visible)
+        const anyWorldBossItems = !pvpSpecData && items.some(i => isItemWorldBoss(i.itemId));
         if (state.hideWorldBoss && !pvpSpecData) {
             items = items.filter(i => !isItemWorldBoss(i.itemId));
         }
@@ -1687,7 +1689,7 @@
         // Show toggles for all professions present (BIS or Alt) so the user can filter them all out.
         const professionSet = new Set();
         let hasPvpRatingItems = false;
-        let hasWorldBossItems = false;
+        let hasWorldBossItems = anyWorldBossItems; // use pre-filter count so button stays visible when active
         if (!pvpSpecData) {
             for (const [slot, items] of Object.entries(slotGroups)) {
                 if (!items.length) continue;
@@ -1697,9 +1699,6 @@
                     if (prof) professionSet.add(prof);
                     if (!hasPvpRatingItems && isItemRatingGated(it.itemId, it.name, slot)) {
                         hasPvpRatingItems = true;
-                    }
-                    if (!hasWorldBossItems && isItemWorldBoss(it.itemId)) {
-                        hasWorldBossItems = true;
                     }
                 }
             }
