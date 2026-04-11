@@ -2060,9 +2060,12 @@
                     <button class="weapon-toggle-btn${weaponMode === 'dw' ? ' active' : ''}" data-weapon-mode="dw">⚔️ Dual-Wield</button>
                     <button class="weapon-toggle-btn${weaponMode === '2h' ? ' active' : ''}" data-weapon-mode="2h">🗡️ Two-Handed</button>
                 </div>` : '';
+            const weaponTitle = (!showWeaponToggle && effectiveDW && !effective2H && isDualWield) ? 'Dual-Wield'
+                              : (!showWeaponToggle && effective2H && !effectiveDW)                 ? 'Two-Handed'
+                              : 'Weapons';
             html += `<div class="weapon-section-header">
                 <span class="weapon-section-icon">⚔️</span>
-                <span class="weapon-section-title">Weapons</span>
+                <span class="weapon-section-title">${weaponTitle}</span>
                 ${toggleHtml}
             </div>`;
         }
@@ -2088,19 +2091,7 @@
             html += `</div>`;
         }
 
-        // Non-toggle specs with 2H (Arms etc) — use old-style header
-        if (!showWeaponToggle && show2H) {
-            html += categoryHeader('🗡️', 'Two-Handed');
-            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
-        }
-
-        // Non-toggle specs with DW only (no 2H in data)
-        if (!showWeaponToggle && showDW && !show2H) {
-            const oneHandTitle = isDualWield ? 'Dual-Wield' : 'Main Hand / Off Hand';
-            html += categoryHeader('⚔️', oneHandTitle);
-            if (hasMH) html += renderSlotGroup('Main Hand', slotGroups, enchantLookup, !!pvpSpecData);
-            if (hasOH) html += renderSlotGroup('Off Hand',  slotGroups, enchantLookup, !!pvpSpecData);
-        }
+        // NOTE: old fallback headers removed — title is now set dynamically above
 
         if (slotGroups['Ranged/Relic']?.length) {
             html += categoryHeader('🏹', 'Ranged / Relic');
@@ -2202,7 +2193,7 @@
 
     // ─── Sim Stats Panel ─────────────────────────────────────────────
     // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
-    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury']);
+    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms']);
 
     const simPanel = document.getElementById('simPanel');
     const simStats = document.getElementById('simStats');
@@ -2231,9 +2222,14 @@
             if (reqId !== _simStatsReqId) return; // stale
 
             if (!stats) {
-                simStats.innerHTML = '<div class="sim-stat-loading">Stats unavailable — WASM loading…</div>';
-                // Retry when WASM is ready
-                onSimReady(() => scheduleSimStats(slotGroups, enchantLookup, gems));
+                if (!_simReady) {
+                    // WASM not loaded yet — retry once when ready
+                    simStats.innerHTML = '<div class="sim-stat-loading">Stats unavailable — WASM loading…</div>';
+                    onSimReady(() => scheduleSimStats(slotGroups, enchantLookup, gems));
+                } else {
+                    // WASM ready but this gear caused a crash — don't retry
+                    simStats.innerHTML = '<div class="sim-stat-loading">Stats unavailable for this phase</div>';
+                }
                 return;
             }
             renderSimStats(stats);
@@ -2278,9 +2274,11 @@
             simDpsFill.style.width = '0%';
 
             const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
+            const specKey = `${state.selectedClass}-${state.selectedSpec}`;
+            const simFn = specKey === 'Warrior-Arms' ? simulateArmsWarrior : simulateFuryWarrior;
 
             try {
-                const result = await simulateFuryWarrior(
+                const result = await simFn(
                     _lastSlotGroups,
                     getActiveItem,
                     wMode,

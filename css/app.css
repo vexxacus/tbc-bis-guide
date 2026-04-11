@@ -460,6 +460,7 @@ body {
 
 /* ─── SEO Description ────────────────────────────────────────────── */
 .seo-description {
+    margin-top: 12px;
     margin-bottom: 12px;
     border-radius: var(--radius);
     overflow: hidden;
@@ -1015,6 +1016,7 @@ body {
 /* ─── Sim Stats Panel ─────────────────────────────────────────────── */
 .sim-panel {
     margin-top: 16px;
+    margin-bottom: 16px;
     background: var(--bg-card);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: var(--radius);

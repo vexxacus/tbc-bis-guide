@@ -52,6 +52,14 @@ class ProtoWriter {
 }
 
 // ─── Proto field constants (from proto/api.proto + proto/common.proto) ──────
+// Arms-specific talent fields
+const WT_DEFLECTION                  = 3;   // arms: parry — not needed, keep at 0
+const WT_IMPROVED_REND_ARMS          = 2;   // 0 in Arms build
+const WT_IMPALE                      = 9;   // 2 (arms: impale)
+const WT_ANGER_MANAGEMENT_ARMS       = 6;   // 1 (arms: anger management)
+const WT_DEEP_WOUNDS_ARMS            = 7;   // 3 (arms: deep wounds)
+const WT_TWO_HAND_WEAPON_SPEC        = 8;   // 3 (arms: 2h weapon spec)
+const WT_MORTAL_STRIKE               = 10;  // 1 (arms: mortal strike, bool)
 
 // RaidSimRequest fields
 const RSR_RAID        = 1;
@@ -331,6 +339,131 @@ function buildRaidSimRequest(gearSlots, iterations, randomSeed) {
     simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
 
     // ── RaidSimRequest ──
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Arms Warrior (33/28/0, 2H, Orc) ──────────────
+
+function buildArmsSimRequest(gearSlots, iterations, randomSeed) {
+    // ── ItemSpec per slot ──
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── Arms Rotation (MS → WW → Slam weave) ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(WR_USE_OVERPOWER, 1);           // true — Arms uses Overpower
+    rotation.fieldVarint(WR_USE_HAMSTRING, 0);           // false
+    rotation.fieldVarint(WR_USE_SLAM, 1);                // true — Slam weave
+    rotation.fieldVarint(WR_PRIORITIZE_WW, 0);           // false — MS first
+    rotation.fieldVarint(WR_SUNDER_ARMOR, 2);            // SunderArmorMaintain
+    rotation.fieldVarint(WR_USE_HS_DURING_EXECUTE, 1);   // true
+    rotation.fieldVarint(WR_USE_MS_DURING_EXECUTE, 1);   // true
+    rotation.fieldVarint(WR_USE_WW_DURING_EXECUTE, 1);   // true
+    rotation.fieldVarint(WR_USE_BT_DURING_EXECUTE, 0);   // false — no BT for Arms
+    writeDouble(rotation, WR_HS_RAGE_THRESHOLD, 60.0);
+    writeDouble(rotation, WR_OVERPOWER_RAGE_THRESHOLD, 10.0);
+    writeDouble(rotation, WR_HAMSTRING_RAGE_THRESHOLD, 75.0);
+    writeDouble(rotation, WR_SLAM_LATENCY, 0.1);          // 100ms slam latency
+    writeDouble(rotation, WR_SLAM_GCD_DELAY, 0.0);
+    writeDouble(rotation, WR_SLAM_MS_WW_DELAY, 0.0);
+
+    // ── Arms Talents: 33/28/0 build ──
+    const armsTalents = new ProtoWriter();
+    // Arms tree (fields 1-18)
+    armsTalents.fieldVarint(WT_IMPROVED_HEROIC_STRIKE, 3);   // 1: imp heroic strike 3
+    armsTalents.fieldVarint(WT_ANGER_MANAGEMENT_ARMS, 1);    // 6: anger management
+    armsTalents.fieldVarint(WT_DEEP_WOUNDS_ARMS, 3);         // 7: deep wounds 3
+    armsTalents.fieldVarint(WT_TWO_HAND_WEAPON_SPEC, 3);     // 8: 2h weapon spec 3
+    armsTalents.fieldVarint(WT_IMPALE, 2);                   // 9: impale 2
+    armsTalents.fieldVarint(WT_MORTAL_STRIKE, 1);            // 10: mortal strike
+    // Fury tree (fields 19-35) — 28 points
+    armsTalents.fieldVarint(WT_CRUELTY, 5);                  // 20: cruelty 5
+    armsTalents.fieldVarint(WT_UNBRIDLED_WRATH, 5);          // 21: unbridled wrath 5
+    armsTalents.fieldVarint(WT_COMMANDING_PRESENCE, 1);      // 23: commanding presence 1
+    armsTalents.fieldVarint(WT_IMPROVED_EXECUTE, 2);         // 25: improved execute 2
+    armsTalents.fieldVarint(WT_SWEEPING_STRIKES, 1);         // 27: sweeping strikes
+    armsTalents.fieldVarint(WT_WEAPON_MASTERY, 2);           // 28: weapon mastery 2
+    armsTalents.fieldVarint(WT_FLURRY, 5);                   // 30: flurry 5
+    armsTalents.fieldVarint(WT_PRECISION, 3);                // 31: precision 3
+
+    // ── WarriorOptions ──
+    const options = new ProtoWriter();
+    writeDouble(options, WO_STARTING_RAGE, 0.0);
+    options.fieldVarint(WO_USE_RECKLESSNESS, 0);  // Arms uses Death Wish instead — not modeled
+    options.fieldVarint(WO_SHOUT, 1);             // Battle Shout
+    options.fieldVarint(WO_PRECAST_SHOUT, 1);
+
+    // ── Warrior spec message ──
+    const warriorSpec = new ProtoWriter();
+    warriorSpec.fieldMessage(WARRIOR_ROTATION, rotation);
+    warriorSpec.fieldMessage(WARRIOR_TALENTS, armsTalents);
+    warriorSpec.fieldMessage(WARRIOR_OPTIONS, options);
+
+    // ── Consumes (no OH imbue for 2H) ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);           // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 4);            // FoodRoastedClefthoof
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);  // HastePotion
+    consumes.fieldVarint(CONS_MH_IMBUE, 1);        // AdamantiteSharpeningStone on 2H
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Arms Warrior'));
+    player.fieldVarint(PLAYER_RACE, RACE_ORC);
+    player.fieldVarint(PLAYER_CLASS, CLASS_WARRIOR);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_WARRIOR, warriorSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
     const rsr = new ProtoWriter();
     rsr.fieldMessage(RSR_RAID, raid);
     rsr.fieldMessage(RSR_ENCOUNTER, encounter);
@@ -693,6 +826,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildRaidSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runArmsWarrior(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildArmsSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {

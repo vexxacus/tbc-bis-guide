@@ -49,8 +49,9 @@ const SPELL_TO_ENCHANT_ID = {
     // Weapon — Mongoose
     27984: 22559,
     22559: 22559,
-    // Weapon — Executioner
-    42974: 42974,
+    // Weapon — Executioner (42974 is spell ID; wowsims enchant item ID is 33307)
+    42974: 33307,
+    33307: 33307,
     // Weapon — Major Agility
     27977: 27977,
     // Ring — Enchant Ring - Stats (requires enchanting profession)
@@ -187,4 +188,14 @@ async function simulateFuryWarrior(slotGroups, getActiveItemFn, weaponMode, ench
     const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
     if (!gearSlots.length) throw new Error('No gear selected');
     return _simBridge.runFuryWarrior(gearSlots, onProgress, iterations);
+}
+
+/**
+ * Run DPS simulation for Arms Warrior (2H).
+ */
+async function simulateArmsWarrior(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    // Arms always uses 2H mode
+    const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, '2h', enchantLookup, gems);
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _simBridge.runArmsWarrior(gearSlots, onProgress, iterations);
 }

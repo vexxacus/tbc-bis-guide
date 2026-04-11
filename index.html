@@ -6,7 +6,7 @@
     <!-- Force reload if browser has cached an old version of this file -->
     <script>
         (function() {
-            var BUILD = '20260411a';
+            var BUILD = '20260411b';
             var stored = sessionStorage.getItem('bis-build');
             if (stored !== BUILD) {
                 sessionStorage.setItem('bis-build', BUILD);
@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://wow.zamimg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css?v=20260411a">
+    <link rel="stylesheet" href="/css/app.css?v=20260411b">
     <!-- Wowhead Tooltip Script (TBC Classic) -->
     <script>const whTooltips = {colorLinks: false, iconizeLinks: false, iconSize: 'small', renameLinks: false};</script>
     <script src="https://wow.zamimg.com/js/tooltips.js"></script>
@@ -116,20 +116,15 @@
 
         <!-- Step 4: BiS List -->
         <section class="step hidden" id="stepBis">
-            <!-- Phase Switcher (inline tabs for quick phase navigation) -->
+            <!-- 1. Phase Switcher -->
             <div class="phase-switcher hidden" id="phaseSwitcher"></div>
-            <!-- Paperdoll Overview -->
-            <div class="paperdoll" id="paperdoll"></div>
-            <!-- GearScore summary -->
-            <div class="gs-summary" id="gsSummary"></div>
-            <!-- SEO description -->
+            <!-- 2. SEO / build description -->
             <div class="seo-description hidden" id="seoDescription"></div>
-            <!-- Profession filter -->
-            <div class="profession-filter hidden" id="professionFilter"></div>
-            <!-- Slot list -->
-            <div class="slot-list" id="slotList"></div>
-
-            <!-- ── Stats panel (PvE specs with sim support) ── -->
+            <!-- 3. Paperdoll Overview -->
+            <div class="paperdoll" id="paperdoll"></div>
+            <!-- 4. GearScore summary — hidden -->
+            <div class="gs-summary hidden" id="gsSummary" style="display:none!important"></div>
+            <!-- 5. Stats panel + SIM -->
             <div class="sim-panel" id="simPanel" style="display:none">
                 <div class="sim-panel-title">📊 Character Stats <span class="sim-panel-subtitle">incl. buffs & consumables</span></div>
                 <div class="sim-panel-stats" id="simStats">
@@ -149,6 +144,10 @@
                     <p class="sim-disclaimer">Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target. Results reflect gear + gems + enchants + buffs.</p>
                 </div>
             </div>
+            <!-- 6. Profession & PvP toggle -->
+            <div class="profession-filter hidden" id="professionFilter"></div>
+            <!-- 7. Slot list -->
+            <div class="slot-list" id="slotList"></div>
         </section>
 
         <!-- Item Detail Modal -->
@@ -168,17 +167,17 @@
         </div>
     </div>
 
-    <script src="/js/data.js?v=20260411a"></script>
-    <script src="/js/icons.js?v=20260411a"></script>
-    <script src="/js/item-quality.js?v=20260411a"></script>
-    <script src="/js/item-sockets.js?v=20260411a"></script>
-    <script src="/js/gem-colors.js?v=20260411a"></script>
-    <script src="/js/gearscore.js?v=20260411a"></script>
-    <script src="/js/item-notes.js?v=20260411a"></script>
-    <script src="/js/item-restrictions.js?v=20260411a"></script>
-    <script src="/js/pvp-data.js?v=20260411a"></script>
-    <script src="/js/sim-bridge.js?v=20260411a"></script>
-    <script src="/js/sim.js?v=20260411a"></script>
-    <script src="/js/app.js?v=20260411a"></script>
+    <script src="/js/data.js?v=20260411b"></script>
+    <script src="/js/icons.js?v=20260411b"></script>
+    <script src="/js/item-quality.js?v=20260411b"></script>
+    <script src="/js/item-sockets.js?v=20260411b"></script>
+    <script src="/js/gem-colors.js?v=20260411b"></script>
+    <script src="/js/gearscore.js?v=20260411b"></script>
+    <script src="/js/item-notes.js?v=20260411b"></script>
+    <script src="/js/item-restrictions.js?v=20260411b"></script>
+    <script src="/js/pvp-data.js?v=20260411b"></script>
+    <script src="/js/sim-bridge.js?v=20260411b"></script>
+    <script src="/js/sim.js?v=20260411b"></script>
+    <script src="/js/app.js?v=20260411b"></script>
 </body>
 </html>

@@ -107191,6 +107191,10 @@
             {
               "spellId": "42974",
               "slot": "Main Hand"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Off Hand"
             }
           ]
         },
@@ -126259,72 +126263,6 @@
               "name": "Hourglass of the Unraveller"
             },
             {
-              "itemId": "28438",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Dragonmaw"
-            },
-            {
-              "itemId": "31332",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Blinkstrike"
-            },
-            {
-              "itemId": "23542",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Fel Edged Battleaxe"
-            },
-            {
-              "itemId": "27872",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "The Harvester of Souls"
-            },
-            {
-              "itemId": "28920",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "High Warlord's Cleaver"
-            },
-            {
-              "itemId": "27490",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Firebrand Battleaxe"
-            },
-            {
-              "itemId": "28189",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Latro's Shifting Sword"
-            },
-            {
-              "itemId": "29124",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Vindicator's Brand"
-            },
-            {
-              "itemId": "28210",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Bloodskull Destroyer"
-            },
-            {
-              "itemId": "28267",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Edge of the Cosmos"
-            },
-            {
-              "itemId": "28956",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Grand Marshal's Slicer"
-            },
-            {
               "itemId": "28429",
               "slot": "Two Hand",
               "rank": "BIS",
@@ -126421,12 +126359,12 @@
               "slot": "Feet"
             },
             {
-              "spellId": "27984",
-              "slot": "Main Hand~Off Hand"
-            },
-            {
               "spellId": "30252",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         },
@@ -126757,54 +126695,6 @@
               "name": "Despair"
             },
             {
-              "itemId": "31332",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Blinkstrike"
-            },
-            {
-              "itemId": "28295",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Gladiator's Slicer"
-            },
-            {
-              "itemId": "30733",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Hope Ender"
-            },
-            {
-              "itemId": "28729",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Spiteblade"
-            },
-            {
-              "itemId": "28438",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Dragonmaw"
-            },
-            {
-              "itemId": "29124",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Vindicator's Brand"
-            },
-            {
-              "itemId": "28307",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Gladiator's Quickblade"
-            },
-            {
-              "itemId": "28189",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Latro's Shifting Sword"
-            },
-            {
               "itemId": "30724",
               "slot": "Ranged/Relic",
               "rank": "BIS",
@@ -126883,12 +126773,12 @@
               "slot": "Feet"
             },
             {
-              "spellId": "27984",
-              "slot": "Main Hand~Off Hand"
-            },
-            {
               "spellId": "30252",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         },
@@ -127291,72 +127181,6 @@
               "name": "Bloodmoon"
             },
             {
-              "itemId": "30082",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "32052",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Merciless Gladiator's Slicer"
-            },
-            {
-              "itemId": "31332",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Blinkstrike"
-            },
-            {
-              "itemId": "28295",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Gladiator's Slicer"
-            },
-            {
-              "itemId": "28439",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Dragonstrike"
-            },
-            {
-              "itemId": "29924",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Netherbane"
-            },
-            {
-              "itemId": "29996",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Rod of the Sun King"
-            },
-            {
-              "itemId": "32027",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Merciless Gladiator's Quickblade"
-            },
-            {
-              "itemId": "28307",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Gladiator's Quickblade"
-            },
-            {
-              "itemId": "28189",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Latro's Shifting Sword"
-            },
-            {
-              "itemId": "32052",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Merciless Gladiator's Slicer"
-            },
-            {
               "itemId": "30105",
               "slot": "Ranged/Relic",
               "rank": "BIS",
@@ -127447,12 +127271,12 @@
               "slot": "Feet"
             },
             {
-              "spellId": "27984",
-              "slot": "Main Hand~Off Hand"
-            },
-            {
               "spellId": "30252",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         },
@@ -127867,60 +127691,6 @@
               "name": "Destroyer Battle-Helm"
             },
             {
-              "itemId": "32838",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "32837",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "33669",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Cleaver"
-            },
-            {
-              "itemId": "33762",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Slicer"
-            },
-            {
-              "itemId": "30881",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Blade of Infamy"
-            },
-            {
-              "itemId": "32369",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Blade of Savagery"
-            },
-            {
-              "itemId": "29924",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Netherbane"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "32052",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Merciless Gladiator's Slicer"
-            },
-            {
               "itemId": "30902",
               "slot": "Two Hand",
               "rank": "BIS",
@@ -127999,12 +127769,12 @@
               "slot": "Feet"
             },
             {
-              "spellId": "27984",
-              "slot": "Main Hand~Off Hand"
-            },
-            {
               "spellId": "30252",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         },
@@ -128425,30 +128195,6 @@
               "name": "Badge of the Swarmguard"
             },
             {
-              "itemId": "30902",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Cataclysm's Edge"
-            },
-            {
-              "itemId": "32348",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Soul Cleaver"
-            },
-            {
-              "itemId": "29993",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Twinblade of the Phoenix"
-            },
-            {
-              "itemId": "33688",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Greatsword"
-            },
-            {
               "itemId": "33474",
               "slot": "Ranged/Relic",
               "rank": "BIS",
@@ -128477,60 +128223,6 @@
               "slot": "Ranged/Relic",
               "rank": "Alt",
               "name": "Sunfury Bow of the Phoenix"
-            },
-            {
-              "itemId": "32838",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "32837",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "33669",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Cleaver"
-            },
-            {
-              "itemId": "33762",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Slicer"
-            },
-            {
-              "itemId": "30881",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Blade of Infamy"
-            },
-            {
-              "itemId": "32369",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Blade of Savagery"
-            },
-            {
-              "itemId": "29924",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Netherbane"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "32052",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Merciless Gladiator's Slicer"
             },
             {
               "itemId": "30902",
@@ -128585,8 +128277,8 @@
           ],
           "enchants": [
             {
-              "spellId": "42974",
-              "slot": "Main Hand"
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         },
@@ -129055,30 +128747,6 @@
               "name": "Badge of the Swarmguard"
             },
             {
-              "itemId": "34247",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Apolyon, the Soul-Render"
-            },
-            {
-              "itemId": "30902",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Cataclysm's Edge"
-            },
-            {
-              "itemId": "32348",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Soul Cleaver"
-            },
-            {
-              "itemId": "29993",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Twinblade of the Phoenix"
-            },
-            {
               "itemId": "34196",
               "slot": "Ranged/Relic",
               "rank": "BIS",
@@ -129119,72 +128787,6 @@
               "slot": "Ranged/Relic",
               "rank": "Alt",
               "name": "Sunfury Bow of the Phoenix"
-            },
-            {
-              "itemId": "32837",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "28439",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Dragonstrike"
-            },
-            {
-              "itemId": "30881",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Blade of Infamy"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "35101",
-              "slot": "Main Hand~Off Hand",
-              "rank": "Alt",
-              "name": "Brutal Gladiator's Slicer"
-            },
-            {
-              "itemId": "34996",
-              "slot": "Main Hand~Off Hand",
-              "rank": "Alt",
-              "name": "Brutal Gladiator's Cleaver"
-            },
-            {
-              "itemId": "34214",
-              "slot": "Main Hand~Off Hand",
-              "rank": "Alt",
-              "name": "Muramasa"
-            },
-            {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "35072",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Brutal Gladiator's Quickblade"
-            },
-            {
-              "itemId": "34164",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Dragonscale-Encrusted Longblade"
-            },
-            {
-              "itemId": "32369",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of Savagery"
             },
             {
               "itemId": "34247",
@@ -129253,12 +128855,12 @@
               "slot": "Feet"
             },
             {
-              "spellId": "27984",
-              "slot": "Main Hand~Off Hand"
-            },
-            {
               "spellId": "30252",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27984",
+              "slot": "Two Hand"
             }
           ]
         }
@@ -131263,16 +130865,34 @@
               "name": "Warglaive of Azzinoth"
             },
             {
-              "itemId": "32054",
-              "slot": "Ranged/Relic",
+              "itemId": "33669",
+              "slot": "Off Hand",
               "rank": "BIS",
-              "name": "Merciless Gladiator's War Edge"
+              "name": "Vengeful Gladiator's Cleaver"
             },
             {
-              "itemId": "32326",
-              "slot": "Ranged/Relic",
+              "itemId": "33762",
+              "slot": "Off Hand",
               "rank": "BIS",
-              "name": "Twisted Blades of Zarak"
+              "name": "Vengeful Gladiator's Slicer"
+            },
+            {
+              "itemId": "30881",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Blade of Infamy"
+            },
+            {
+              "itemId": "29924",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Netherbane"
+            },
+            {
+              "itemId": "32052",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Merciless Gladiator's Slicer"
             },
             {
               "itemId": "30105",
@@ -131281,10 +130901,22 @@
               "name": "Serpent Spine Longbow"
             },
             {
+              "itemId": "32326",
+              "slot": "Ranged/Relic",
+              "rank": "BIS",
+              "name": "Twisted Blades of Zarak"
+            },
+            {
               "itemId": "30724",
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "Barrel-Blade Longrifle"
+            },
+            {
+              "itemId": "32054",
+              "slot": "Ranged/Relic",
+              "rank": "BIS",
+              "name": "Merciless Gladiator's War Edge"
             },
             {
               "itemId": "28772",
@@ -131737,16 +131369,16 @@
               "name": "Stormrage Signet Ring"
             },
             {
-              "itemId": "33496",
-              "slot": "Ring",
-              "rank": "BIS",
-              "name": "Signet of Primal Wrath"
-            },
-            {
               "itemId": "32335",
               "slot": "Ring",
               "rank": "BIS",
               "name": "Unstoppable Aggressor's Ring"
+            },
+            {
+              "itemId": "33496",
+              "slot": "Ring",
+              "rank": "BIS",
+              "name": "Signet of Primal Wrath"
             },
             {
               "itemId": "32526",
@@ -131821,28 +131453,10 @@
               "name": "Badge of the Swarmguard"
             },
             {
-              "itemId": "32837",
-              "slot": "Weapon",
+              "itemId": "30105",
+              "slot": "Ranged/Relic",
               "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "33669",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Cleaver"
-            },
-            {
-              "itemId": "33762",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Vengeful Gladiator's Slicer"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Weapon",
-              "rank": "BIS",
-              "name": "Talon of Azshara"
+              "name": "Serpent Spine Longbow"
             },
             {
               "itemId": "33474",
@@ -131855,12 +131469,6 @@
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "Twisted Blades of Zarak"
-            },
-            {
-              "itemId": "30105",
-              "slot": "Ranged/Relic",
-              "rank": "BIS",
-              "name": "Serpent Spine Longbow"
             },
             {
               "itemId": "30724",
@@ -131927,6 +131535,42 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Warglaive of Azzinoth"
+            },
+            {
+              "itemId": "33669",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Vengeful Gladiator's Cleaver"
+            },
+            {
+              "itemId": "33762",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Vengeful Gladiator's Slicer"
+            },
+            {
+              "itemId": "30881",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Blade of Infamy"
+            },
+            {
+              "itemId": "32369",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Blade of Savagery"
+            },
+            {
+              "itemId": "29924",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Netherbane"
+            },
+            {
+              "itemId": "32052",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Merciless Gladiator's Slicer"
             }
           ],
           "gems": [
@@ -131957,8 +131601,8 @@
           ],
           "enchants": [
             {
-              "spellId": "42974",
-              "slot": "Main Hand"
+              "spellId": "27984",
+              "slot": "Main Hand~Off Hand"
             }
           ]
         },
