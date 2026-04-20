@@ -69,9 +69,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git rebase origin/main
           git add js/pvp-data.js
           git commit -m "chore: auto-refresh PvP BiS data $(date -u '+%Y-%m-%d')"
-          git pull --rebase origin main
           git push
 
       - name: No changes detected
