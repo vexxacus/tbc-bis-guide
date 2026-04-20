@@ -270,6 +270,23 @@ const SIM_STAT_LABELS_CASTER = {
 const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
 
 /**
+ * Stat labels for Hunter specs
+ * Key stats: Health, Stam, RAP (28), Agility (1), Hit (19), Crit (20), Haste (21), AP (18)
+ */
+const SIM_STAT_LABELS_HUNTER = {
+    35: { label: 'Health',          fmt: v => Math.round(v) },
+     2: { label: 'Stamina',         fmt: v => Math.round(v) },
+     1: { label: 'Agility',         fmt: v => Math.round(v) },
+    28: { label: 'Ranged AP',       fmt: v => Math.round(v) },
+    18: { label: 'Attack Power',    fmt: v => Math.round(v) },
+    19: { label: 'Melee Hit',       fmt: v => `${Math.round(v)} (${(v / MELEE_HIT_RATING_PER_PCT).toFixed(2)}%)` },
+    20: { label: 'Melee Crit',      fmt: v => `${Math.round(v)} (${(v / MELEE_CRIT_RATING_PER_PCT).toFixed(2)}%)` },
+    21: { label: 'Melee Haste',     fmt: v => `${Math.round(v)} (${(v / MELEE_HASTE_RATING_PER_PCT).toFixed(2)}%)` },
+    22: { label: 'Armor Pen',       fmt: v => Math.round(v) },
+};
+const SIM_STAT_ORDER_HUNTER = [35, 2, 1, 28, 18, 19, 20, 21, 22];
+
+/**
  * Stat labels for tank specs (Bear Druid, Prot Warrior)
  * Key stats: Health, Stamina, Armor, Defense, Dodge, Parry, Block + some threat stats
  *

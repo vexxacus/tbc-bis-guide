@@ -307,6 +307,139 @@ const PT_MISERY                   = 29;  // 0-5
 const PT_VAMPIRIC_TOUCH           = 30;  // bool
 const PT_SHADOW_AFFINITY          = 32;  // 0-3
 
+// MageTalents fields — verified against proto/mage.proto
+const MT_ARCANE_SUBTLETY      = 1;
+const MT_ARCANE_CONCENTRATION = 4;   // 0-5
+const MT_ARCANE_MEDITATION    = 6;   // 0-3
+const MT_PRESENCE_OF_MIND     = 7;   // bool
+const MT_ARCANE_MIND          = 8;   // 0-5
+const MT_ARCANE_INSTABILITY   = 9;   // 0-3
+const MT_ARCANE_POTENCY       = 10;  // 0-2
+const MT_ARCANE_POWER         = 12;  // bool
+const MT_SPELL_POWER          = 13;  // 0-5
+const MT_MIND_MASTERY         = 14;  // 0-5
+const MT_IMPROVED_FIREBALL    = 15;  // 0-5
+const MT_IGNITE               = 16;  // 0-5
+const MT_IMPROVED_SCORCH      = 21;  // 0-3
+const MT_MASTER_OF_ELEMENTS   = 22;  // 0-3
+const MT_PLAYING_WITH_FIRE    = 23;  // 0-3
+const MT_CRITICAL_MASS        = 24;  // 0-3
+const MT_FIRE_POWER           = 26;  // 0-5
+const MT_PYROMANIAC           = 27;  // 0-3
+const MT_COMBUSTION           = 28;  // bool
+const MT_MOLTEN_FURY          = 29;  // 0-2
+const MT_EMPOWERED_FIREBALL   = 30;  // 0-5
+const MT_IMPROVED_FROSTBOLT   = 32;  // 0-5
+const MT_ELEMENTAL_PRECISION  = 33;  // 0-3
+const MT_ICE_SHARDS           = 34;  // 0-5
+const MT_PIERCING_ICE         = 36;  // 0-3
+const MT_ICY_VEINS            = 37;  // bool
+const MT_FROST_CHANNELING     = 38;  // 0-3
+const MT_SHATTER              = 39;  // 0-5
+const MT_WINTERS_CHILL        = 43;  // 0-5
+const MT_ARCTIC_WINDS         = 44;  // 0-5
+const MT_EMPOWERED_FROSTBOLT  = 45;  // 0-5
+const MT_SUMMON_WATER_ELEMENTAL = 46; // bool
+// Mage spec/rotation field numbers
+const MAGE_ROTATION = 1;
+const MAGE_TALENTS  = 2;
+const MAGE_OPTIONS  = 3;
+const MO_ARMOR      = 1;  // 0=NoArmor, 1=MageArmor, 2=MoltenArmor
+
+// WarlockTalents fields — verified against proto/warlock.proto
+const WLT_SUPPRESSION         = 1;
+const WLT_IMPROVED_CORRUPTION = 2;   // 0-5
+const WLT_SOUL_SIPHON         = 4;   // 0-2
+const WLT_NIGHTFALL           = 7;   // 0-2
+const WLT_EMPOWERED_CORRUPTION = 8;  // 0-3
+const WLT_SIPHON_LIFE         = 9;   // bool
+const WLT_SHADOW_MASTERY      = 10;  // 0-5
+const WLT_CONTAGION           = 11;  // 0-5
+const WLT_DARK_PACT           = 12;  // bool
+const WLT_MALEDICTION         = 13;  // 0-3
+const WLT_UNSTABLE_AFFLICTION = 14;  // bool
+const WLT_DEMONIC_EMBRACE     = 16;  // 0-5
+const WLT_DEMONIC_TACTICS     = 30;  // 0-5
+const WLT_SUMMON_FELGUARD     = 31;  // bool
+const WLT_IMPROVED_SHADOW_BOLT = 32; // 0-5
+const WLT_CATACLYSM           = 33;  // 0-5
+const WLT_BANE                = 34;  // 0-5
+const WLT_DEVASTATION         = 37;  // 0-5
+const WLT_RUIN                = 41;  // bool
+const WLT_EMBERSTORM          = 42;  // 0-5
+const WLT_SOUL_LEECH          = 45;  // 0-4
+const WLT_SHADOW_AND_FLAME    = 46;  // 0-5
+// Warlock spec/rotation/options field numbers
+const WARLOCK_ROTATION = 1;
+const WARLOCK_TALENTS  = 2;
+const WARLOCK_OPTIONS  = 3;
+const WLO_ARMOR        = 1;  // 1=FelArmor, 2=DemonArmor
+const WLO_SUMMON       = 2;  // 1=Imp, 4=Felhound, 5=Felguard
+const WLO_SACRIFICE    = 3;  // bool
+
+// HunterTalents fields — verified against proto/hunter.proto
+const HT_IMPROVED_ASPECT_OF_HAWK = 1;
+const HT_FOCUSED_FIRE        = 3;
+const HT_UNLEASHED_FURY      = 4;   // 0-5
+const HT_FEROCITY            = 5;   // 0-5
+const HT_BESTIAL_DISCIPLINE  = 6;   // 0-2
+const HT_FRENZY              = 7;   // 0-5
+const HT_FEROCIOUS_INSPIRATION = 8; // 0-3
+const HT_BESTIAL_WRATH       = 9;   // bool
+const HT_SERPENTS_SWIFTNESS  = 10;  // 0-5
+const HT_THE_BEAST_WITHIN    = 11;  // bool
+const HT_LETHAL_SHOTS        = 12;  // 0-5
+const HT_IMPROVED_HUNTERS_MARK = 13; // 0-5
+const HT_EFFICIENCY          = 14;  // 0-5
+const HT_GO_FOR_THE_THROAT   = 15;  // 0-2
+const HT_AIMED_SHOT          = 17;  // bool
+const HT_MORTAL_SHOTS        = 20;  // 0-5
+const HT_SCATTER_SHOT        = 21;  // bool
+const HT_BARRAGE             = 22;  // 0-3
+const HT_RANGED_WEAPON_SPEC  = 24;  // 0-5
+const HT_CAREFUL_AIM         = 25;  // 0-3
+const HT_TRUESHOT_AURA       = 26;  // bool
+const HT_MASTER_MARKSMAN     = 28;  // 0-5
+const HT_LIGHTNING_REFLEXES  = 40;  // 0-5
+const HT_THRILL_OF_THE_HUNT  = 41;  // 0-3
+const HT_EXPOSE_WEAKNESS     = 42;  // 0-3
+const HT_MASTER_TACTICIAN    = 43;  // 0-5
+const HT_READINESS           = 44;  // bool
+// Hunter spec/rotation/options field numbers
+const HUNTER_ROTATION = 1;
+const HUNTER_TALENTS  = 2;
+const HUNTER_OPTIONS  = 3;
+const HRO_QUIVER_BONUS = 1;  // 6=Speed15
+const HRO_AMMO         = 2;  // 6=BlackflightArrow
+const HRO_PET_TYPE     = 3;  // 1=Ravager, 2=Cat, 3=Raptor
+const HRO_PET_UPTIME   = 4;
+const HR_USE_MULTI_SHOT  = 1;
+const HR_USE_ARCANE_SHOT = 2;
+const HR_STING           = 5;  // 2=SerpentSting
+const HR_WEAVE           = 11; // 3=WeaveFull
+
+// ElementalShamanTalents fields — verified against proto/shaman.proto
+const EST_CONVECTION         = 1;   // 0-5
+const EST_CONCUSSION         = 2;   // 0-5
+const EST_CALL_OF_FLAME      = 3;   // 0-5
+const EST_ELEMENTAL_FOCUS    = 4;   // bool
+const EST_REVERBERATION      = 5;   // 0-5
+const EST_CALL_OF_THUNDER    = 6;   // 0-5
+const EST_ELEMENTAL_DEVASTATION = 8; // 0-3
+const EST_ELEMENTAL_FURY     = 9;   // bool
+const EST_UNRELENTING_STORM  = 10;  // 0-3
+const EST_ELEMENTAL_PRECISION = 11; // 0-3
+const EST_LIGHTNING_MASTERY  = 12;  // 0-5
+const EST_ELEMENTAL_MASTERY  = 13;  // bool
+const EST_LIGHTNING_OVERLOAD  = 14; // 0-5
+const EST_TOTEM_OF_WRATH     = 33;  // bool
+// Elemental Shaman spec field numbers
+const ELE_SHAMAN_ROTATION = 1;
+const ELE_SHAMAN_TALENTS  = 2;
+const ELE_SHAMAN_OPTIONS  = 3;
+const ESO_WATER_SHIELD    = 1;  // bool
+const ESO_BLOODLUST       = 2;  // bool
+
 // Shadow Priest consumes (field numbers from proto/common.proto Consumes + enum values)
 const CONS_SP_FLASK          = 38;  // enum: FlaskOfPureDeath = 3
 const CONS_SP_FOOD           = 41;  // enum: FoodBlackenedBasilisk = 1
@@ -335,18 +468,30 @@ const RACE_UNDEAD   = 11;  // RaceUndead = 11 (from proto/common.proto Race enum
 // ─── Additional class/race/spec constants ────────────────────────────────────
 // Class enum (from proto/common.proto)
 const CLASS_DRUID   = 1;
+const CLASS_HUNTER  = 2;
+const CLASS_MAGE    = 3;
 const CLASS_PALADIN = 4;
+// CLASS_PRIEST = 5  (declared above)
 const CLASS_ROGUE   = 6;
 const CLASS_SHAMAN  = 7;
+const CLASS_WARLOCK = 8;
 // Race enum (from proto/common.proto)
-const RACE_TAUREN   = 8;
-const RACE_HUMAN    = 5;
+const RACE_TAUREN    = 8;
+const RACE_HUMAN     = 5;
 const RACE_NIGHT_ELF = 6;
+const RACE_TROLL     = 9;  // Troll10 = 9 (most common for caster shaman/hunter horde)
+const RACE_GNOME     = 4;
 // Player oneof spec field numbers (from proto/api.proto Player.oneof spec)
+const PLAYER_BALANCE_DRUID    = 6;   // balance_druid = 6
+const PLAYER_HUNTER           = 7;   // hunter = 7
+const PLAYER_MAGE             = 8;   // mage = 8
 const PLAYER_RET_PALADIN      = 9;   // retribution_paladin = 9
+const PLAYER_SHADOW_PRIEST_SP = 10;  // shadow_priest = 10 (alias to avoid collision)
 const PLAYER_PROT_PALADIN     = 25;  // protection_paladin = 25
 const PLAYER_PROT_WARRIOR     = 21;  // protection_warrior = 21
 const PLAYER_ROGUE            = 11;  // rogue = 11
+const PLAYER_ELE_SHAMAN       = 12;  // elemental_shaman = 12
+const PLAYER_WARLOCK          = 13;  // warlock = 13
 const PLAYER_ENH_SHAMAN       = 18;  // enhancement_shaman = 18
 const PLAYER_FERAL_DRUID      = 22;  // feral_druid = 22
 const PLAYER_FERAL_TANK_DRUID = 26;  // feral_tank_druid = 26
@@ -1129,6 +1274,428 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_BUFFS, indBuffs);
         player.fieldMessage(PLAYER_PROT_WARRIOR, protWarSpec);
 
+    } else if (specKey === 'Mage-Fire') {
+        const mageTalents = new ProtoWriter();
+        mageTalents.fieldVarint(MT_IMPROVED_FIREBALL,    5);
+        mageTalents.fieldVarint(MT_IGNITE,               5);
+        mageTalents.fieldVarint(MT_IMPROVED_SCORCH,      3);
+        mageTalents.fieldVarint(MT_MASTER_OF_ELEMENTS,   3);
+        mageTalents.fieldVarint(MT_PLAYING_WITH_FIRE,    3);
+        mageTalents.fieldVarint(MT_CRITICAL_MASS,        3);
+        mageTalents.fieldVarint(MT_FIRE_POWER,           5);
+        mageTalents.fieldVarint(MT_PYROMANIAC,           3);
+        mageTalents.fieldVarint(MT_COMBUSTION,           1);
+        mageTalents.fieldVarint(MT_MOLTEN_FURY,          2);
+        mageTalents.fieldVarint(MT_EMPOWERED_FIREBALL,   5);
+        mageTalents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
+        mageTalents.fieldVarint(MT_ARCANE_CONCENTRATION, 5);
+
+        const mageOptions = new ProtoWriter();
+        mageOptions.fieldVarint(MO_ARMOR, 2);  // MoltenArmor
+
+        const mageSpec = new ProtoWriter();
+        mageSpec.fieldMessageRequired(MAGE_ROTATION, new ProtoWriter());
+        mageSpec.fieldMessage(MAGE_TALENTS, mageTalents);
+        mageSpec.fieldMessage(MAGE_OPTIONS, mageOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Fire Mage'));
+        player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+        player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    } else if (specKey === 'Mage-Frost') {
+        const mageTalents = new ProtoWriter();
+        mageTalents.fieldVarint(MT_IMPROVED_FROSTBOLT,     5);
+        mageTalents.fieldVarint(MT_ELEMENTAL_PRECISION,    3);
+        mageTalents.fieldVarint(MT_ICE_SHARDS,             5);
+        mageTalents.fieldVarint(MT_PIERCING_ICE,           3);
+        mageTalents.fieldVarint(MT_ICY_VEINS,              1);
+        mageTalents.fieldVarint(MT_FROST_CHANNELING,       3);
+        mageTalents.fieldVarint(MT_SHATTER,                5);
+        mageTalents.fieldVarint(MT_WINTERS_CHILL,          5);
+        mageTalents.fieldVarint(MT_ARCTIC_WINDS,           5);
+        mageTalents.fieldVarint(MT_EMPOWERED_FROSTBOLT,    5);
+        mageTalents.fieldVarint(MT_SUMMON_WATER_ELEMENTAL, 1);
+        mageTalents.fieldVarint(MT_ARCANE_SUBTLETY,        2);
+        mageTalents.fieldVarint(MT_ARCANE_CONCENTRATION,   5);
+
+        const mageOptions = new ProtoWriter();
+        mageOptions.fieldVarint(MO_ARMOR, 1);  // MageArmor
+
+        const mageSpec = new ProtoWriter();
+        mageSpec.fieldMessageRequired(MAGE_ROTATION, new ProtoWriter());
+        mageSpec.fieldMessage(MAGE_TALENTS, mageTalents);
+        mageSpec.fieldMessage(MAGE_OPTIONS, mageOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Frost Mage'));
+        player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+        player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    } else if (specKey === 'Mage-Arcane') {
+        const mageTalents = new ProtoWriter();
+        mageTalents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
+        mageTalents.fieldVarint(MT_ARCANE_CONCENTRATION, 5);
+        mageTalents.fieldVarint(MT_ARCANE_MEDITATION,    3);
+        mageTalents.fieldVarint(MT_PRESENCE_OF_MIND,     1);
+        mageTalents.fieldVarint(MT_ARCANE_MIND,          5);
+        mageTalents.fieldVarint(MT_ARCANE_INSTABILITY,   3);
+        mageTalents.fieldVarint(MT_ARCANE_POTENCY,       2);
+        mageTalents.fieldVarint(MT_ARCANE_POWER,         1);
+        mageTalents.fieldVarint(MT_SPELL_POWER,          5);
+        mageTalents.fieldVarint(MT_MIND_MASTERY,         5);
+        mageTalents.fieldVarint(MT_IMPROVED_FIREBALL,    5);
+        mageTalents.fieldVarint(MT_IGNITE,               5);
+
+        const mageOptions = new ProtoWriter();
+        mageOptions.fieldVarint(MO_ARMOR, 1);
+
+        const mageSpec = new ProtoWriter();
+        mageSpec.fieldMessageRequired(MAGE_ROTATION, new ProtoWriter());
+        mageSpec.fieldMessage(MAGE_TALENTS, mageTalents);
+        mageSpec.fieldMessage(MAGE_OPTIONS, mageOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Arcane Mage'));
+        player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+        player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    } else if (specKey === 'Warlock-Destruction') {
+        const wlTalents = new ProtoWriter();
+        wlTalents.fieldVarint(WLT_DEMONIC_EMBRACE,       5);
+        wlTalents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,  5);
+        wlTalents.fieldVarint(WLT_CATACLYSM,             5);
+        wlTalents.fieldVarint(WLT_BANE,                  5);
+        wlTalents.fieldVarint(WLT_DEVASTATION,           5);
+        wlTalents.fieldVarint(WLT_RUIN,                  1);
+        wlTalents.fieldVarint(WLT_EMBERSTORM,            5);
+        wlTalents.fieldVarint(WLT_SOUL_LEECH,            4);
+        wlTalents.fieldVarint(WLT_SHADOW_AND_FLAME,      5);
+
+        const wlOptions = new ProtoWriter();
+        wlOptions.fieldVarint(WLO_ARMOR, 1);    // FelArmor
+        wlOptions.fieldVarint(WLO_SUMMON, 4);   // Felhound
+
+        const wlSpec = new ProtoWriter();
+        wlSpec.fieldMessageRequired(WARLOCK_ROTATION, new ProtoWriter());
+        wlSpec.fieldMessage(WARLOCK_TALENTS, wlTalents);
+        wlSpec.fieldMessage(WARLOCK_OPTIONS, wlOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Destro Warlock'));
+        player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+        player.fieldVarint(PLAYER_CLASS, CLASS_WARLOCK);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_WARLOCK, wlSpec);
+
+    } else if (specKey === 'Warlock-Affliction') {
+        const wlTalents = new ProtoWriter();
+        wlTalents.fieldVarint(WLT_SUPPRESSION,            5);
+        wlTalents.fieldVarint(WLT_IMPROVED_CORRUPTION,    5);
+        wlTalents.fieldVarint(WLT_SOUL_SIPHON,            2);
+        wlTalents.fieldVarint(WLT_NIGHTFALL,              2);
+        wlTalents.fieldVarint(WLT_EMPOWERED_CORRUPTION,   3);
+        wlTalents.fieldVarint(WLT_SIPHON_LIFE,            1);
+        wlTalents.fieldVarint(WLT_SHADOW_MASTERY,         5);
+        wlTalents.fieldVarint(WLT_CONTAGION,              5);
+        wlTalents.fieldVarint(WLT_DARK_PACT,              1);
+        wlTalents.fieldVarint(WLT_MALEDICTION,            3);
+        wlTalents.fieldVarint(WLT_UNSTABLE_AFFLICTION,    1);
+        wlTalents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,   5);
+        wlTalents.fieldVarint(WLT_CATACLYSM,              2);
+
+        const wlOptions = new ProtoWriter();
+        wlOptions.fieldVarint(WLO_ARMOR, 1);
+        wlOptions.fieldVarint(WLO_SUMMON, 4);
+
+        const wlSpec = new ProtoWriter();
+        wlSpec.fieldMessageRequired(WARLOCK_ROTATION, new ProtoWriter());
+        wlSpec.fieldMessage(WARLOCK_TALENTS, wlTalents);
+        wlSpec.fieldMessage(WARLOCK_OPTIONS, wlOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Afflic Warlock'));
+        player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+        player.fieldVarint(PLAYER_CLASS, CLASS_WARLOCK);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_WARLOCK, wlSpec);
+
+    } else if (specKey === 'Warlock-Demonology') {
+        const wlTalents = new ProtoWriter();
+        wlTalents.fieldVarint(WLT_DEMONIC_EMBRACE,       5);
+        wlTalents.fieldVarint(WLT_DEMONIC_TACTICS,       5);
+        wlTalents.fieldVarint(WLT_SUMMON_FELGUARD,       1);
+        wlTalents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,  5);
+        wlTalents.fieldVarint(WLT_CATACLYSM,             5);
+        wlTalents.fieldVarint(WLT_BANE,                  5);
+        wlTalents.fieldVarint(WLT_RUIN,                  1);
+
+        const wlOptions = new ProtoWriter();
+        wlOptions.fieldVarint(WLO_ARMOR, 1);
+        wlOptions.fieldVarint(WLO_SUMMON, 5);  // Felguard
+
+        const wlSpec = new ProtoWriter();
+        wlSpec.fieldMessageRequired(WARLOCK_ROTATION, new ProtoWriter());
+        wlSpec.fieldMessage(WARLOCK_TALENTS, wlTalents);
+        wlSpec.fieldMessage(WARLOCK_OPTIONS, wlOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Demo Warlock'));
+        player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+        player.fieldVarint(PLAYER_CLASS, CLASS_WARLOCK);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_WARLOCK, wlSpec);
+
+    } else if (specKey === 'Hunter-MM') {
+        const hunterTalents = new ProtoWriter();
+        hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+        hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);
+        hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
+        hunterTalents.fieldVarint(HT_FEROCITY,             5);
+        hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
+        hunterTalents.fieldVarint(HT_IMPROVED_HUNTERS_MARK, 5);
+        hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
+        hunterTalents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+        hunterTalents.fieldVarint(HT_AIMED_SHOT,           1);
+        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         5);
+        hunterTalents.fieldVarint(HT_BARRAGE,              3);
+        hunterTalents.fieldVarint(HT_RANGED_WEAPON_SPEC,   5);
+        hunterTalents.fieldVarint(HT_CAREFUL_AIM,          3);
+        hunterTalents.fieldVarint(HT_TRUESHOT_AURA,        1);
+        hunterTalents.fieldVarint(HT_MASTER_MARKSMAN,      5);
+
+        const hunterOptions = new ProtoWriter();
+        hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
+        hunterOptions.fieldVarint(HRO_AMMO, 6);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
+        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+
+        const hunterRotation = new ProtoWriter();
+        hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
+        hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+        hunterRotation.fieldVarint(HR_STING, 2);
+        hunterRotation.fieldVarint(HR_WEAVE, 3);
+
+        const hunterSpec = new ProtoWriter();
+        hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
+        hunterSpec.fieldMessage(HUNTER_TALENTS, hunterTalents);
+        hunterSpec.fieldMessage(HUNTER_OPTIONS, hunterOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);
+        consumes.fieldVarint(CONS_FOOD, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('MM Hunter'));
+        player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+        player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    } else if (specKey === 'Hunter-BM') {
+        const hunterTalents = new ProtoWriter();
+        hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+        hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);
+        hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
+        hunterTalents.fieldVarint(HT_FEROCITY,             5);
+        hunterTalents.fieldVarint(HT_BESTIAL_DISCIPLINE,   2);
+        hunterTalents.fieldVarint(HT_FRENZY,               5);
+        hunterTalents.fieldVarint(HT_FEROCIOUS_INSPIRATION, 3);
+        hunterTalents.fieldVarint(HT_BESTIAL_WRATH,        1);
+        hunterTalents.fieldVarint(HT_SERPENTS_SWIFTNESS,   5);
+        hunterTalents.fieldVarint(HT_THE_BEAST_WITHIN,     1);
+        hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
+        hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
+        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         3);
+
+        const hunterOptions = new ProtoWriter();
+        hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
+        hunterOptions.fieldVarint(HRO_AMMO, 6);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
+        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+
+        const hunterRotation = new ProtoWriter();
+        hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
+        hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+        hunterRotation.fieldVarint(HR_STING, 2);
+        hunterRotation.fieldVarint(HR_WEAVE, 3);
+
+        const hunterSpec = new ProtoWriter();
+        hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
+        hunterSpec.fieldMessage(HUNTER_TALENTS, hunterTalents);
+        hunterSpec.fieldMessage(HUNTER_OPTIONS, hunterOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);
+        consumes.fieldVarint(CONS_FOOD, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('BM Hunter'));
+        player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+        player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    } else if (specKey === 'Hunter-Survival') {
+        const hunterTalents = new ProtoWriter();
+        hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+        hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
+        hunterTalents.fieldVarint(HT_FEROCITY,             5);
+        hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
+        hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
+        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         5);
+        hunterTalents.fieldVarint(HT_RANGED_WEAPON_SPEC,   5);
+        hunterTalents.fieldVarint(HT_CAREFUL_AIM,          3);
+        hunterTalents.fieldVarint(HT_LIGHTNING_REFLEXES,   5);
+        hunterTalents.fieldVarint(HT_THRILL_OF_THE_HUNT,   3);
+        hunterTalents.fieldVarint(HT_EXPOSE_WEAKNESS,      3);
+        hunterTalents.fieldVarint(HT_MASTER_TACTICIAN,     5);
+        hunterTalents.fieldVarint(HT_READINESS,            1);
+
+        const hunterOptions = new ProtoWriter();
+        hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
+        hunterOptions.fieldVarint(HRO_AMMO, 6);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
+        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+
+        const hunterRotation = new ProtoWriter();
+        hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
+        hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+        hunterRotation.fieldVarint(HR_STING, 2);
+        hunterRotation.fieldVarint(HR_WEAVE, 3);
+
+        const hunterSpec = new ProtoWriter();
+        hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
+        hunterSpec.fieldMessage(HUNTER_TALENTS, hunterTalents);
+        hunterSpec.fieldMessage(HUNTER_OPTIONS, hunterOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);
+        consumes.fieldVarint(CONS_FOOD, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Surv Hunter'));
+        player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+        player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    } else if (specKey === 'Shaman-Elemental') {
+        const eleTalents = new ProtoWriter();
+        eleTalents.fieldVarint(EST_CONVECTION,            5);
+        eleTalents.fieldVarint(EST_CONCUSSION,            5);
+        eleTalents.fieldVarint(EST_CALL_OF_FLAME,         3);
+        eleTalents.fieldVarint(EST_ELEMENTAL_FOCUS,       1);
+        eleTalents.fieldVarint(EST_CALL_OF_THUNDER,       5);
+        eleTalents.fieldVarint(EST_ELEMENTAL_DEVASTATION, 3);
+        eleTalents.fieldVarint(EST_ELEMENTAL_FURY,        1);
+        eleTalents.fieldVarint(EST_ELEMENTAL_PRECISION,   3);
+        eleTalents.fieldVarint(EST_LIGHTNING_MASTERY,     5);
+        eleTalents.fieldVarint(EST_ELEMENTAL_MASTERY,     1);
+        eleTalents.fieldVarint(EST_LIGHTNING_OVERLOAD,    5);
+        eleTalents.fieldVarint(EST_TOTEM_OF_WRATH,        1);
+
+        const eleOptions = new ProtoWriter();
+        eleOptions.fieldVarint(ESO_WATER_SHIELD, 1);
+        eleOptions.fieldVarint(ESO_BLOODLUST, 1);
+
+        const eleSpec = new ProtoWriter();
+        eleSpec.fieldMessageRequired(ELE_SHAMAN_ROTATION, new ProtoWriter());
+        eleSpec.fieldMessage(ELE_SHAMAN_TALENTS, eleTalents);
+        eleSpec.fieldMessage(ELE_SHAMAN_OPTIONS, eleOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Ele Shaman'));
+        player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+        player.fieldVarint(PLAYER_CLASS, CLASS_SHAMAN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_ELE_SHAMAN, eleSpec);
+
+    } else if (specKey === 'Druid-Balance') {
+        const druidTalents = new ProtoWriter();
+        // Balance tree field numbers (from proto/druid.proto BalanceDruidTalents)
+        druidTalents.fieldVarint(4,  5);  // focused_starlight
+        druidTalents.fieldVarint(5,  5);  // improved_starfire
+        druidTalents.fieldVarint(6,  1);  // insect_swarm (bool)
+        druidTalents.fieldVarint(9,  5);  // vengeance
+        druidTalents.fieldVarint(10, 3);  // lunar_guidance
+        druidTalents.fieldVarint(11, 5);  // starlight_wrath
+        druidTalents.fieldVarint(14, 3);  // celestial_focus
+        druidTalents.fieldVarint(15, 5);  // moonfury
+        druidTalents.fieldVarint(16, 2);  // balance_of_power
+        druidTalents.fieldVarint(17, 1);  // moonkin_form (bool)
+        druidTalents.fieldVarint(18, 5);  // empowered_starfire
+        druidTalents.fieldVarint(20, 5);  // wrath_of_cenarius
+
+        const balanceSpec = new ProtoWriter();
+        balanceSpec.fieldMessageRequired(1, new ProtoWriter());
+        balanceSpec.fieldMessage(2, druidTalents);
+        balanceSpec.fieldMessageRequired(3, new ProtoWriter());
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Balance Druid'));
+        player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BALANCE_DRUID, balanceSpec);
+
     } else {
         // ── Fury Warrior spec for ComputeStats (default) ──
         const rotation = new ProtoWriter();
@@ -1189,7 +1756,10 @@ function buildComputeStatsRequest(gearSlots, specKey) {
     party.fieldMessage(PARTY_PLAYERS, player);
 
     const raidBuffs = new ProtoWriter();
-    if (specKey === 'Priest-Shadow') {
+    const isCasterSpec = ['Priest-Shadow','Mage-Fire','Mage-Frost','Mage-Arcane',
+        'Warlock-Destruction','Warlock-Affliction','Warlock-Demonology',
+        'Shaman-Elemental','Druid-Balance'].includes(specKey);
+    if (isCasterSpec) {
         raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
         raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
     }
@@ -1202,6 +1772,11 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);   // field 4
         debuffs.fieldVarint(DB_FAERIE_FIRE, 2);         // field 10
         debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);      // field 18
+    } else if (isCasterSpec) {
+        // Standard caster debuffs (no shadow weaving/misery for non-priest)
+        debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+        debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);
+        debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
     } else {
         debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
         debuffs.fieldVarint(DB_FAERIE_FIRE, 2);

@@ -2272,8 +2272,11 @@
         'Priest-Shadow',
         'Rogue-Dps',
         'Paladin-Retribution', 'Paladin-Protection',
-        'Shaman-Enhancement',
-        'Druid-Cat', 'Druid-Bear',
+        'Shaman-Enhancement', 'Shaman-Elemental',
+        'Druid-Cat', 'Druid-Bear', 'Druid-Balance',
+        'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
+        'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
+        'Hunter-BM', 'Hunter-MM', 'Hunter-Survival',
     ]);
 
     // Specs där DPS-simulering är aktiv (Shadow Priest har bara stats, ingen sim-knapp)
@@ -2333,14 +2336,21 @@
     }
 
     function renderSimStats(stats, specKey) {
-        const isCaster = specKey === 'Priest-Shadow';
+        const CASTER_SPECS = new Set(['Priest-Shadow', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
+            'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
+            'Shaman-Elemental', 'Druid-Balance']);
+        const HUNTER_SPECS = new Set(['Hunter-BM', 'Hunter-MM', 'Hunter-Survival']);
+        const isCaster = CASTER_SPECS.has(specKey);
+        const isHunter = HUNTER_SPECS.has(specKey);
         const isBear   = specKey === 'Druid-Bear';
         const isTank   = isBear || specKey === 'Warrior-Protection' || specKey === 'Paladin-Protection';
         const labels = isCaster ? SIM_STAT_LABELS_CASTER
+                     : isHunter ? SIM_STAT_LABELS_HUNTER
                      : isTank   ? SIM_STAT_LABELS_TANK
                      :            SIM_STAT_LABELS_MELEE;
         // Bear uses a different stat order: no block/parry, has crit-immune badge via SotF
         const order  = isCaster ? SIM_STAT_ORDER_CASTER
+                     : isHunter ? SIM_STAT_ORDER_HUNTER
                      : isBear   ? SIM_STAT_ORDER_TANK_BEAR
                      : isTank   ? SIM_STAT_ORDER_TANK
                      :            SIM_STAT_ORDER_MELEE;
