@@ -1667,6 +1667,7 @@
         for (const item of items) {
             let slot = item.slot;
             if (slot === 'Shoulders') slot = 'Shoulder';
+            if (slot === 'Weapon')    slot = 'Main Hand';   // normalize to MH (some data uses "Weapon" for caster/tank MH)
 
             // Buffer Ring and Trinket for later split into 1/2
             if (slot === 'Ring')    { if (!_ringBuf.find(i => i.itemId === item.itemId))    _ringBuf.push(item);    continue; }
