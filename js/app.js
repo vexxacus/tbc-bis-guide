@@ -2267,7 +2267,14 @@
 
     // ─── Sim Stats Panel ─────────────────────────────────────────────
     // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
-    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Priest-Shadow']);
+    const SIM_SUPPORTED_SPECS = new Set([
+        'Warrior-Fury', 'Warrior-Arms', 'Warrior-Protection',
+        'Priest-Shadow',
+        'Rogue-Dps',
+        'Paladin-Retribution',
+        'Shaman-Enhancement',
+        'Druid-Cat', 'Druid-Bear',
+    ]);
 
     // Specs där DPS-simulering är aktiv (Shadow Priest har bara stats, ingen sim-knapp)
     const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms']);
@@ -2327,8 +2334,13 @@
 
     function renderSimStats(stats, specKey) {
         const isCaster = specKey === 'Priest-Shadow';
-        const labels = isCaster ? SIM_STAT_LABELS_CASTER : SIM_STAT_LABELS_MELEE;
-        const order  = isCaster ? SIM_STAT_ORDER_CASTER  : SIM_STAT_ORDER_MELEE;
+        const isTank   = specKey === 'Druid-Bear' || specKey === 'Warrior-Protection';
+        const labels = isCaster ? SIM_STAT_LABELS_CASTER
+                     : isTank   ? SIM_STAT_LABELS_TANK
+                     :            SIM_STAT_LABELS_MELEE;
+        const order  = isCaster ? SIM_STAT_ORDER_CASTER
+                     : isTank   ? SIM_STAT_ORDER_TANK
+                     :            SIM_STAT_ORDER_MELEE;
         const rows = order.map(idx => {
             const def = labels[idx];
             if (!def) return '';

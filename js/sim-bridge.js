@@ -48,6 +48,15 @@ class ProtoWriter {
         if (bytes.length) this.fieldBytes(field, bytes);
     }
 
+    // Like fieldMessage but ALWAYS writes the field tag+length even for empty messages.
+    // Required for proto oneof spec sub-messages so Go decodes a non-nil pointer.
+    fieldMessageRequired(field, writer) {
+        const bytes = writer.finish();
+        this._tag(field, 2);
+        this._varint(bytes.length);
+        for (const b of bytes) this._buf.push(b);
+    }
+
     finish() { return new Uint8Array(this._buf); }
 }
 
@@ -231,6 +240,23 @@ const DB_SHADOW_WEAVING      = 18;  // bool — 5-stack shadow weaving (shadow_w
 const CLASS_PRIEST  = 5;
 // Race enum
 const RACE_UNDEAD   = 11;  // RaceUndead = 11 (from proto/common.proto Race enum)
+
+// ─── Additional class/race/spec constants ────────────────────────────────────
+// Class enum (from proto/common.proto)
+const CLASS_DRUID   = 1;
+const CLASS_PALADIN = 4;
+const CLASS_ROGUE   = 6;
+const CLASS_SHAMAN  = 7;
+// Race enum (from proto/common.proto)
+const RACE_TAUREN   = 8;
+const RACE_HUMAN    = 5;
+const RACE_NIGHT_ELF = 6;
+// Player oneof spec field numbers (from proto/api.proto Player.oneof spec)
+const PLAYER_RET_PALADIN      = 9;   // retribution_paladin = 9
+const PLAYER_ROGUE            = 11;  // rogue = 11
+const PLAYER_ENH_SHAMAN       = 18;  // enhancement_shaman = 18
+const PLAYER_FERAL_DRUID      = 22;  // feral_druid = 22
+const PLAYER_FERAL_TANK_DRUID = 26;  // feral_tank_druid = 26
 
 // Consumes fields (melee — kept for warrior)
 const CONS_FLASK          = 38;  // enum: 4 = FlaskOfRelentlessAssault
@@ -727,6 +753,137 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_BUFFS, indBuffs);
         player.fieldMessage(PLAYER_SHADOW_PRIEST, spSpec);
+
+    } else if (specKey === 'Rogue-Dps') {
+        // ── Rogue (Combat/Dps) — minimal spec for computeStats ──
+        // Rogue proto: rotation=1, talents=2, options=3 (all empty = default values)
+        const rogueSpec = new ProtoWriter();
+        rogueSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation (empty = default)
+        rogueSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        rogueSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);         // FlaskOfRelentlessAssault
+        consumes.fieldVarint(CONS_FOOD, 3);          // FoodRavagerDog
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 3); // HastePotion
+        consumes.fieldVarint(CONS_MH_IMBUE, 10);     // RogueDeadlyPoison = 10
+        consumes.fieldVarint(CONS_OH_IMBUE, 10);
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Rogue'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_ROGUE);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_ROGUE, rogueSpec);
+
+    } else if (specKey === 'Paladin-Retribution') {
+        // ── Retribution Paladin — minimal spec for computeStats ──
+        const retSpec = new ProtoWriter();
+        retSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        retSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        retSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);          // FlaskOfRelentlessAssault
+        consumes.fieldVarint(CONS_FOOD, 4);           // FoodRoastedClefthoof
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 3); // HastePotion
+        consumes.fieldVarint(CONS_MH_IMBUE, 1);       // AdamantiteSharpeningStone
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Ret Paladin'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_PALADIN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_RET_PALADIN, retSpec);
+
+    } else if (specKey === 'Shaman-Enhancement') {
+        // ── Enhancement Shaman — minimal spec for computeStats ──
+        const enhSpec = new ProtoWriter();
+        enhSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        enhSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        enhSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);          // FlaskOfRelentlessAssault
+        consumes.fieldVarint(CONS_FOOD, 4);           // FoodRoastedClefthoof
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 3); // HastePotion
+        consumes.fieldVarint(CONS_MH_IMBUE, 9);       // ShamanWindfury = 9
+        consumes.fieldVarint(CONS_OH_IMBUE, 7);       // ShamanRockbiter = 8, Flametongue = 6
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Enh Shaman'));
+        player.fieldVarint(PLAYER_RACE, RACE_ORC);
+        player.fieldVarint(PLAYER_CLASS, CLASS_SHAMAN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_ENH_SHAMAN, enhSpec);
+
+    } else if (specKey === 'Druid-Cat') {
+        // ── Feral Druid (Cat DPS) — minimal spec for computeStats ──
+        const feralSpec = new ProtoWriter();
+        feralSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        feralSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        feralSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);          // FlaskOfRelentlessAssault
+        consumes.fieldVarint(CONS_FOOD, 4);           // FoodRoastedClefthoof
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 3); // HastePotion
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Feral Cat'));
+        player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_FERAL_DRUID, feralSpec);
+
+    } else if (specKey === 'Druid-Bear') {
+        // ── Feral Tank Druid (Bear) — minimal spec for computeStats ──
+        const bearSpec = new ProtoWriter();
+        bearSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        bearSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        bearSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 6);          // FlaskOfFortification = 6
+        consumes.fieldVarint(CONS_FOOD, 7);           // FoodFishermansFeast = 7
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 7); // IronshieldPotion = 7
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Feral Bear'));
+        player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_FERAL_TANK_DRUID, bearSpec);
 
     } else {
         // ── Fury Warrior spec for ComputeStats (default) ──

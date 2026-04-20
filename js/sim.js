@@ -186,6 +186,25 @@ const SIM_STAT_LABELS_CASTER = {
 };
 const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
 
+/**
+ * Stat labels for tank specs (Bear Druid, Prot Warrior)
+ * Key stats: Health, Stamina, Armor, Defense, Dodge, Parry, Block + some threat stats
+ */
+const SIM_STAT_LABELS_TANK = {
+    35: { label: 'Health',       fmt: v => Math.round(v) },
+     2: { label: 'Stamina',      fmt: v => Math.round(v) },
+    27: { label: 'Armor',        fmt: v => Math.round(v) },
+    29: { label: 'Defense',      fmt: v => Math.round(v) },
+    32: { label: 'Dodge',        fmt: v => `${Math.round(v)} (${(v / 157.0).toFixed(2)}%)` },
+    33: { label: 'Parry',        fmt: v => `${Math.round(v)} (${(v / 23.65).toFixed(2)}%)` },
+    30: { label: 'Block',        fmt: v => `${Math.round(v)} (${(v / 7.9).toFixed(2)}%)` },
+    31: { label: 'Block Value',  fmt: v => Math.round(v) },
+     0: { label: 'Strength',     fmt: v => Math.round(v) },
+     1: { label: 'Agility',      fmt: v => Math.round(v) },
+    18: { label: 'Attack Power', fmt: v => Math.round(v) },
+};
+const SIM_STAT_ORDER_TANK = [35, 2, 27, 29, 32, 33, 30, 31, 0, 1, 18];
+
 // Backwards-compat aliases used by renderSimStats
 const SIM_STAT_LABELS = SIM_STAT_LABELS_MELEE;
 const SIM_STAT_ORDER  = SIM_STAT_ORDER_MELEE;
