@@ -1762,6 +1762,17 @@
         splitDualSlot(_ringBuf,    'Ring 1',    'Ring 2');
         splitDualSlot(_trinketBuf, 'Trinket 1', 'Trinket 2');
 
+        // ── Remove 2H weapons from Main Hand slot ──
+        // Some items (Zhar'doom, Earthwarden, etc.) are tagged in the source data as
+        // BOTH 'Main Hand' AND 'Two Hand'. They are 2H weapons — remove them from MH
+        // so they only appear in the Two Hand slot group. This prevents showing a 2H
+        // weapon as if it could be equipped alongside an Off Hand.
+        if (slotGroups['Two Hand'] && slotGroups['Main Hand']) {
+            const twoHandIds = new Set(slotGroups['Two Hand'].map(i => String(i.itemId)));
+            slotGroups['Main Hand'] = slotGroups['Main Hand'].filter(i => !twoHandIds.has(String(i.itemId)));
+            if (!slotGroups['Main Hand'].length) delete slotGroups['Main Hand'];
+        }
+
         // ── Dual-wield fix: if MH exists but OH is empty, clone MH → OH ──
         // Only for PvE mode — PvP scraped data already has correct slots
         // Only for true dual-wield melee specs (same weapon in both hands)
@@ -2052,14 +2063,19 @@
         for (const slot of PD_ORDER) {
             const si = slotGroups[slot];
             if (!si || !si.length) continue;
+
+            // Skip weapon slots that shouldn't be shown for this spec/mode
+            const isMHOrOH = slot === 'Main Hand' || slot === 'Off Hand';
+            const is2H     = slot === 'Two Hand';
+            if (isMHOrOH && !effectiveDW && !showWeaponToggle) continue;
+            if (is2H     && !effective2H && !showWeaponToggle) continue;
+
             const bis = getActiveItem(slot, si);
             const isOverridden = String(bis.itemId) !== String(si[0].itemId);
             const hasEnchant = !!enchantLookup[slot];
             const pdTitle = (bis.name || slot).replace(/"/g, '&quot;');
 
-            // Weapon mode: dim inactive weapon slots
-            const isMHOrOH = slot === 'Main Hand' || slot === 'Off Hand';
-            const is2H     = slot === 'Two Hand';
+            // Weapon mode: dim inactive weapon slots (toggle specs only)
             const isWeaponDimmed = showWeaponToggle && (
                 (weaponMode === '2h' && isMHOrOH) ||
                 (weaponMode === 'dw' && is2H)
