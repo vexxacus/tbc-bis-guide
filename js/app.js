@@ -2344,7 +2344,16 @@
         const rows = order.map(idx => {
             const def = labels[idx];
             if (!def) return '';
-            const val = stats[idx] || 0;
+            // Sentinel 999 = Total Avoidance (computed from dodge + parry + block ratings)
+            let val;
+            if (idx === 999) {
+                const dodgePct = (stats[32] || 0) / DODGE_RATING_PER_PCT;
+                const parryPct = (stats[33] || 0) / PARRY_RATING_PER_PCT;
+                const blockPct = (stats[30] || 0) / BLOCK_RATING_PER_PCT;
+                val = dodgePct + parryPct + blockPct;
+            } else {
+                val = stats[idx] || 0;
+            }
             return `<div class="sim-stat-row">
                 <span class="sim-stat-label">${def.label}</span>
                 <span class="sim-stat-value">${def.fmt(val)}</span>
@@ -2375,7 +2384,7 @@
             }
         }
 
-        simStats.innerHTML = `<div class="sim-stat-grid">${rows}</div>${enchantNoteHtml}`;
+        simStats.innerHTML = `<div class="sim-stat-grid${isTank ? ' sim-stat-grid--tank' : ''}">${rows}</div>${enchantNoteHtml}`;
     }
 
     // ─── Sim DPS Button ──────────────────────────────────────────────

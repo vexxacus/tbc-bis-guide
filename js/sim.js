@@ -148,16 +148,32 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
  * Stat index → display info (from wowsims common.proto Stat enum)
  * Melee specs (Warrior etc.)
  */
+// Rating conversion constants from wowsims sim/core/constants.go & ui/core/constants/mechanics.ts
+const MELEE_HIT_RATING_PER_PCT     = 15.77;
+const MELEE_CRIT_RATING_PER_PCT    = 22.08;
+const MELEE_HASTE_RATING_PER_PCT   = 15.77;
+const SPELL_HIT_RATING_PER_PCT     = 12.62;
+const SPELL_CRIT_RATING_PER_PCT    = 22.08;
+const SPELL_HASTE_RATING_PER_PCT   = 15.77;
+const EXPERTISE_PER_QUARTER_PCT    = 3.94;     // 3.94 rating = 0.25% dodge/parry reduction
+const DEFENSE_RATING_PER_DEFENSE   = 2.3654;   // rating -> defense skill
+const BLOCK_RATING_PER_PCT         = 7.8846;
+const DODGE_RATING_PER_PCT         = 18.9231;
+const PARRY_RATING_PER_PCT         = 23.6538;
+// Crit immunity requires 490 defense skill (350 base + 140 extra × 0.04%/skill = 5.6% reduction)
+const DEFENSE_SKILL_FOR_CRIT_CAP   = 490;
+const DEFENSE_BASE_SKILL            = 350;      // character level 70 × 5
+
 const SIM_STAT_LABELS_MELEE = {
      0: { label: 'Strength',     fmt: v => Math.round(v) },
      1: { label: 'Agility',      fmt: v => Math.round(v) },
      2: { label: 'Stamina',      fmt: v => Math.round(v) },
     18: { label: 'Attack Power', fmt: v => Math.round(v) },
-    19: { label: 'Hit',          fmt: v => `${Math.round(v)} (${(v / 15.76).toFixed(2)}%)` },
-    20: { label: 'Crit',         fmt: v => `${Math.round(v)} (${(v / 22.08).toFixed(2)}%)` },
-    21: { label: 'Haste',        fmt: v => `${Math.round(v)} (${(v / 15.76).toFixed(2)}%)` },
+    19: { label: 'Hit',          fmt: v => `${Math.round(v)} (${(v / MELEE_HIT_RATING_PER_PCT).toFixed(2)}%)` },
+    20: { label: 'Crit',         fmt: v => `${Math.round(v)} (${(v / MELEE_CRIT_RATING_PER_PCT).toFixed(2)}%)` },
+    21: { label: 'Haste',        fmt: v => `${Math.round(v)} (${(v / MELEE_HASTE_RATING_PER_PCT).toFixed(2)}%)` },
     22: { label: 'Armor Pen',    fmt: v => Math.round(v) },
-    23: { label: 'Expertise',    fmt: v => `${Math.round(v)} (${Math.floor(v / 3.9375)} skill)` },
+    23: { label: 'Expertise',    fmt: v => `${Math.round(v)} (${Math.floor(v / EXPERTISE_PER_QUARTER_PCT)} skill)` },
     35: { label: 'Health',       fmt: v => Math.round(v) },
 };
 const SIM_STAT_ORDER_MELEE = [35, 0, 1, 2, 18, 19, 20, 21, 22, 23];
@@ -179,9 +195,9 @@ const SIM_STAT_LABELS_CASTER = {
      4: { label: 'Spirit',        fmt: v => Math.round(v) },
      5: { label: 'Spell Power',   fmt: v => Math.round(v) },
     12: { label: 'Shadow Power',  fmt: v => Math.round(v) },
-    14: { label: 'Spell Hit',     fmt: v => `${Math.round(v)} (${(v / 12.62).toFixed(2)}%)` },
-    15: { label: 'Spell Crit',    fmt: v => `${Math.round(v)} (${(v / 22.08).toFixed(2)}%)` },
-    16: { label: 'Spell Haste',   fmt: v => `${Math.round(v)} (${(v / 15.76).toFixed(2)}%)` },
+    14: { label: 'Spell Hit',     fmt: v => `${Math.round(v)} (${(v / SPELL_HIT_RATING_PER_PCT).toFixed(2)}%)` },
+    15: { label: 'Spell Crit',    fmt: v => `${Math.round(v)} (${(v / SPELL_CRIT_RATING_PER_PCT).toFixed(2)}%)` },
+    16: { label: 'Spell Haste',   fmt: v => `${Math.round(v)} (${(v / SPELL_HASTE_RATING_PER_PCT).toFixed(2)}%)` },
     13: { label: 'MP5',           fmt: v => Math.round(v) },
 };
 const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
@@ -189,21 +205,37 @@ const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
 /**
  * Stat labels for tank specs (Bear Druid, Prot Warrior)
  * Key stats: Health, Stamina, Armor, Defense, Dodge, Parry, Block + some threat stats
+ *
+ * Defense (idx 29) = raw defense rating; skill = 350 + rating/2.3654
+ * Crit-immunity requires defense skill >= 490 (i.e. 140 extra skill = 5.6% / 0.04% per skill)
+ * Dodge/Parry/Block (idx 32/33/30) = raw rating; convert to % using respective constants
+ *
+ * Index 999 is a sentinel for "Total Avoidance" (computed from dodge + parry + block ratings)
  */
 const SIM_STAT_LABELS_TANK = {
     35: { label: 'Health',       fmt: v => Math.round(v) },
      2: { label: 'Stamina',      fmt: v => Math.round(v) },
     27: { label: 'Armor',        fmt: v => Math.round(v) },
-    29: { label: 'Defense',      fmt: v => Math.round(v) },
-    32: { label: 'Dodge',        fmt: v => `${Math.round(v)} (${(v / 157.0).toFixed(2)}%)` },
-    33: { label: 'Parry',        fmt: v => `${Math.round(v)} (${(v / 23.65).toFixed(2)}%)` },
-    30: { label: 'Block',        fmt: v => `${Math.round(v)} (${(v / 7.9).toFixed(2)}%)` },
+    // Defense: show rating AND skill value; wowsims formula: skill = CHARACTER_LEVEL*5 + rating/DEFENSE_RATING_PER_DEFENSE
+    29: { label: 'Defense',      fmt: v => {
+        const skill = DEFENSE_BASE_SKILL + v / DEFENSE_RATING_PER_DEFENSE;
+        const critImmune = skill >= DEFENSE_SKILL_FOR_CRIT_CAP;
+        const badge = critImmune
+            ? `<span class="sim-crit-immune">✔ Crit Immune</span>`
+            : `<span class="sim-not-crit-immune">✘ Need ${(DEFENSE_SKILL_FOR_CRIT_CAP - skill).toFixed(1)} more skill</span>`;
+        return `${Math.round(v)} (${skill.toFixed(1)} skill) ${badge}`;
+    }},
+    32: { label: 'Dodge',        fmt: v => `${Math.round(v)} (${(v / DODGE_RATING_PER_PCT).toFixed(2)}%)` },
+    33: { label: 'Parry',        fmt: v => `${Math.round(v)} (${(v / PARRY_RATING_PER_PCT).toFixed(2)}%)` },
+    30: { label: 'Block',        fmt: v => `${Math.round(v)} (${(v / BLOCK_RATING_PER_PCT).toFixed(2)}%)` },
     31: { label: 'Block Value',  fmt: v => Math.round(v) },
      0: { label: 'Strength',     fmt: v => Math.round(v) },
      1: { label: 'Agility',      fmt: v => Math.round(v) },
     18: { label: 'Attack Power', fmt: v => Math.round(v) },
+    // 999 = computed: Total Avoidance (dodge% + parry% + block%) — handled specially in renderSimStats
+    999: { label: 'Total Avoidance', fmt: v => `${v.toFixed(2)}%` },
 };
-const SIM_STAT_ORDER_TANK = [35, 2, 27, 29, 32, 33, 30, 31, 0, 1, 18];
+const SIM_STAT_ORDER_TANK = [35, 2, 27, 29, 32, 33, 30, 31, 999, 0, 1, 18];
 
 // Backwards-compat aliases used by renderSimStats
 const SIM_STAT_LABELS = SIM_STAT_LABELS_MELEE;

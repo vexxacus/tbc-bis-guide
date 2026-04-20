@@ -1038,6 +1038,11 @@ body {
     gap: 4px 16px;
 }
 
+/* Tank stats need a single-column layout since Defense row is wide */
+.sim-stat-grid.sim-stat-grid--tank {
+    grid-template-columns: 1fr;
+}
+
 .sim-stat-row {
     display: flex;
     justify-content: space-between;
@@ -1058,6 +1063,32 @@ body {
     color: var(--text-primary);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+}
+
+/* Crit-immunity badges for tank defense display */
+.sim-crit-immune {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: rgba(80, 200, 100, 0.18);
+    border: 1px solid rgba(80, 200, 100, 0.45);
+    border-radius: 4px;
+    color: #6ddf88;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+.sim-not-crit-immune {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: rgba(220, 80, 60, 0.18);
+    border: 1px solid rgba(220, 80, 60, 0.40);
+    border-radius: 4px;
+    color: #e07070;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
 }
 
 .sim-stat-loading {
