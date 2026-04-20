@@ -6,11 +6,13 @@
     <!-- Force reload if browser has cached an old version of this file -->
     <script>
         (function() {
+            // Skip cache-bust for bots to avoid infinite reload loop
+            var ua = navigator.userAgent || '';
+            if (/Googlebot|bingbot|Baiduspider|yandex|facebookexternalhit|Twitterbot|rogerbot|linkedinbot|embedly|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator/i.test(ua)) return;
             var BUILD = '20260411b';
             var stored = sessionStorage.getItem('bis-build');
             if (stored !== BUILD) {
                 sessionStorage.setItem('bis-build', BUILD);
-                // location.reload(true) bypasses cache and fetches fresh HTML
                 window.location.reload(true);
             }
         })();
