@@ -98,7 +98,8 @@
     function buildPath() {
         if (!state.selectedClass) return '/';
         const cls = toSlug(state.selectedClass);
-        if (!state.selectedSpec || state.isPvP) return `/${cls}`;
+        if (!state.selectedSpec) return `/${cls}`;
+        if (state.isPvP) return `/${cls}/${toSlug(state.selectedSpec)}/pvp`;
         const spec = toSlug(state.selectedSpec);
         if (state.selectedPhase == null) return `/${cls}/${spec}`;
         const phase = PHASE_TO_SLUG[state.selectedPhase] || `phase-${state.selectedPhase}`;
@@ -160,6 +161,29 @@
         }
 
         const phaseSlug = parts[2];
+
+        // /warrior/arms/pvp — restore PvP view
+        if (phaseSlug === 'pvp') {
+            state.selectedClass = specEntry.cls;
+            state.selectedSpec  = specEntry.spec;
+            state.isPvP         = true;
+            state.pvpKey        = `${specEntry.cls}|${specEntry.spec}`;
+            state.selectedPhase = null;
+            const pvpTag = '<span class="pvp-tag">PvP</span>';
+            headerTitle.innerHTML = `${cls} — ${specEntry.spec} PvP ${pvpTag}`;
+            headerTitle.style.color = CLASS_META[cls].color;
+            const meta = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta) || {};
+            const dateStr = meta.analyzedAt
+                ? new Date(meta.analyzedAt).toLocaleDateString('sv-SE')
+                : 'recently';
+            headerSub.textContent = `Live snapshot · Updated ${dateStr}`;
+            renderSpecGrid(cls);
+            renderBisList();
+            state.history.push('class', 'spec');
+            showStep(stepBis);
+            return true;
+        }
+
         const phase = PHASE_SLUG_MAP[phaseSlug];
         if (phase === undefined) return false;
 
@@ -199,10 +223,14 @@
             pageTitle = 'TBC Classic BiS Guide — Best in Slot for Every Class & Spec';
             metaDesc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell. Includes enchants, gems, and phase-by-phase progression.';
             path      = '/';
-        } else if (!state.selectedSpec || state.isPvP) {
+        } else if (!state.selectedSpec) {
             pageTitle = `${state.selectedClass} BiS Guide — TBC Classic`;
             metaDesc  = `Best in Slot gear lists for every ${state.selectedClass} spec in TBC Classic — from Pre-BiS dungeons to Sunwell Plateau.`;
             path      = `/${toSlug(state.selectedClass)}`;
+        } else if (state.isPvP) {
+            pageTitle = `${state.selectedSpec} ${state.selectedClass} PvP BiS — TBC Classic`;
+            metaDesc  = `Live arena snapshot of the best gear for ${state.selectedSpec} ${state.selectedClass} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now.`;
+            path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/pvp`;
         } else if (state.selectedPhase == null) {
             pageTitle = `${state.selectedSpec} ${state.selectedClass} BiS Guide — TBC Classic`;
             metaDesc  = `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic. Choose a phase to see the full gear list.`;
@@ -540,8 +568,44 @@
     const WH = 'tbc';
     const WH_ICON_CDN = 'https://wow.zamimg.com/images/wow/icons';
 
+    // Mapping from wowsims negative IDs (random enchant suffix items) → Wowhead base item IDs
+    // Used for icon lookup and Wowhead tooltip links since Wowhead doesn't know negative IDs.
+    const NEGATIVE_ID_TO_WOWHEAD = {
+        '-5':  30680,  // Glider's Foot-Wraps of Shadow Wrath
+        '-9':  30675,  // Lurker's Cord of Shadow Wrath
+        '-14': 30684,  // Ravager's Cuffs of Shadow Wrath
+        '-16': 25295,  // Flawless Wand of Shadow Wrath
+        '-18': 31201,  // Illidari Cloak of Shadow Wrath
+        '-19': 24692,  // Elementalist Bracelets of Shadow Wrath
+        '-20': 25043,  // Amber Cape of Shadow Wrath
+        '-21': 24688,  // Elementalist Gloves of Shadow Wrath
+        '-22': 31166,  // Nethersteel-Lined Handwraps of Shadow Wrath
+    };
+
+    // Shadow power bonus from each "of Shadow Wrath" random enchant item (verified on Wowhead TBC)
+    const RANDOM_ENCHANT_SHADOW_POWER = {
+        '-5':  78,   // Glider's Foot-Wraps of Shadow Wrath
+        '-9':  78,   // Lurker's Cord of Shadow Wrath
+        '-14': 58,   // Ravager's Cuffs of Shadow Wrath
+        '-16': 25,   // Flawless Wand of Shadow Wrath
+        '-18': 47,   // Illidari Cloak of Shadow Wrath
+        '-19': 45,   // Elementalist Bracelets of Shadow Wrath
+        '-20': 45,   // Amber Cape of Shadow Wrath
+        '-21': 60,   // Elementalist Gloves of Shadow Wrath
+        '-22': 62,   // Nethersteel-Lined Handwraps of Shadow Wrath
+    };
+
+    // Returns the positive Wowhead item ID for an item — maps negative wowsims IDs to base items.
+    function toWhId(id) {
+        const n = Number(id);
+        return (n < 0 && NEGATIVE_ID_TO_WOWHEAD[String(n)]) || n;
+    }
+
     function whItem(id, text, cls) {
-        return `<a href="https://www.wowhead.com/${WH}/item=${id}" data-wowhead="item=${id}&domain=${WH}" data-wh-item="${id}" class="${cls||''}">${text}</a>`;
+        // Use mapped Wowhead ID for the tooltip/href, but keep original id in data-wh-item
+        // so the modal click handler can find the item in phase data (which uses negative IDs).
+        const whId = toWhId(id);
+        return `<a href="https://www.wowhead.com/${WH}/item=${whId}" data-wowhead="item=${whId}&domain=${WH}" data-wh-item="${id}" class="${cls||''}">${text}</a>`;
     }
 
     function whSpell(id, text, enchSrcData) {
@@ -568,10 +632,12 @@
     function itemIcon(itemId, size, cssClass) {
         size = size || 'medium';    // tiny|small|medium|large
         cssClass = cssClass || '';
-        const iconName = (typeof ICONS !== 'undefined' && ICONS[itemId]) || 'inv_misc_questionmark';
+        // For wowsims negative IDs (random enchant suffix items), use the base Wowhead item ID
+        const whId = toWhId(itemId);
+        const iconName = (typeof ICONS !== 'undefined' && ICONS[whId]) || 'inv_misc_questionmark';
         const img = `<img src="${WH_ICON_CDN}/${size}/${iconName}.jpg" alt="" class="${cssClass}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/${size}/inv_misc_questionmark.jpg'">`;
-        // Intercept click → open modal, keep data-wowhead for hover tooltip
-        return `<a href="https://www.wowhead.com/${WH}/item=${itemId}" data-wowhead="item=${itemId}&domain=${WH}" data-wh-item="${itemId}" class="icon-link">${img}</a>`;
+        // Intercept click → open modal, keep data-wowhead for hover tooltip (link to base item on Wowhead)
+        return `<a href="https://www.wowhead.com/${WH}/item=${whId}" data-wowhead="item=${whId}&domain=${WH}" data-wh-item="${itemId}" class="icon-link">${img}</a>`;
     }
 
     // Spec icons mapping (Wowhead CDN icon names)
@@ -793,15 +859,23 @@
         'Druid-Cat':            '2h',
         'Paladin-Retribution':  '2h',
         'Warrior-Arms':         'both',
+        'Priest-Shadow':        'both',   // Staff (2H) or MH+OH
     };
 
-    // Specs where the user can explicitly toggle between DW and 2H
-    const WEAPON_TOGGLE_SPECS = new Set(['Warrior-Fury']);
+    // Specs där user kan toggla mellan DW och 2H
+    const WEAPON_TOGGLE_SPECS = new Set(['Warrior-Fury', 'Priest-Shadow']);
 
-    // weaponMode: per selectionKey() → 'dw' | '2h' (default 'dw')
+    // weaponMode: per selectionKey() → 'dw' | '2h' (default varies by spec)
+    // Default: 'dw' for most, '2h' for Shadow Priest (staff is common)
+    const WEAPON_MODE_DEFAULT = {
+        'Priest-Shadow': '2h',
+    };
     const weaponModeState = {};
     function getWeaponMode() {
-        return weaponModeState[selectionKey()] || 'dw';
+        const key = selectionKey();
+        if (key in weaponModeState) return weaponModeState[key];
+        const specKey = `${state.selectedClass}-${state.selectedSpec}`;
+        return WEAPON_MODE_DEFAULT[specKey] || 'dw';
     }
     function setWeaponMode(mode) {
         weaponModeState[selectionKey()] = mode;
@@ -2193,10 +2267,20 @@
 
     // ─── Sim Stats Panel ─────────────────────────────────────────────
     // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
-    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms']);
+    const SIM_SUPPORTED_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Priest-Shadow']);
 
-    const simPanel = document.getElementById('simPanel');
-    const simStats = document.getElementById('simStats');
+    // Specs där DPS-simulering är aktiv (Shadow Priest har bara stats, ingen sim-knapp)
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms']);
+
+    const SIM_DISCLAIMER = {
+        'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
+        'Warrior-Arms':  'Simulation uses standard Arms Warrior rotation (Mortal Strike → Overpower priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
+    };
+
+    const simPanel       = document.getElementById('simPanel');
+    const simStats       = document.getElementById('simStats');
+    const simDpsSection  = document.getElementById('simDpsSection');
+    const simDisclaimer  = document.getElementById('simDisclaimer');
     let _simStatsDebounce = null;
     let _simStatsReqId = 0;
 
@@ -2207,6 +2291,11 @@
             return;
         }
         if (simPanel) simPanel.style.display = 'block';
+
+        // Visa/dölj DPS-knapp beroende på spec
+        if (simDpsSection) simDpsSection.style.display = SIM_DPS_SPECS.has(specKey) ? 'block' : 'none';
+        if (simDisclaimer) simDisclaimer.textContent = SIM_DISCLAIMER[specKey] || '';
+
         _lastSlotGroups    = slotGroups;
         _lastEnchantLookup = enchantLookup;
         _lastGems          = gems;
@@ -2218,7 +2307,7 @@
 
             // Capture slotGroups + weaponMode at this moment
             const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
-            const stats = await computeStatsForBis(slotGroups, getActiveItem, wMode, enchantLookup, gems);
+            const stats = await computeStatsForBis(slotGroups, getActiveItem, wMode, enchantLookup, gems, specKey);
             if (reqId !== _simStatsReqId) return; // stale
 
             if (!stats) {
@@ -2232,13 +2321,16 @@
                 }
                 return;
             }
-            renderSimStats(stats);
+            renderSimStats(stats, specKey);
         }, 300);
     }
 
-    function renderSimStats(stats) {
-        const rows = SIM_STAT_ORDER.map(idx => {
-            const def = SIM_STAT_LABELS[idx];
+    function renderSimStats(stats, specKey) {
+        const isCaster = specKey === 'Priest-Shadow';
+        const labels = isCaster ? SIM_STAT_LABELS_CASTER : SIM_STAT_LABELS_MELEE;
+        const order  = isCaster ? SIM_STAT_ORDER_CASTER  : SIM_STAT_ORDER_MELEE;
+        const rows = order.map(idx => {
+            const def = labels[idx];
             if (!def) return '';
             const val = stats[idx] || 0;
             return `<div class="sim-stat-row">
@@ -2246,7 +2338,32 @@
                 <span class="sim-stat-value">${def.fmt(val)}</span>
             </div>`;
         }).join('');
-        simStats.innerHTML = `<div class="sim-stat-grid">${rows}</div>`;
+
+        // For Shadow Priest: visa hur mycket shadow power som kommer från random enchants
+        let enchantNoteHtml = '';
+        if (isCaster && _lastSlotGroups) {
+            let totalEnchantSP = 0;
+            const enchantLines = [];
+            for (const [slot, items] of Object.entries(_lastSlotGroups)) {
+                const item = getActiveItem(slot, items);
+                if (!item) continue;
+                const key = String(item.itemId);
+                const sp = RANDOM_ENCHANT_SHADOW_POWER[key];
+                if (sp) {
+                    totalEnchantSP += sp;
+                    enchantLines.push(`${item.name || slot}: +${sp}`);
+                }
+            }
+            if (totalEnchantSP > 0) {
+                enchantNoteHtml = `<div class="sim-enchant-note">
+                    <span class="sim-enchant-icon">🎲</span>
+                    <span><strong>+${totalEnchantSP} sp</strong> från random enchants</span>
+                    <span class="sim-enchant-detail">(${enchantLines.join(', ')})</span>
+                </div>`;
+            }
+        }
+
+        simStats.innerHTML = `<div class="sim-stat-grid">${rows}</div>${enchantNoteHtml}`;
     }
 
     // ─── Sim DPS Button ──────────────────────────────────────────────
@@ -2275,7 +2392,9 @@
 
             const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
             const specKey = `${state.selectedClass}-${state.selectedSpec}`;
-            const simFn = specKey === 'Warrior-Arms' ? simulateArmsWarrior : simulateFuryWarrior;
+            const simFn = specKey === 'Warrior-Arms'   ? simulateArmsWarrior
+                        : specKey === 'Priest-Shadow'   ? simulateShadowPriest
+                        : simulateFuryWarrior;
 
             try {
                 const result = await simFn(
@@ -2421,7 +2540,7 @@
         }
 
         // Prominent Wowhead button at the bottom
-        html += `<a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
+        html += `<a href="https://www.wowhead.com/${WH}/item=${toWhId(itemId)}" target="_blank" rel="noopener" class="modal-wowhead-btn">
             <img src="${WH_ICON_CDN}/small/inv_misc_note_01.jpg" alt="" class="modal-wowhead-icon" onerror="this.style.display='none'">
             View on Wowhead →
         </a>`;
@@ -2469,7 +2588,7 @@
                 <div><div class="modal-row-value">Source not in database</div><div class="modal-row-label">Item ID: ${itemId}</div></div></div></div>`;
         }
 
-        html += `<a href="https://www.wowhead.com/${WH}/item=${itemId}" target="_blank" rel="noopener" class="modal-wowhead-btn">
+        html += `<a href="https://www.wowhead.com/${WH}/item=${toWhId(itemId)}" target="_blank" rel="noopener" class="modal-wowhead-btn">
             View on Wowhead →
         </a>`;
 
