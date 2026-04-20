@@ -92823,22 +92823,16 @@
               "name": "Spaulders of Oblivion"
             },
             {
-              "itemId": "31201",
+              "itemId": "-18",
               "slot": "Back",
               "rank": "BIS",
               "name": "Illidari Cloak of Shadow Wrath"
             },
             {
-              "itemId": "25043",
+              "itemId": "-20",
               "slot": "Back",
               "rank": "BIS",
               "name": "Amber Cape of Shadow Wrath / Nether Cloak of Shadow Wrath / Ambusher's Cloak of Shadow Wrath"
-            },
-            {
-              "itemId": "31254",
-              "slot": "Back",
-              "rank": "BIS",
-              "name": "Striderhide Cloak of Shadow Wrath"
             },
             {
               "itemId": "28570",
@@ -92883,28 +92877,16 @@
               "name": "Robe of the Crimson Order"
             },
             {
-              "itemId": "30684",
+              "itemId": "-14",
               "slot": "Wrist",
               "rank": "BIS",
               "name": "Ravager's Cuffs of Shadow Wrath"
             },
             {
-              "itemId": "31225",
-              "slot": "Wrist",
-              "rank": "BIS",
-              "name": "Illidari Bindings of Shadow Wrath"
-            },
-            {
-              "itemId": "24692",
+              "itemId": "-19",
               "slot": "Wrist",
               "rank": "BIS",
               "name": "Elementalist Bracelets of Shadow Wrath / Archmage Bracelets of Shadow Wrath / Eldr'naan Bracelets of Shadow Wrath"
-            },
-            {
-              "itemId": "31192",
-              "slot": "Wrist",
-              "rank": "BIS",
-              "name": "Crocolisk Hide Bindings of Shadow Wrath"
             },
             {
               "itemId": "24250",
@@ -92925,7 +92907,7 @@
               "name": "Harbinger Bands"
             },
             {
-              "itemId": "31166",
+              "itemId": "-22",
               "slot": "Hands",
               "rank": "BIS",
               "name": "Nethersteel-Lined Handwraps of Shadow Wrath"
@@ -92943,7 +92925,7 @@
               "name": "Soul-Eater's Handwraps"
             },
             {
-              "itemId": "24688",
+              "itemId": "-21",
               "slot": "Hands",
               "rank": "BIS",
               "name": "Elementalist Gloves of Shadow Wrath"
@@ -92955,7 +92937,7 @@
               "name": "Anger-Spark Gloves"
             },
             {
-              "itemId": "30675",
+              "itemId": "-9",
               "slot": "Waist",
               "rank": "BIS",
               "name": "Lurker's Cord of Shadow Wrath"
@@ -93003,7 +92985,7 @@
               "name": "Kirin Tor Master's Trousers"
             },
             {
-              "itemId": "30680",
+              "itemId": "-5",
               "slot": "Feet",
               "rank": "BIS",
               "name": "Glider's Foot-Wraps of Shadow Wrath"
@@ -93207,7 +93189,7 @@
               "name": "Gavel of Unearthed Secrets"
             },
             {
-              "itemId": "25295",
+              "itemId": "-16",
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "Flawless Wand of Shadow Wrath"
@@ -93217,12 +93199,6 @@
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "The Black Stalk"
-            },
-            {
-              "itemId": "25294",
-              "slot": "Ranged/Relic",
-              "rank": "BIS",
-              "name": "Dragonscale Wand of Shadow Wrath / Draenethyst Wand of Shadow Wrath"
             },
             {
               "itemId": "28673",
@@ -93377,7 +93353,7 @@
               "name": "Illidari Shoulderpads"
             },
             {
-              "itemId": "31201",
+              "itemId": "-18",
               "slot": "Back",
               "rank": "BIS",
               "name": "Illidari Cloak of Shadow Wrath"
@@ -93389,7 +93365,7 @@
               "name": "Royal Cloak of the Sunstriders"
             },
             {
-              "itemId": "25043",
+              "itemId": "-20",
               "slot": "Back",
               "rank": "BIS",
               "name": "Amber Cape of Shadow Wrath"
@@ -93425,19 +93401,13 @@
               "name": "Robe of Hateful Echoes"
             },
             {
-              "itemId": "30684",
+              "itemId": "-14",
               "slot": "Wrist",
               "rank": "BIS",
               "name": "Ravager's Cuffs of Shadow Wrath"
             },
             {
-              "itemId": "31225",
-              "slot": "Wrist",
-              "rank": "BIS",
-              "name": "Illidari Bindings of Shadow Wrath"
-            },
-            {
-              "itemId": "24692",
+              "itemId": "-19",
               "slot": "Wrist",
               "rank": "BIS",
               "name": "Elementalist Bracelets of Shadow Wrath"
@@ -93455,7 +93425,7 @@
               "name": "Bands of Nefarious Deeds"
             },
             {
-              "itemId": "31166",
+              "itemId": "-22",
               "slot": "Hands",
               "rank": "BIS",
               "name": "Nethersteel-Lined Handwraps of Shadow Wrath"
@@ -93485,7 +93455,7 @@
               "name": "Gauntlets of the Sun King"
             },
             {
-              "itemId": "30675",
+              "itemId": "-9",
               "slot": "Waist",
               "rank": "BIS",
               "name": "Lurker's Cord of Shadow Wrath"
@@ -93539,7 +93509,7 @@
               "name": "Trial-Fire Trousers"
             },
             {
-              "itemId": "30680",
+              "itemId": "-5",
               "slot": "Feet",
               "rank": "BIS",
               "name": "Glider's Foot-Wraps of Shadow Wrath"
@@ -93725,16 +93695,10 @@
               "name": "Illidari Rod of Discipline"
             },
             {
-              "itemId": "25295",
+              "itemId": "-16",
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "Flawless Wand of Shadow Wrath"
-            },
-            {
-              "itemId": "25294",
-              "slot": "Ranged/Relic",
-              "rank": "BIS",
-              "name": "Dragonscale Wand of Shadow Wrath Draenethyst Wand of Shadow Wrath"
             },
             {
               "itemId": "28673",
@@ -94495,7 +94459,7 @@
               "name": "Focused Mana Bindings"
             },
             {
-              "itemId": "30684",
+              "itemId": "-14",
               "slot": "Wrist",
               "rank": "BIS",
               "name": "Ravager's Cuffs of Shadow Wrath"
@@ -94537,7 +94501,7 @@
               "name": "Belt of Blasting"
             },
             {
-              "itemId": "30675",
+              "itemId": "-9",
               "slot": "Waist",
               "rank": "BIS",
               "name": "Lurker's Cord of Shadow Wrath"
@@ -94603,7 +94567,7 @@
               "name": "Footpads of Madness"
             },
             {
-              "itemId": "30680",
+              "itemId": "-5",
               "slot": "Feet",
               "rank": "BIS",
               "name": "Glider's Foot-Wraps of Shadow Wrath"
@@ -94813,7 +94777,7 @@
               "name": "Wand of Prismatic Focus"
             },
             {
-              "itemId": "25295",
+              "itemId": "-16",
               "slot": "Ranged/Relic",
               "rank": "BIS",
               "name": "Flawless Wand of Shadow Wrath"

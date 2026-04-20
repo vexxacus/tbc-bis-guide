@@ -30,32 +30,52 @@ const SLOT_MAP = {
 const SPELL_TO_ENCHANT_ID = {
     // Head — Glyph of Ferocity (Cenarion Expedition exalted)
     35452: 29192,
+    // Head — Glyph of Power (Sha'tar exalted) — caster (wowsims ID: 29191)
+    35455: 29191,
+    29191: 29191,
     // Shoulder — Greater Inscription of Vengeance (Aldor exalted)
     29483: 28888,
+    // Shoulder — Greater Inscription of the Orb (Scryer exalted) — caster
+    29467: 28911,
+    28911: 28911,
     // Back — Enchant Cloak - Greater Agility
     34004: 34004,
+    // Back — Enchant Cloak - Subtlety / spell shadow power (no wowsims ID, skip)
     // Chest — Enchant Chest - Exceptional Stats
     27960: 24003,
     // Wrist — Enchant Bracer - Brawn (Strength)
     27899: 27899,
+    // Wrist — Enchant Bracer - Spellpower (wowsims ID: 22534, not the spell ID 27917)
+    27917: 22534,
     // Hands — Enchant Gloves - Major Strength
     33995: 33995,
+    // Hands — Enchant Gloves - Spell Strike (wowsims ID: 28271, not spell ID 33997)
+    33997: 28271,
     // Legs — Nethercobra Leg Armor
     35490: 29535,
     29535: 29535,
+    // Legs — Runic Spellthread — caster
+    31368: 24274,
+    24274: 24274,
     // Feet — Enchant Boots - Dexterity
     34007: 28279,
     28279: 28279,
     // Weapon — Mongoose
     27984: 22559,
     22559: 22559,
-    // Weapon — Executioner (42974 is spell ID; wowsims enchant item ID is 33307)
+    // Weapon — Executioner
     42974: 33307,
     33307: 33307,
-    // Weapon — Major Agility
-    27977: 27977,
-    // Ring — Enchant Ring - Stats (requires enchanting profession)
-    27927: 27927,
+    // Weapon — Major Agility (1H — not in wowsims all_enchants.go, closest is 22552 Major Striking; skip)
+    // 27977: skipped — no matching wowsims enchant
+    // Weapon — Soulfrost (shadow/frost power) — caster (wowsims ID: 22561)
+    27975: 22561,
+    // Weapon — Sunfire (fire/arcane power) — caster (wowsims ID: 22560)
+    27981: 22560,
+    // Weapon — Superior Wizard Oil — caster
+    // (applied at use, not enchant slot in wowsims — skip)
+    // Ring — Enchant Ring - Stats (requires enchanting profession) (wowsims ID: 22538)
+    27927: 22538,
     // NOTE: Scope enchants (30252 Khorium Scope etc.) are NOT in wowsims — skip them
 };
 
@@ -126,8 +146,9 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
 
 /**
  * Stat index → display info (from wowsims common.proto Stat enum)
+ * Melee specs (Warrior etc.)
  */
-const SIM_STAT_LABELS = {
+const SIM_STAT_LABELS_MELEE = {
      0: { label: 'Strength',     fmt: v => Math.round(v) },
      1: { label: 'Agility',      fmt: v => Math.round(v) },
      2: { label: 'Stamina',      fmt: v => Math.round(v) },
@@ -139,7 +160,35 @@ const SIM_STAT_LABELS = {
     23: { label: 'Expertise',    fmt: v => `${Math.round(v)} (${Math.floor(v / 3.9375)} skill)` },
     35: { label: 'Health',       fmt: v => Math.round(v) },
 };
-const SIM_STAT_ORDER = [35, 0, 1, 2, 18, 19, 20, 21, 22, 23];
+const SIM_STAT_ORDER_MELEE = [35, 0, 1, 2, 18, 19, 20, 21, 22, 23];
+
+/**
+ * Stat labels for caster specs (Shadow Priest etc.)
+ * Stat indices from wowsims sim/core/stats/stats.go (iota order):
+ *   Strength=0, Agility=1, Stamina=2, Intellect=3, Spirit=4,
+ *   SpellPower=5, HealingPower=6, ArcaneSpellPower=7, FireSpellPower=8,
+ *   FrostSpellPower=9, HolySpellPower=10, NatureSpellPower=11, ShadowSpellPower=12,
+ *   MP5=13, SpellHit=14, SpellCrit=15, SpellHaste=16, SpellPenetration=17,
+ *   AttackPower=18, MeleeHit=19, MeleeCrit=20, MeleeHaste=21, ...
+ *   Health=35
+ */
+const SIM_STAT_LABELS_CASTER = {
+    35: { label: 'Health',        fmt: v => Math.round(v) },
+     2: { label: 'Stamina',       fmt: v => Math.round(v) },
+     3: { label: 'Intellect',     fmt: v => Math.round(v) },
+     4: { label: 'Spirit',        fmt: v => Math.round(v) },
+     5: { label: 'Spell Power',   fmt: v => Math.round(v) },
+    12: { label: 'Shadow Power',  fmt: v => Math.round(v) },
+    14: { label: 'Spell Hit',     fmt: v => `${Math.round(v)} (${(v / 12.62).toFixed(2)}%)` },
+    15: { label: 'Spell Crit',    fmt: v => `${Math.round(v)} (${(v / 22.08).toFixed(2)}%)` },
+    16: { label: 'Spell Haste',   fmt: v => `${Math.round(v)} (${(v / 15.76).toFixed(2)}%)` },
+    13: { label: 'MP5',           fmt: v => Math.round(v) },
+};
+const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
+
+// Backwards-compat aliases used by renderSimStats
+const SIM_STAT_LABELS = SIM_STAT_LABELS_MELEE;
+const SIM_STAT_ORDER  = SIM_STAT_ORDER_MELEE;
 
 /**
  * Global sim instance (lazily initialized)
@@ -168,15 +217,17 @@ function onSimReady(fn) {
 
 /**
  * Compute character stats for current gear selection.
+ * @param {string} specKey — e.g. 'Warrior-Fury', 'Priest-Shadow'
  */
-async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems) {
+async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, specKey) {
     if (!_simReady) return null;
     const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
     if (!gearSlots.length) return null;
+    console.log('[sim] computeStats gearSlots:', JSON.stringify(gearSlots.map(s => s.id)));
     try {
-        return await _simBridge.computeStats(gearSlots);
+        return await _simBridge.computeStats(gearSlots, specKey);
     } catch (e) {
-        console.warn('[sim] computeStats error:', e.message);
+        console.error('[sim] computeStats error:', e);
         return null;
     }
 }
@@ -198,4 +249,14 @@ async function simulateArmsWarrior(slotGroups, getActiveItemFn, weaponMode, ench
     const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, '2h', enchantLookup, gems);
     if (!gearSlots.length) throw new Error('No gear selected');
     return _simBridge.runArmsWarrior(gearSlots, onProgress, iterations);
+}
+
+/**
+ * Run DPS simulation for Shadow Priest.
+ * Shadow Priest can use Staff (2h) or MH+OH — weapon mode follows BiS selection.
+ */
+async function simulateShadowPriest(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _simBridge.runShadowPriest(gearSlots, onProgress, iterations);
 }

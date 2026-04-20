@@ -130,7 +130,7 @@
                 <div class="sim-panel-stats" id="simStats">
                     <div class="sim-stat-loading">Loading stats…</div>
                 </div>
-                <div class="sim-dps-section">
+                <div class="sim-dps-section" id="simDpsSection">
                     <button class="sim-dps-btn" id="simDpsBtn">▶ Simulate DPS</button>
                     <div class="sim-dps-progress" id="simDpsProgress" style="display:none">
                         <div class="sim-dps-bar"><div class="sim-dps-fill" id="simDpsFill"></div></div>
@@ -141,7 +141,7 @@
                         <span class="sim-dps-label">DPS</span>
                         <span class="sim-dps-stdev" id="simDpsStdev"></span>
                     </div>
-                    <p class="sim-disclaimer">Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target. Results reflect gear + gems + enchants + buffs.</p>
+                    <p class="sim-disclaimer" id="simDisclaimer"></p>
                 </div>
             </div>
             <!-- 6. Profession & PvP toggle -->

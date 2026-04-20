@@ -166,7 +166,73 @@ const WO_USE_RECKLESSNESS  = 2;
 const WO_SHOUT             = 3;  // enum: 1 = Battle Shout
 const WO_PRECAST_SHOUT     = 4;
 
-// Consumes fields
+// ─── Shadow Priest proto fields ──────────────────────────────────────────────
+// Player spec oneof field for Shadow Priest (from proto/api.proto)
+const PLAYER_SHADOW_PRIEST = 10;  // ShadowPriest spec field in Player oneof (proto: shadow_priest = 10)
+
+// ShadowPriest message fields (rotation=1, talents=2, options=3)
+const SP_ROTATION = 1;
+const SP_TALENTS  = 2;
+const SP_OPTIONS  = 3;
+
+// ShadowPriest_Rotation fields
+const SPR_ROTATION_TYPE  = 1;  // enum: 0=Basic, 1=Clipping, 2=Ideal
+const SPR_USE_DEV_PLAGUE = 2;  // bool (undead only)
+const SPR_USE_STARSHARDS = 3;  // bool (night elf only)
+const SPR_PRECAST_VT     = 4;  // bool
+const SPR_LATENCY        = 5;  // double (ms)
+
+// ShadowPriest_Rotation_RotationType enum values
+const SP_ROTATION_IDEAL    = 2;  // Ideal (best DPS)
+
+// ShadowPriest_Options fields
+const SPO_USE_SHADOWFIEND = 1;  // bool
+
+// PriestTalents fields — Standard 0/5/56 shadow build
+// Discipline tree
+const PT_INNER_FOCUS              = 9;   // bool (field 9)
+const PT_MEDITATION               = 10;  // 3
+// Shadow tree — all fields ≥ 19 based on proto ordering
+const PT_SHADOW_AFFINITY          = 19;  // 3
+const PT_IMP_SHADOW_WORD_PAIN     = 21;  // 2
+const PT_SHADOW_FOCUS             = 22;  // 5
+const PT_IMP_MIND_BLAST           = 23;  // 5
+const PT_MIND_FLAY                = 24;  // bool true
+const PT_SHADOW_WEAVING           = 25;  // 5
+const PT_VAMPIRIC_EMBRACE         = 26;  // bool true
+const PT_FOCUSED_MIND             = 27;  // 3
+const PT_DARKNESS                 = 29;  // 5
+const PT_SHADOWFORM               = 30;  // bool true
+const PT_SHADOW_POWER             = 31;  // 4
+const PT_MISERY                   = 32;  // 5
+const PT_VAMPIRIC_TOUCH           = 33;  // bool true
+
+// Shadow Priest consumes (field numbers from proto/common.proto Consumes + enum values)
+const CONS_SP_FLASK          = 38;  // enum: FlaskOfPureDeath = 3
+const CONS_SP_FOOD           = 41;  // enum: FoodBlackenedBasilisk = 1
+const CONS_SP_DEFAULT_POTION = 15;  // enum: SuperManaPotion = 2
+const CONS_SP_MH_IMBUE       = 32;  // enum: WeaponImbueSuperiorWizardOil = 4
+
+// IndividualBuffs for casters (field numbers from proto/common.proto IndividualBuffs)
+const IB_BLESSING_OF_WISDOM    = 2;  // TristateEffect: 2 = Improved (blessing_of_wisdom = 2)
+const IB_BLESSING_OF_SALVATION = 8;  // bool true (blessing_of_salvation = 8)
+
+// RaidBuffs for casters (field numbers from proto/common.proto RaidBuffs message)
+const RB_ARCANE_BRILLIANCE   = 1;  // bool true (arcane_brilliance = 1)
+const RB_DIVINE_SPIRIT        = 4;  // TristateEffect: 2 = Improved (divine_spirit = 4)
+
+// Debuffs for shadow priests (field numbers from proto/common.proto Debuffs message)
+const DB_JUDGEMENT_OF_WISDOM = 1;   // bool (judgement_of_wisdom = 1)
+const DB_MISERY              = 3;   // bool — 5% spell hit (misery = 3)
+const DB_CURSE_OF_ELEMENTS   = 4;   // TristateEffect: 1 = Regular (curse_of_elements = 4)
+const DB_SHADOW_WEAVING      = 18;  // bool — 5-stack shadow weaving (shadow_weaving = 18)
+
+// Class enum
+const CLASS_PRIEST  = 5;
+// Race enum
+const RACE_UNDEAD   = 11;  // RaceUndead = 11 (from proto/common.proto Race enum)
+
+// Consumes fields (melee — kept for warrior)
 const CONS_FLASK          = 38;  // enum: 4 = FlaskOfRelentlessAssault
 const CONS_FOOD           = 41;  // enum: 4 = FoodRoastedClefthoof
 const CONS_DEFAULT_POTION = 15;  // enum: 3 = HastePotion
@@ -472,12 +538,10 @@ function buildArmsSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
-// ─── Build ComputeStatsRequest ───────────────────────────────────────────────
-// ComputeStatsRequest { raid = 1 }
-// Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
+// ─── Build RaidSimRequest for Shadow Priest (0/5/56, Undead) ─────────────────
 
-function buildComputeStatsRequest(gearSlots) {
-    // Samma equipment
+function buildShadowPriestSimRequest(gearSlots, iterations, randomSeed) {
+    // ── ItemSpec per slot ──
     const equipSpec = new ProtoWriter();
     for (const slot of gearSlots) {
         const itemSpec = new ProtoWriter();
@@ -487,70 +551,261 @@ function buildComputeStatsRequest(gearSlots) {
         equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
     }
 
-    // Warrior spec (samma som i buildRaidSimRequest)
+    // ── ShadowPriest Rotation — Ideal rotation ──
     const rotation = new ProtoWriter();
-    rotation.fieldVarint(WR_USE_HAMSTRING, 1);
-    rotation.fieldVarint(WR_SUNDER_ARMOR, 2);
-    rotation.fieldVarint(WR_USE_HS_DURING_EXECUTE, 1);
-    rotation.fieldVarint(WR_USE_BT_DURING_EXECUTE, 1);
-    rotation.fieldVarint(WR_USE_WW_DURING_EXECUTE, 1);
-    writeDouble(rotation, WR_HS_RAGE_THRESHOLD, 60.0);
-    writeDouble(rotation, WR_RAMPAGE_CD_THRESHOLD, 5.0);
+    rotation.fieldVarint(SPR_ROTATION_TYPE, SP_ROTATION_IDEAL);  // Ideal
+    rotation.fieldVarint(SPR_USE_DEV_PLAGUE, 1);                  // true — Undead gets Devouring Plague
+    rotation.fieldVarint(SPR_PRECAST_VT, 1);                      // true — precast VT
+    writeDouble(rotation, SPR_LATENCY, 50.0);                     // 50ms latency
 
-    const furyTalents = new ProtoWriter();
-    furyTalents.fieldVarint(WT_IMPROVED_HEROIC_STRIKE, 3);
-    furyTalents.fieldVarint(WT_CRUELTY, 5);
-    furyTalents.fieldVarint(WT_UNBRIDLED_WRATH, 5);
-    furyTalents.fieldVarint(WT_COMMANDING_PRESENCE, 1);
-    furyTalents.fieldVarint(WT_IMPROVED_EXECUTE, 3);
-    furyTalents.fieldVarint(WT_WEAPON_MASTERY, 2);
-    furyTalents.fieldVarint(WT_FLURRY, 5);
-    furyTalents.fieldVarint(WT_PRECISION, 3);
-    furyTalents.fieldVarint(WT_BLOODTHIRST, 1);
-    furyTalents.fieldVarint(WT_IMPROVED_BERSERKER_STANCE, 5);
-    furyTalents.fieldVarint(WT_RAMPAGE, 1);
+    // ── PriestTalents — Standard 0/5/56 shadow build ──
+    const talents = new ProtoWriter();
+    // Discipline tree
+    talents.fieldVarint(PT_INNER_FOCUS, 1);              // 9: inner focus (bool)
+    talents.fieldVarint(PT_MEDITATION, 3);               // 10: meditation 3
+    // Shadow tree
+    talents.fieldVarint(PT_SHADOW_AFFINITY, 3);          // 19: shadow affinity 3
+    talents.fieldVarint(PT_IMP_SHADOW_WORD_PAIN, 2);     // 21: imp shadow word pain 2
+    talents.fieldVarint(PT_SHADOW_FOCUS, 5);             // 22: shadow focus 5
+    talents.fieldVarint(PT_IMP_MIND_BLAST, 5);           // 23: imp mind blast 5
+    talents.fieldVarint(PT_MIND_FLAY, 1);                // 24: mind flay (bool)
+    talents.fieldVarint(PT_SHADOW_WEAVING, 5);           // 25: shadow weaving 5
+    talents.fieldVarint(PT_VAMPIRIC_EMBRACE, 1);         // 26: vampiric embrace (bool)
+    talents.fieldVarint(PT_FOCUSED_MIND, 3);             // 27: focused mind 3
+    talents.fieldVarint(PT_DARKNESS, 5);                 // 29: darkness 5
+    talents.fieldVarint(PT_SHADOWFORM, 1);               // 30: shadowform (bool)
+    talents.fieldVarint(PT_SHADOW_POWER, 4);             // 31: shadow power 4
+    talents.fieldVarint(PT_MISERY, 5);                   // 32: misery 5
+    talents.fieldVarint(PT_VAMPIRIC_TOUCH, 1);           // 33: vampiric touch (bool)
 
+    // ── ShadowPriest Options ──
     const options = new ProtoWriter();
-    writeDouble(options, WO_STARTING_RAGE, 0.0);
-    options.fieldVarint(WO_USE_RECKLESSNESS, 1);
-    options.fieldVarint(WO_SHOUT, 1);
-    options.fieldVarint(WO_PRECAST_SHOUT, 1);
+    options.fieldVarint(SPO_USE_SHADOWFIEND, 1);  // use shadowfiend
 
-    const warriorSpec = new ProtoWriter();
-    warriorSpec.fieldMessage(WARRIOR_ROTATION, rotation);
-    warriorSpec.fieldMessage(WARRIOR_TALENTS, furyTalents);
-    warriorSpec.fieldMessage(WARRIOR_OPTIONS, options);
+    // ── ShadowPriest spec message ──
+    const spSpec = new ProtoWriter();
+    spSpec.fieldMessage(SP_ROTATION, rotation);
+    spSpec.fieldMessage(SP_TALENTS, talents);
+    spSpec.fieldMessage(SP_OPTIONS, options);
 
+    // ── Consumes (caster) ──
     const consumes = new ProtoWriter();
-    consumes.fieldVarint(CONS_FLASK, 4);
-    consumes.fieldVarint(CONS_FOOD, 4);
-    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);
-    consumes.fieldVarint(CONS_MH_IMBUE, 1);
-    consumes.fieldVarint(CONS_OH_IMBUE, 1);
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath = 3
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // FoodBlackenedBasilisk = 1
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion = 2
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // WeaponImbueSuperiorWizardOil = 4
 
+    // ── Individual buffs ──
     const indBuffs = new ProtoWriter();
-    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
-    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);      // true
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);     // Improved Blessing of Wisdom
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);  // true
 
+    // ── Player ──
     const player = new ProtoWriter();
-    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Fury Warrior'));
-    player.fieldVarint(PLAYER_RACE, RACE_ORC);
-    player.fieldVarint(PLAYER_CLASS, CLASS_WARRIOR);
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Shadow Priest'));
+    player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+    player.fieldVarint(PLAYER_CLASS, CLASS_PRIEST);
     player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
     player.fieldMessage(PLAYER_CONSUMES, consumes);
     player.fieldMessage(PLAYER_BUFFS, indBuffs);
-    player.fieldMessage(PLAYER_WARRIOR, warriorSpec);
+    player.fieldMessage(PLAYER_SHADOW_PRIEST, spSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    // ── Raid buffs ──
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);  // true
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);       // Improved Divine Spirit
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);   // Improved Gift of the Wild
+
+    // ── Debuffs — Misery + Shadow Weaving + Improved Faerie Fire + CoE ──
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1); // Judgement of Wisdom (field 1)
+    debuffs.fieldVarint(DB_MISERY, 1);              // Misery (5% spell hit, field 3)
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);   // Curse of Elements regular (field 4)
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);         // Improved Faerie Fire (field 10)
+    debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);      // 5-stack Shadow Weaving (field 18)
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    // ── Target (level 73 Undead) ──
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, 3);  // Undead = 3
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build ComputeStatsRequest ───────────────────────────────────────────────
+// ComputeStatsRequest { raid = 1 }
+// Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
+
+function buildComputeStatsRequest(gearSlots, specKey) {
+    // Equipment is the same for all specs
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    let player;
+
+    if (specKey === 'Priest-Shadow') {
+        // ── Shadow Priest spec for ComputeStats ──
+        const rotation = new ProtoWriter();
+        rotation.fieldVarint(SPR_ROTATION_TYPE, SP_ROTATION_IDEAL);
+        rotation.fieldVarint(SPR_USE_DEV_PLAGUE, 1);
+        rotation.fieldVarint(SPR_PRECAST_VT, 1);
+        writeDouble(rotation, SPR_LATENCY, 50.0);
+
+        const talents = new ProtoWriter();
+        talents.fieldVarint(PT_INNER_FOCUS, 1);
+        talents.fieldVarint(PT_MEDITATION, 3);
+        talents.fieldVarint(PT_SHADOW_AFFINITY, 3);
+        talents.fieldVarint(PT_IMP_SHADOW_WORD_PAIN, 2);
+        talents.fieldVarint(PT_SHADOW_FOCUS, 5);
+        talents.fieldVarint(PT_IMP_MIND_BLAST, 5);
+        talents.fieldVarint(PT_MIND_FLAY, 1);
+        talents.fieldVarint(PT_SHADOW_WEAVING, 5);
+        talents.fieldVarint(PT_VAMPIRIC_EMBRACE, 1);
+        talents.fieldVarint(PT_FOCUSED_MIND, 3);
+        talents.fieldVarint(PT_DARKNESS, 5);
+        talents.fieldVarint(PT_SHADOWFORM, 1);
+        talents.fieldVarint(PT_SHADOW_POWER, 4);
+        talents.fieldVarint(PT_MISERY, 5);
+        talents.fieldVarint(PT_VAMPIRIC_TOUCH, 1);
+
+        const options = new ProtoWriter();
+        options.fieldVarint(SPO_USE_SHADOWFIEND, 1);
+
+        const spSpec = new ProtoWriter();
+        spSpec.fieldMessage(SP_ROTATION, rotation);
+        spSpec.fieldMessage(SP_TALENTS, talents);
+        spSpec.fieldMessage(SP_OPTIONS, options);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath = 3
+        consumes.fieldVarint(CONS_SP_FOOD, 1);            // FoodBlackenedBasilisk = 1
+        consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion = 2
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // WeaponImbueSuperiorWizardOil = 4
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+        indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Shadow Priest'));
+        player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+        player.fieldVarint(PLAYER_CLASS, CLASS_PRIEST);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_SHADOW_PRIEST, spSpec);
+
+    } else {
+        // ── Fury Warrior spec for ComputeStats (default) ──
+        const rotation = new ProtoWriter();
+        rotation.fieldVarint(WR_USE_HAMSTRING, 1);
+        rotation.fieldVarint(WR_SUNDER_ARMOR, 2);
+        rotation.fieldVarint(WR_USE_HS_DURING_EXECUTE, 1);
+        rotation.fieldVarint(WR_USE_BT_DURING_EXECUTE, 1);
+        rotation.fieldVarint(WR_USE_WW_DURING_EXECUTE, 1);
+        writeDouble(rotation, WR_HS_RAGE_THRESHOLD, 60.0);
+        writeDouble(rotation, WR_RAMPAGE_CD_THRESHOLD, 5.0);
+
+        const furyTalents = new ProtoWriter();
+        furyTalents.fieldVarint(WT_IMPROVED_HEROIC_STRIKE, 3);
+        furyTalents.fieldVarint(WT_CRUELTY, 5);
+        furyTalents.fieldVarint(WT_UNBRIDLED_WRATH, 5);
+        furyTalents.fieldVarint(WT_COMMANDING_PRESENCE, 1);
+        furyTalents.fieldVarint(WT_IMPROVED_EXECUTE, 3);
+        furyTalents.fieldVarint(WT_WEAPON_MASTERY, 2);
+        furyTalents.fieldVarint(WT_FLURRY, 5);
+        furyTalents.fieldVarint(WT_PRECISION, 3);
+        furyTalents.fieldVarint(WT_BLOODTHIRST, 1);
+        furyTalents.fieldVarint(WT_IMPROVED_BERSERKER_STANCE, 5);
+        furyTalents.fieldVarint(WT_RAMPAGE, 1);
+
+        const options = new ProtoWriter();
+        writeDouble(options, WO_STARTING_RAGE, 0.0);
+        options.fieldVarint(WO_USE_RECKLESSNESS, 1);
+        options.fieldVarint(WO_SHOUT, 1);
+        options.fieldVarint(WO_PRECAST_SHOUT, 1);
+
+        const warriorSpec = new ProtoWriter();
+        warriorSpec.fieldMessage(WARRIOR_ROTATION, rotation);
+        warriorSpec.fieldMessage(WARRIOR_TALENTS, furyTalents);
+        warriorSpec.fieldMessage(WARRIOR_OPTIONS, options);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 4);
+        consumes.fieldVarint(CONS_FOOD, 4);
+        consumes.fieldVarint(CONS_DEFAULT_POTION, 3);
+        consumes.fieldVarint(CONS_MH_IMBUE, 1);
+        consumes.fieldVarint(CONS_OH_IMBUE, 1);
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Fury Warrior'));
+        player.fieldVarint(PLAYER_RACE, RACE_ORC);
+        player.fieldVarint(PLAYER_CLASS, CLASS_WARRIOR);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_WARRIOR, warriorSpec);
+    }
 
     const party = new ProtoWriter();
     party.fieldMessage(PARTY_PLAYERS, player);
 
     const raidBuffs = new ProtoWriter();
+    if (specKey === 'Priest-Shadow') {
+        raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+        raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    }
     raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
 
     const debuffs = new ProtoWriter();
-    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
-    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
-    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+    if (specKey === 'Priest-Shadow') {
+        debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1); // field 1
+        debuffs.fieldVarint(DB_MISERY, 1);              // field 3
+        debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);   // field 4
+        debuffs.fieldVarint(DB_FAERIE_FIRE, 2);         // field 10
+        debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);      // field 18
+    } else {
+        debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+        debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+        debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+    }
 
     const raid = new ProtoWriter();
     raid.fieldMessage(RAID_PARTIES, party);
@@ -854,11 +1109,27 @@ class WowSimBridge {
         });
     }
 
-    // Synkront stats-anrop — returnerar Promise<float[]> (final_stats array)
-    computeStats(gearSlots) {
+    runShadowPriest(gearSlots, onProgress, iterations = 3000) {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
-        const request = buildComputeStatsRequest(gearSlots);
+        const request = buildShadowPriestSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    // Synkront stats-anrop — returnerar Promise<float[]> (final_stats array)
+    computeStats(gearSlots, specKey) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildComputeStatsRequest(gearSlots, specKey);
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {
