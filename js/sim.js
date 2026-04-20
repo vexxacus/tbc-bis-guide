@@ -363,19 +363,38 @@ function onSimReady(fn) {
 
 /**
  * Compute character stats for current gear selection.
+ * Automatically retries after stripping items unknown to wowsims (those that
+ * cause a "No item with id: XXXXX" panic in the WASM runtime).
  * @param {string} specKey — e.g. 'Warrior-Fury', 'Priest-Shadow'
  */
 async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, specKey) {
     if (!_simReady) return null;
     const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
     if (!gearSlots.length) return null;
-    console.log('[sim] computeStats gearSlots:', JSON.stringify(gearSlots.map(s => s.id)));
-    try {
-        return await _simBridge.computeStats(gearSlots, specKey);
-    } catch (e) {
-        console.error('[sim] computeStats error:', e?.message || e);
-        return null;
+
+    // Retry loop: if wowsims doesn't know an item, remove it and try again.
+    const unknownIds = new Set();
+    for (let attempt = 0; attempt < 5; attempt++) {
+        const slots = gearSlots.filter(s => !unknownIds.has(s.id));
+        if (!slots.length) return null;
+        console.log('[sim] computeStats attempt', attempt + 1, 'slots:', JSON.stringify(slots.map(s => s.id)));
+        try {
+            return await _simBridge.computeStats(slots, specKey);
+        } catch (e) {
+            const msg = e?.message || String(e);
+            const match = msg.match(/No item with id:\s*(\d+)/);
+            if (match) {
+                const badId = parseInt(match[1]);
+                console.warn(`[sim] item ${badId} unknown to wowsims — retrying without it`);
+                unknownIds.add(badId);
+            } else {
+                console.error('[sim] computeStats error:', msg);
+                return null;
+            }
+        }
     }
+    console.error('[sim] computeStats: too many unknown items, giving up');
+    return null;
 }
 
 /**

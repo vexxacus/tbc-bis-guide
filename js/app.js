@@ -2204,9 +2204,15 @@
             html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
         }
         if (showWeaponToggle && weaponMode === 'dw' && has2H) {
-            html += `<div class="slot-group-inactive-wrap">`;
-            html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
-            html += `</div>`;
+            // Only show dimmed 2H if it has items distinct from the active MH
+            // (avoids showing the same item twice, e.g. The Nexus Key as both MH and 2H)
+            const activeMHIds = new Set((slotGroups['Main Hand'] || []).map(i => String(i.itemId)));
+            const distinct2H  = (slotGroups['Two Hand'] || []).filter(i => !activeMHIds.has(String(i.itemId)));
+            if (distinct2H.length) {
+                html += `<div class="slot-group-inactive-wrap">`;
+                html += renderSlotGroup('Two Hand', slotGroups, enchantLookup, !!pvpSpecData);
+                html += `</div>`;
+            }
         }
 
         // NOTE: old fallback headers removed — title is now set dynamically above
