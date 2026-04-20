@@ -22,6 +22,7 @@ const SLOT_MAP = {
     'Main Hand':     'MainHand',
     'Off Hand':      'OffHand',
     'Two Hand':      'MainHand',   // 2H goes in MH slot for wowsims
+    'Weapon':        'MainHand',   // some data uses "Weapon" for caster MH items
     'Ranged/Relic':  'Ranged',
 };
 
@@ -168,7 +169,7 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
         if (!items || !items.length) continue;
 
         // Skip inactive weapon slots based on weapon mode
-        if (weaponMode === '2h' && (bisSlot === 'Main Hand' || bisSlot === 'Off Hand')) continue;
+        if (weaponMode === '2h' && (bisSlot === 'Main Hand' || bisSlot === 'Off Hand' || bisSlot === 'Weapon')) continue;
         if (weaponMode === 'dw' && bisSlot === 'Two Hand') continue;
 
         const wsSlot = SLOT_MAP[bisSlot];

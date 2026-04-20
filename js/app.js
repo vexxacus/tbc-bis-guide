@@ -860,15 +860,36 @@
         'Paladin-Retribution':  '2h',
         'Warrior-Arms':         'both',
         'Priest-Shadow':        'both',   // Staff (2H) or MH+OH
+        'Mage-Fire':            'both',   // Staff or MH+OH
+        'Mage-Frost':           'both',
+        'Mage-Arcane':          'both',
+        'Warlock-Destruction':  'both',
+        'Warlock-Affliction':   'both',
+        'Warlock-Demonology':   'both',
+        'Druid-Balance':        'both',
+        'Shaman-Elemental':     'both',
     };
 
     // Specs där user kan toggla mellan DW och 2H
-    const WEAPON_TOGGLE_SPECS = new Set(['Warrior-Fury', 'Priest-Shadow']);
+    const WEAPON_TOGGLE_SPECS = new Set([
+        'Warrior-Fury', 'Priest-Shadow',
+        'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
+        'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
+        'Druid-Balance', 'Shaman-Elemental',
+    ]);
 
     // weaponMode: per selectionKey() → 'dw' | '2h' (default varies by spec)
-    // Default: 'dw' for most, '2h' for Shadow Priest (staff is common)
+    // Default: 'dw' for most, '2h' for staff casters
     const WEAPON_MODE_DEFAULT = {
-        'Priest-Shadow': '2h',
+        'Priest-Shadow':       '2h',
+        'Mage-Fire':           '2h',
+        'Mage-Frost':          '2h',
+        'Mage-Arcane':         '2h',
+        'Warlock-Destruction': '2h',
+        'Warlock-Affliction':  '2h',
+        'Warlock-Demonology':  '2h',
+        'Druid-Balance':       '2h',
+        'Shaman-Elemental':    '2h',
     };
     const weaponModeState = {};
     function getWeaponMode() {
@@ -2129,10 +2150,13 @@
 
         // ── Weapons ──
         if (effectiveDW || effective2H) {
+            const isCasterToggle = ['Mage-Fire','Mage-Frost','Mage-Arcane',
+                'Warlock-Destruction','Warlock-Affliction','Warlock-Demonology',
+                'Druid-Balance','Shaman-Elemental','Priest-Shadow'].includes(specKey);
             const toggleHtml = showWeaponToggle ? `
                 <div class="weapon-toggle">
-                    <button class="weapon-toggle-btn${weaponMode === 'dw' ? ' active' : ''}" data-weapon-mode="dw">⚔️ Dual-Wield</button>
-                    <button class="weapon-toggle-btn${weaponMode === '2h' ? ' active' : ''}" data-weapon-mode="2h">🗡️ Two-Handed</button>
+                    <button class="weapon-toggle-btn${weaponMode === 'dw' ? ' active' : ''}" data-weapon-mode="dw">${isCasterToggle ? '🪄 MH + Off Hand' : '⚔️ Dual-Wield'}</button>
+                    <button class="weapon-toggle-btn${weaponMode === '2h' ? ' active' : ''}" data-weapon-mode="2h">${isCasterToggle ? '🔮 Staff / 2H' : '🗡️ Two-Handed'}</button>
                 </div>` : '';
             const weaponTitle = (!showWeaponToggle && effectiveDW && !effective2H && isDualWield) ? 'Dual-Wield'
                               : (!showWeaponToggle && effective2H && !effectiveDW)                 ? 'Two-Handed'
