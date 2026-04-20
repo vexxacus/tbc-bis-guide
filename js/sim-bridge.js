@@ -169,13 +169,103 @@ const WT_IMPROVED_BERSERKER_STANCE   = 34;  // 5
 const WT_RAMPAGE                     = 35;  // bool true
 const WT_ENDLESS_RAGE                = 18;  // bool true
 
+// WarriorTalents — Protection tree fields (from proto/warrior.proto)
+const WT_TACTICAL_MASTERY            = 37;  // 3
+const WT_ANTICIPATION                = 47;  // 5 → +5 defense skill
+const WT_SHIELD_SPECIALIZATION       = 48;  // 5 → +5% block chance
+const WT_TOUGHNESS                   = 49;  // 5 → +10% armor
+const WT_DEFIANCE                    = 38;  // 3 → +15% threat
+const WT_IMPROVED_SUNDER_ARMOR       = 39;  // 3
+const WT_SHIELD_SLAM                 = 41;  // bool true
+const WT_ONE_HAND_WEAPON_SPEC        = 40;  // 5
+const WT_FOCUSED_RAGE                = 42;  // 3
+const WT_VITALITY                    = 43;  // 5 → +4% str/stam
+const WT_DEVASTATE                   = 44;  // bool true
+
 // WarriorOptions fields
 const WO_STARTING_RAGE     = 1;
 const WO_USE_RECKLESSNESS  = 2;
 const WO_SHOUT             = 3;  // enum: 1 = Battle Shout
 const WO_PRECAST_SHOUT     = 4;
 
-// ─── Shadow Priest proto fields ──────────────────────────────────────────────
+// ─── DruidTalents fields (from proto/druid.proto) ─────────────────────────
+// Feral Combat tree — key talents for tank/cat
+const DT_FEROCITY                  = 17;  // 5 → -5 energy/rage cost
+const DT_FERAL_AGGRESSION          = 18;  // 2 → improved demo roar
+const DT_FERAL_INSTINCT            = 41;  // 3 → +15% threat in bear form
+const DT_THICK_HIDE                = 42;  // 3 → +10% armor in bear form
+const DT_SHARPENED_CLAWS           = 19;  // 3 → +6% crit chance
+const DT_PREDATORY_STRIKES         = 21;  // 3
+const DT_PRIMAL_FURY               = 22;  // 2 → extra combo point on crit
+const DT_HEART_OF_THE_WILD         = 25;  // 5 → +20% stam in bear form
+const DT_SURVIVAL_OF_THE_FITTEST   = 26;  // 3 → -6% crit chance taken (CRIT IMMUNITY)
+const DT_LEADER_OF_THE_PACK        = 27;  // bool → aura (+5% crit)
+const DT_MANGLE                    = 30;  // bool → key ability
+
+// ─── RogueTalents fields (from proto/rogue.proto) ────────────────────────────
+// Assassination tree
+const RT_MALICE                    = 2;   // 5 → +5% crit
+const RT_RUTHLESSNESS              = 3;   // 3 → CP on finishing moves
+const RT_MURDER                    = 4;   // 2 → +4% dmg vs below 35%
+const RT_LETHALITY                 = 8;   // 5 → +30% crit bonus dmg
+const RT_RELENTLESS_STRIKES        = 6;   // bool → energy on finishers
+const RT_SEAL_FATE                 = 13;  // 5 → CP on extra crit
+// Combat tree
+const RT_IMPROVED_SINISTER_STRIKE  = 18;  // 2 → -2 energy
+const RT_PRECISION                 = 20;  // 5 → +5% hit
+const RT_DUAL_WIELD_SPEC           = 22;  // 5 → +5% OH dmg
+const RT_BLADE_FLURRY              = 24;  // bool
+const RT_SWORD_SPEC                = 25;  // 5 → extra swings
+const RT_WEAPON_EXPERTISE          = 27;  // 2 → +10 weapon skill (expertise)
+const RT_AGGRESSION                = 28;  // 3 → +6% SS/Eviscerate dmg
+const RT_VITALITY                  = 29;  // 2 → +8% AP/energy regen
+const RT_ADRENALINE_RUSH           = 30;  // bool
+const RT_COMBAT_POTENCY            = 31;  // 5 → +15% OH proc energy
+const RT_SURPRISE_ATTACKS          = 32;  // bool → removes dodge on finisher
+
+// ─── PaladinTalents fields (from proto/paladin.proto) ────────────────────────
+// Retribution tree
+const PAL_CONVICTION                = 23;  // 5 → +5% crit
+const PAL_SEAL_OF_COMMAND           = 24;  // bool
+const PAL_CRUSADE                   = 25;  // 3 → +3% dmg vs undead/humanoid/demon
+const PAL_TWO_HAND_SPEC             = 26;  // 5 → +10% 2H dmg
+const PAL_VENGEANCE                 = 29;  // 5 → stacking dmg bonus after crits
+const PAL_SANCTIFIED_SEALS          = 31;  // 5 → +5% crit chance
+const PAL_FANATICISM                = 32;  // 5 → +15% crit / -30% threat
+const PAL_CRUSADER_STRIKE           = 33;  // bool → key ability
+const PAL_IMPROVED_JUDGEMENT        = 20;  // 2 → -1s cooldown
+const PAL_BENEDICTION               = 19;  // 5 → reduced mana cost
+// Protection tree — for prot paladin
+const PAL_REDOUBT                   = 36;  // 5 → block on being crit
+const PAL_PRECISION                 = 11;  // 3 → +3% hit
+const PAL_TOUGHNESS                 = 37;  // 5 → +10% armor
+const PAL_IMPROVED_RF               = 38;  // 3 → improved Righteous Fury threat
+const PAL_SHIELD_SPEC               = 39;  // 3 → proc on block
+const PAL_ANTICIPATION              = 40;  // 5 → +20 defense skill
+const PAL_BLESSING_OF_SANCTUARY     = 42;  // bool → block/parry rage
+const PAL_SACRED_DUTY               = 14;  // 2 → +6% stam, reduced DS cooldown
+const PAL_ONE_HAND_SPEC             = 15;  // 5 → +10% 1H dmg
+const PAL_HOLY_SHIELD               = 44;  // bool → block ability
+const PAL_ARDENT_DEFENDER           = 45;  // 3 → survive killing blows
+const PAL_COMBAT_EXPERTISE          = 16;  // 5 → +10 expertise / +6% stam
+const PAL_AVENGERS_SHIELD           = 17;  // bool → pull ability
+
+// ─── ShamanTalents fields (from proto/shaman.proto) ──────────────────────────
+// Enhancement tree
+const ST_THUNDERING_STRIKES         = 16;  // 5 → +5% melee crit
+const ST_ENHANCING_TOTEMS           = 17;  // 2 → stronger SoE/GoA
+const ST_SHAMANISTIC_FOCUS          = 18;  // bool → reduced cost on hit
+const ST_FLURRY                     = 19;  // 5 → +30% attack speed on crit
+const ST_ELEMENTAL_WEAPONS          = 21;  // 3 → +30% weapon imbue
+const ST_MENTAL_QUICKNESS           = 22;  // 3 → +30% SP from AP
+const ST_WEAPON_MASTERY             = 23;  // 5 → +10 weapon skill (expertise)
+const ST_DUAL_WIELD_SPEC            = 24;  // 5 → +5% OH hit / +5% OH dmg
+const ST_UNLEASHED_RAGE             = 25;  // 5 → +10% AP aura
+const ST_STORMSTRIKE                = 34;  // bool → key ability
+const ST_SPIRIT_WEAPONS             = 36;  // bool → -30% threat
+const ST_SHAMANISTIC_RAGE           = 35;  // bool → mana return on hit
+// Restoration dip for Enhancement
+const ST_NATURES_GUIDANCE           = 27;  // 3 → +3% hit/spell hit
 // Player spec oneof field for Shadow Priest (from proto/api.proto)
 const PLAYER_SHADOW_PRIEST = 10;  // ShadowPriest spec field in Player oneof (proto: shadow_priest = 10)
 
@@ -197,24 +287,25 @@ const SP_ROTATION_IDEAL    = 2;  // Ideal (best DPS)
 // ShadowPriest_Options fields
 const SPO_USE_SHADOWFIEND = 1;  // bool
 
-// PriestTalents fields — Standard 0/5/56 shadow build
+// PriestTalents fields — verified against proto/priest.proto field numbers
 // Discipline tree
-const PT_INNER_FOCUS              = 9;   // bool (field 9)
-const PT_MEDITATION               = 10;  // 3
-// Shadow tree — all fields ≥ 19 based on proto ordering
-const PT_SHADOW_AFFINITY          = 19;  // 3
-const PT_IMP_SHADOW_WORD_PAIN     = 21;  // 2
-const PT_SHADOW_FOCUS             = 22;  // 5
-const PT_IMP_MIND_BLAST           = 23;  // 5
-const PT_MIND_FLAY                = 24;  // bool true
-const PT_SHADOW_WEAVING           = 25;  // 5
-const PT_VAMPIRIC_EMBRACE         = 26;  // bool true
-const PT_FOCUSED_MIND             = 27;  // 3
-const PT_DARKNESS                 = 29;  // 5
-const PT_SHADOWFORM               = 30;  // bool true
-const PT_SHADOW_POWER             = 31;  // 4
-const PT_MISERY                   = 32;  // 5
-const PT_VAMPIRIC_TOUCH           = 33;  // bool true
+const PT_INNER_FOCUS              = 2;   // bool
+const PT_MEDITATION               = 3;   // 0-3
+// Holy tree (unused for shadow)
+// Shadow tree
+const PT_IMP_SHADOW_WORD_PAIN     = 18;  // 0-2
+const PT_SHADOW_FOCUS             = 19;  // 0-5
+const PT_IMP_MIND_BLAST           = 20;  // 0-5
+const PT_MIND_FLAY                = 21;  // bool
+const PT_SHADOW_WEAVING           = 22;  // 0-5
+const PT_VAMPIRIC_EMBRACE         = 23;  // bool
+const PT_FOCUSED_MIND             = 25;  // 0-3
+const PT_DARKNESS                 = 26;  // 0-5
+const PT_SHADOWFORM               = 27;  // bool
+const PT_SHADOW_POWER             = 28;  // 0-5
+const PT_MISERY                   = 29;  // 0-5
+const PT_VAMPIRIC_TOUCH           = 30;  // bool
+const PT_SHADOW_AFFINITY          = 32;  // 0-3
 
 // Shadow Priest consumes (field numbers from proto/common.proto Consumes + enum values)
 const CONS_SP_FLASK          = 38;  // enum: FlaskOfPureDeath = 3
@@ -254,6 +345,7 @@ const RACE_NIGHT_ELF = 6;
 // Player oneof spec field numbers (from proto/api.proto Player.oneof spec)
 const PLAYER_RET_PALADIN      = 9;   // retribution_paladin = 9
 const PLAYER_PROT_PALADIN     = 25;  // protection_paladin = 25
+const PLAYER_PROT_WARRIOR     = 21;  // protection_warrior = 21
 const PLAYER_ROGUE            = 11;  // rogue = 11
 const PLAYER_ENH_SHAMAN       = 18;  // enhancement_shaman = 18
 const PLAYER_FERAL_DRUID      = 22;  // feral_druid = 22
@@ -587,23 +679,23 @@ function buildShadowPriestSimRequest(gearSlots, iterations, randomSeed) {
 
     // ── PriestTalents — Standard 0/5/56 shadow build ──
     const talents = new ProtoWriter();
-    // Discipline tree
-    talents.fieldVarint(PT_INNER_FOCUS, 1);              // 9: inner focus (bool)
-    talents.fieldVarint(PT_MEDITATION, 3);               // 10: meditation 3
-    // Shadow tree
-    talents.fieldVarint(PT_SHADOW_AFFINITY, 3);          // 19: shadow affinity 3
-    talents.fieldVarint(PT_IMP_SHADOW_WORD_PAIN, 2);     // 21: imp shadow word pain 2
-    talents.fieldVarint(PT_SHADOW_FOCUS, 5);             // 22: shadow focus 5
-    talents.fieldVarint(PT_IMP_MIND_BLAST, 5);           // 23: imp mind blast 5
-    talents.fieldVarint(PT_MIND_FLAY, 1);                // 24: mind flay (bool)
-    talents.fieldVarint(PT_SHADOW_WEAVING, 5);           // 25: shadow weaving 5
-    talents.fieldVarint(PT_VAMPIRIC_EMBRACE, 1);         // 26: vampiric embrace (bool)
-    talents.fieldVarint(PT_FOCUSED_MIND, 3);             // 27: focused mind 3
-    talents.fieldVarint(PT_DARKNESS, 5);                 // 29: darkness 5
-    talents.fieldVarint(PT_SHADOWFORM, 1);               // 30: shadowform (bool)
-    talents.fieldVarint(PT_SHADOW_POWER, 4);             // 31: shadow power 4
-    talents.fieldVarint(PT_MISERY, 5);                   // 32: misery 5
-    talents.fieldVarint(PT_VAMPIRIC_TOUCH, 1);           // 33: vampiric touch (bool)
+    // Discipline (5 pts)
+    talents.fieldVarint(PT_INNER_FOCUS,          1);  // bool — free spell on demand
+    talents.fieldVarint(PT_MEDITATION,           3);  // 30% mana regen while casting
+    // Shadow (56 pts)
+    talents.fieldVarint(PT_IMP_SHADOW_WORD_PAIN, 2);  // +10% SWP damage
+    talents.fieldVarint(PT_SHADOW_FOCUS,         5);  // -10% spell miss
+    talents.fieldVarint(PT_IMP_MIND_BLAST,       5);  // -2.5s MB cooldown
+    talents.fieldVarint(PT_MIND_FLAY,            1);  // bool — core ability
+    talents.fieldVarint(PT_SHADOW_WEAVING,       5);  // +10% shadow damage taken
+    talents.fieldVarint(PT_VAMPIRIC_EMBRACE,     1);  // bool — party healing
+    talents.fieldVarint(PT_FOCUSED_MIND,         3);  // -15% mana cost
+    talents.fieldVarint(PT_DARKNESS,             5);  // +10% shadow damage
+    talents.fieldVarint(PT_SHADOWFORM,           1);  // bool — form
+    talents.fieldVarint(PT_SHADOW_POWER,         5);  // +10% shadow crit damage
+    talents.fieldVarint(PT_MISERY,               5);  // +5% spell hit debuff
+    talents.fieldVarint(PT_VAMPIRIC_TOUCH,       1);  // bool — mana drain
+    talents.fieldVarint(PT_SHADOW_AFFINITY,      3);  // -15% threat
 
     // ── ShadowPriest Options ──
     const options = new ProtoWriter();
@@ -711,21 +803,21 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         writeDouble(rotation, SPR_LATENCY, 50.0);
 
         const talents = new ProtoWriter();
-        talents.fieldVarint(PT_INNER_FOCUS, 1);
-        talents.fieldVarint(PT_MEDITATION, 3);
-        talents.fieldVarint(PT_SHADOW_AFFINITY, 3);
+        talents.fieldVarint(PT_INNER_FOCUS,          1);
+        talents.fieldVarint(PT_MEDITATION,           3);
         talents.fieldVarint(PT_IMP_SHADOW_WORD_PAIN, 2);
-        talents.fieldVarint(PT_SHADOW_FOCUS, 5);
-        talents.fieldVarint(PT_IMP_MIND_BLAST, 5);
-        talents.fieldVarint(PT_MIND_FLAY, 1);
-        talents.fieldVarint(PT_SHADOW_WEAVING, 5);
-        talents.fieldVarint(PT_VAMPIRIC_EMBRACE, 1);
-        talents.fieldVarint(PT_FOCUSED_MIND, 3);
-        talents.fieldVarint(PT_DARKNESS, 5);
-        talents.fieldVarint(PT_SHADOWFORM, 1);
-        talents.fieldVarint(PT_SHADOW_POWER, 4);
-        talents.fieldVarint(PT_MISERY, 5);
-        talents.fieldVarint(PT_VAMPIRIC_TOUCH, 1);
+        talents.fieldVarint(PT_SHADOW_FOCUS,         5);
+        talents.fieldVarint(PT_IMP_MIND_BLAST,       5);
+        talents.fieldVarint(PT_MIND_FLAY,            1);
+        talents.fieldVarint(PT_SHADOW_WEAVING,       5);
+        talents.fieldVarint(PT_VAMPIRIC_EMBRACE,     1);
+        talents.fieldVarint(PT_FOCUSED_MIND,         3);
+        talents.fieldVarint(PT_DARKNESS,             5);
+        talents.fieldVarint(PT_SHADOWFORM,           1);
+        talents.fieldVarint(PT_SHADOW_POWER,         5);
+        talents.fieldVarint(PT_MISERY,               5);
+        talents.fieldVarint(PT_VAMPIRIC_TOUCH,       1);
+        talents.fieldVarint(PT_SHADOW_AFFINITY,      3);
 
         const options = new ProtoWriter();
         options.fieldVarint(SPO_USE_SHADOWFIEND, 1);
@@ -756,11 +848,27 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_SHADOW_PRIEST, spSpec);
 
     } else if (specKey === 'Rogue-Dps') {
-        // ── Rogue (Combat/Dps) — minimal spec for computeStats ──
-        // Rogue proto: rotation=1, talents=2, options=3 (all empty = default values)
+        // ── Rogue (Combat Swords) — BiS P1 talents ──
+        const rogueTalents = new ProtoWriter();
+        rogueTalents.fieldVarint(RT_MALICE,                   5);  // +5% crit
+        rogueTalents.fieldVarint(RT_RUTHLESSNESS,             3);  // CP on finishing moves
+        rogueTalents.fieldVarint(RT_MURDER,                   2);  // +4% dmg
+        rogueTalents.fieldVarint(RT_LETHALITY,                5);  // +30% crit bonus
+        rogueTalents.fieldVarint(RT_RELENTLESS_STRIKES,       1);  // energy on finishers
+        rogueTalents.fieldVarint(RT_SEAL_FATE,                5);  // CP on crit
+        rogueTalents.fieldVarint(RT_IMPROVED_SINISTER_STRIKE, 2);  // -2 energy cost
+        rogueTalents.fieldVarint(RT_PRECISION,                5);  // +5% hit
+        rogueTalents.fieldVarint(RT_DUAL_WIELD_SPEC,          5);  // +5% OH dmg
+        rogueTalents.fieldVarint(RT_SWORD_SPEC,               5);  // extra swings
+        rogueTalents.fieldVarint(RT_WEAPON_EXPERTISE,         2);  // +10 weapon skill
+        rogueTalents.fieldVarint(RT_AGGRESSION,               3);  // +6% dmg
+        rogueTalents.fieldVarint(RT_VITALITY,                 2);  // +8% AP
+        rogueTalents.fieldVarint(RT_COMBAT_POTENCY,           5);  // +15% OH energy
+        rogueTalents.fieldVarint(RT_SURPRISE_ATTACKS,         1);  // no dodge on finisher
+
         const rogueSpec = new ProtoWriter();
-        rogueSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation (empty = default)
-        rogueSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        rogueSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        rogueSpec.fieldMessage(2, rogueTalents);               // talents
         rogueSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -785,9 +893,21 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
     } else if (specKey === 'Paladin-Retribution') {
         // ── Retribution Paladin — minimal spec for computeStats ──
+        const retTalents = new ProtoWriter();
+        retTalents.fieldVarint(PAL_CONVICTION,            5);  // +5% crit
+        retTalents.fieldVarint(PAL_SEAL_OF_COMMAND,       1);  // key ability
+        retTalents.fieldVarint(PAL_CRUSADE,               3);  // +3% dmg
+        retTalents.fieldVarint(PAL_TWO_HAND_SPEC,         5);  // +10% 2H dmg
+        retTalents.fieldVarint(PAL_VENGEANCE,             5);  // stacking dmg bonus
+        retTalents.fieldVarint(PAL_SANCTIFIED_SEALS,      5);  // +5% crit
+        retTalents.fieldVarint(PAL_FANATICISM,            5);  // +15% crit / -30% threat
+        retTalents.fieldVarint(PAL_CRUSADER_STRIKE,       1);  // key ability
+        retTalents.fieldVarint(PAL_IMPROVED_JUDGEMENT,    2);  // -1s cooldown
+        retTalents.fieldVarint(PAL_BENEDICTION,           5);  // reduced mana cost
+
         const retSpec = new ProtoWriter();
         retSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
-        retSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        retSpec.fieldMessage(2, retTalents);                 // talents
         retSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -810,10 +930,26 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_RET_PALADIN, retSpec);
 
     } else if (specKey === 'Paladin-Protection') {
-        // ── Protection Paladin — minimal spec for computeStats ──
+        // ── Protection Paladin — full talents for computeStats ──
+        // Anticipation 5/5 = +20 defense skill (key for crit immunity!)
+        const protPalTalents = new ProtoWriter();
+        protPalTalents.fieldVarint(PAL_REDOUBT,            5);  // block on being crit
+        protPalTalents.fieldVarint(PAL_PRECISION,          3);  // +3% hit
+        protPalTalents.fieldVarint(PAL_TOUGHNESS,          5);  // +10% armor
+        protPalTalents.fieldVarint(PAL_IMPROVED_RF,        3);  // Righteous Fury threat
+        protPalTalents.fieldVarint(PAL_SHIELD_SPEC,        3);  // block procs
+        protPalTalents.fieldVarint(PAL_ANTICIPATION,       5);  // +20 defense skill — KEY
+        protPalTalents.fieldVarint(PAL_BLESSING_OF_SANCTUARY, 1); // block/parry rage
+        protPalTalents.fieldVarint(PAL_SACRED_DUTY,        2);  // +6% stam
+        protPalTalents.fieldVarint(PAL_ONE_HAND_SPEC,      5);  // +10% 1H dmg
+        protPalTalents.fieldVarint(PAL_HOLY_SHIELD,        1);  // key ability
+        protPalTalents.fieldVarint(PAL_ARDENT_DEFENDER,    3);  // survive killing blows
+        protPalTalents.fieldVarint(PAL_COMBAT_EXPERTISE,   5);  // +10 expertise / +6% stam
+        protPalTalents.fieldVarint(PAL_AVENGERS_SHIELD,    1);  // pull ability
+
         const protPalSpec = new ProtoWriter();
         protPalSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
-        protPalSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        protPalSpec.fieldMessage(2, protPalTalents);             // talents
         protPalSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -834,10 +970,25 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_PROT_PALADIN, protPalSpec);
 
     } else if (specKey === 'Shaman-Enhancement') {
-        // ── Enhancement Shaman — minimal spec for computeStats ──
+        // ── Enhancement Shaman — BiS P1 talents ──
+        const enhTalents = new ProtoWriter();
+        enhTalents.fieldVarint(ST_THUNDERING_STRIKES,  5);  // +5% melee crit
+        enhTalents.fieldVarint(ST_ENHANCING_TOTEMS,    2);  // stronger totems
+        enhTalents.fieldVarint(ST_SHAMANISTIC_FOCUS,   1);  // reduced cost on hit
+        enhTalents.fieldVarint(ST_FLURRY,              5);  // +30% attack speed on crit
+        enhTalents.fieldVarint(ST_ELEMENTAL_WEAPONS,   3);  // +30% weapon imbue
+        enhTalents.fieldVarint(ST_MENTAL_QUICKNESS,    3);  // +30% SP from AP
+        enhTalents.fieldVarint(ST_WEAPON_MASTERY,      5);  // +10 weapon skill
+        enhTalents.fieldVarint(ST_DUAL_WIELD_SPEC,     5);  // +5% OH hit/dmg
+        enhTalents.fieldVarint(ST_UNLEASHED_RAGE,      5);  // +10% AP aura
+        enhTalents.fieldVarint(ST_STORMSTRIKE,         1);  // key ability
+        enhTalents.fieldVarint(ST_SPIRIT_WEAPONS,      1);  // -30% threat
+        enhTalents.fieldVarint(ST_SHAMANISTIC_RAGE,    1);  // mana return
+        enhTalents.fieldVarint(ST_NATURES_GUIDANCE,    3);  // +3% hit
+
         const enhSpec = new ProtoWriter();
         enhSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
-        enhSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        enhSpec.fieldMessage(2, enhTalents);                 // talents
         enhSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -861,10 +1012,23 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_ENH_SHAMAN, enhSpec);
 
     } else if (specKey === 'Druid-Cat') {
-        // ── Feral Druid (Cat DPS) — minimal spec for computeStats ──
+        // ── Feral Druid (Cat DPS) — BiS P1 talents ──
+        // Key talents: Heart of the Wild (+20% AP in cat), Leader of the Pack, Mangle
+        const catTalents = new ProtoWriter();
+        catTalents.fieldVarint(DT_FEROCITY,              5);  // -5 energy cost
+        catTalents.fieldVarint(DT_FERAL_AGGRESSION,      2);  // improved demo roar
+        catTalents.fieldVarint(DT_THICK_HIDE,            3);  // +10% armor
+        catTalents.fieldVarint(DT_SHARPENED_CLAWS,       3);  // +6% crit
+        catTalents.fieldVarint(DT_PREDATORY_STRIKES,     3);  // +150% weapon bonus
+        catTalents.fieldVarint(DT_PRIMAL_FURY,           2);  // extra CP on crit
+        catTalents.fieldVarint(DT_HEART_OF_THE_WILD,     5);  // +20% AP in cat form
+        catTalents.fieldVarint(DT_SURVIVAL_OF_THE_FITTEST, 3); // +3% all stats
+        catTalents.fieldVarint(DT_LEADER_OF_THE_PACK,   1);  // +5% melee crit aura
+        catTalents.fieldVarint(DT_MANGLE,                1);  // key ability
+
         const feralSpec = new ProtoWriter();
         feralSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
-        feralSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        feralSpec.fieldMessage(2, catTalents);                 // talents
         feralSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -886,10 +1050,25 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_FERAL_DRUID, feralSpec);
 
     } else if (specKey === 'Druid-Bear') {
-        // ── Feral Tank Druid (Bear) — minimal spec for computeStats ──
+        // ── Feral Tank Druid (Bear) — full talents for computeStats ──
+        // Crit immunity comes from Survival of the Fittest 3/3 (-6% crit taken)
+        // NOT from defense rating — displayed separately in UI
+        const bearTalents = new ProtoWriter();
+        bearTalents.fieldVarint(DT_FEROCITY,                5);  // -5 rage cost
+        bearTalents.fieldVarint(DT_FERAL_AGGRESSION,        2);  // improved demo roar
+        bearTalents.fieldVarint(DT_FERAL_INSTINCT,          3);  // +15% threat
+        bearTalents.fieldVarint(DT_THICK_HIDE,              3);  // +10% armor in bear
+        bearTalents.fieldVarint(DT_SHARPENED_CLAWS,         3);  // +6% crit
+        bearTalents.fieldVarint(DT_PREDATORY_STRIKES,       3);
+        bearTalents.fieldVarint(DT_PRIMAL_FURY,             2);
+        bearTalents.fieldVarint(DT_HEART_OF_THE_WILD,       5);  // +20% stam in bear
+        bearTalents.fieldVarint(DT_SURVIVAL_OF_THE_FITTEST, 3);  // CRIT IMMUNITY (-6%)
+        bearTalents.fieldVarint(DT_LEADER_OF_THE_PACK,      1);  // bool
+        bearTalents.fieldVarint(DT_MANGLE,                  1);  // bool
+
         const bearSpec = new ProtoWriter();
         bearSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
-        bearSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        bearSpec.fieldMessage(2, bearTalents);                // talents with SotF 3/3
         bearSpec.fieldMessageRequired(3, new ProtoWriter());  // options
 
         const consumes = new ProtoWriter();
@@ -909,6 +1088,46 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_BUFFS, indBuffs);
         player.fieldMessage(PLAYER_FERAL_TANK_DRUID, bearSpec);
+
+    } else if (specKey === 'Warrior-Protection') {
+        // ── Protection Warrior — full talents including Anticipation 5/5 ──
+        const protWarTalents = new ProtoWriter();
+        // Protection tree
+        protWarTalents.fieldVarint(WT_TACTICAL_MASTERY,      3);  // keep rage on stance change
+        protWarTalents.fieldVarint(WT_ANTICIPATION,          5);  // +5 defense skill — KEY for crit cap
+        protWarTalents.fieldVarint(WT_SHIELD_SPECIALIZATION, 5);  // +5% block chance
+        protWarTalents.fieldVarint(WT_TOUGHNESS,             5);  // +10% armor
+        protWarTalents.fieldVarint(WT_DEFIANCE,              3);  // +15% threat
+        protWarTalents.fieldVarint(WT_IMPROVED_SUNDER_ARMOR, 3);
+        protWarTalents.fieldVarint(WT_SHIELD_SLAM,           1);  // bool: key ability
+        protWarTalents.fieldVarint(WT_ONE_HAND_WEAPON_SPEC,  5);  // +5% 1H damage
+        protWarTalents.fieldVarint(WT_FOCUSED_RAGE,          3);  // -3 rage cost
+        protWarTalents.fieldVarint(WT_VITALITY,              5);  // +4% str/stam
+        protWarTalents.fieldVarint(WT_DEVASTATE,             1);  // bool: key ability
+        // Fury tree — points needed to reach Protection
+        protWarTalents.fieldVarint(WT_CRUELTY,               5);  // 5/5 crit
+
+        const protWarSpec = new ProtoWriter();
+        protWarSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        protWarSpec.fieldMessage(2, protWarTalents);             // talents
+        protWarSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 6);          // FlaskOfFortification = 6
+        consumes.fieldVarint(CONS_FOOD, 5);           // FoodGrilledMudfish = 5
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Prot Warrior'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_WARRIOR);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_PROT_WARRIOR, protWarSpec);
 
     } else {
         // ── Fury Warrior spec for ComputeStats (default) ──

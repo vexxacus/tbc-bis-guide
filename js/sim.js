@@ -28,55 +28,122 @@ const SLOT_MAP = {
 // Spell ID (from data.json enchants) → wowsims enchant item ID
 // ONLY include enchants that wowsims actually knows — unknown IDs crash the sim.
 const SPELL_TO_ENCHANT_ID = {
-    // Head — Glyph of Ferocity (Cenarion Expedition exalted)
-    35452: 29192,
-    // Head — Glyph of Power (Sha'tar exalted) — caster (wowsims ID: 29191)
+    // ── Head ──────────────────────────────────────────────────────────────────
+    // Glyph of the Defender (+16 def, +17 dodge) — Keepers of Time exalted
+    35477: 29186,
+    35443: 29186,
+    29186: 29186,
+    // Glyph of Power (+22 SP, +14 spell hit) — The Sha'tar exalted
     35455: 29191,
     29191: 29191,
-    // Shoulder — Greater Inscription of Vengeance (Aldor exalted)
-    29483: 28888,
-    // Shoulder — Greater Inscription of the Orb (Scryer exalted) — caster
-    29467: 28911,
+    // Glyph of Ferocity (+34 AP, +16 hit) — Cenarion Expedition exalted
+    35452: 29192,
+    29192: 29192,
+    // Presence of Might (+10 def, +15 stam, +10 dodge, +10 block val) — ZG quest
+    24149: 19782,
+    19782: 19782,
+
+    // ── Shoulder ──────────────────────────────────────────────────────────────
+    // Greater Inscription of the Knight (+15 def, +10 dodge) — Scryer exalted
+    35433: 28911,
     28911: 28911,
-    // Back — Enchant Cloak - Greater Agility
+    // Greater Inscription of Warding (+10 def, +15 dodge) — Aldor exalted
+    29480: 28889,
+    28889: 28889,
+    // Greater Inscription of Vengeance (+30 AP, +10 crit) — Aldor exalted
+    29483: 28888,
+    28888: 28888,
+    // Greater Inscription of the Orb (+12 SP, +15 spell crit) — Scryer exalted
+    29467: 28909,
+    28909: 28909,
+    // Inscription of the Knight (Lesser) — fallback
+    29467: 28911,
+
+    // ── Back ──────────────────────────────────────────────────────────────────
+    // Enchant Cloak - Dodge (+12 dodge) — tank cloak
+    35316: 33148,
+    33148: 33148,
+    // Enchant Cloak - Greater Agility (+12 agi)
     34004: 34004,
-    // Back — Enchant Cloak - Subtlety / spell shadow power (no wowsims ID, skip)
-    // Chest — Enchant Chest - Exceptional Stats
+    // Enchant Cloak - Steelweave (+12 def) — Phase 5
+    35279: 35756,
+    35756: 35756,
+
+    // ── Chest ─────────────────────────────────────────────────────────────────
+    // Enchant Chest - Exceptional Stats (+6 all stats)
     27960: 24003,
-    // Wrist — Enchant Bracer - Brawn (Strength)
+    24003: 24003,
+    // Enchant Chest - Exceptional Health (+150 hp)
+    27957: 27957,
+    // Enchant Chest - Defense (+15 def) — Phase 5
+    33992: 35500,
+    35500: 35500,
+
+    // ── Wrist ─────────────────────────────────────────────────────────────────
+    // Enchant Bracer - Major Defense (+12 def)
+    22530: 22530,
+    // Enchant Bracer - Fortitude (+12 stam)
+    22533: 22533,
+    // Enchant Bracer - Brawn (+12 str)
     27899: 27899,
-    // Wrist — Enchant Bracer - Spellpower (wowsims ID: 22534, not the spell ID 27917)
+    // Enchant Bracer - Spellpower
     27917: 22534,
-    // Hands — Enchant Gloves - Major Strength
+    22534: 22534,
+
+    // ── Hands ─────────────────────────────────────────────────────────────────
+    // Enchant Gloves - Major Strength (+15 str)
     33995: 33995,
-    // Hands — Enchant Gloves - Spell Strike (wowsims ID: 28271, not spell ID 33997)
+    // Enchant Gloves - Spell Strike (+15 spell hit)
     33997: 28271,
-    // Legs — Nethercobra Leg Armor
+    28271: 28271,
+    // Enchant Gloves - Major Agility (+15 agi)
+    34082: 33152,
+    33152: 33152,
+
+    // ── Legs ──────────────────────────────────────────────────────────────────
+    // Nethercobra Leg Armor (+50 AP, +12 crit) — DPS
     35490: 29535,
     29535: 29535,
-    // Legs — Runic Spellthread — caster
+    // Nethercleft Leg Armor (+40 stam, +12 agi) — tank/hybrid
+    35495: 29536,
+    29536: 29536,
+    // Clefthide Leg Armor (+30 stam, +10 agi) — lesser version
+    35492: 29534,
+    29534: 29534,
+    // Runic Spellthread (+35 SP, +20 stam) — caster
     31368: 24274,
     24274: 24274,
-    // Feet — Enchant Boots - Dexterity
+
+    // ── Feet ──────────────────────────────────────────────────────────────────
+    // Enchant Boots - Dexterity (+12 agi)
     34007: 28279,
     28279: 28279,
-    // Weapon — Mongoose
+    // Enchant Boots - Cat's Swiftness (+6 agi + run speed)
+    34008: 28279,
+    // Enchant Boots - Fortitude (+12 stam)
+    22543: 22543,
+    // Enchant Boots - Boar's Speed (+9 stam + run speed)
+    35298: 35297,
+    35297: 35297,
+
+    // ── Weapon ────────────────────────────────────────────────────────────────
+    // Mongoose
     27984: 22559,
     22559: 22559,
-    // Weapon — Executioner
+    // Executioner (Phase 4)
     42974: 33307,
     33307: 33307,
-    // Weapon — Major Agility (1H — not in wowsims all_enchants.go, closest is 22552 Major Striking; skip)
-    // 27977: skipped — no matching wowsims enchant
-    // Weapon — Soulfrost (shadow/frost power) — caster (wowsims ID: 22561)
+    // Soulfrost — caster shadow/frost
     27975: 22561,
-    // Weapon — Sunfire (fire/arcane power) — caster (wowsims ID: 22560)
+    22561: 22561,
+    // Sunfire — caster fire/arcane
     27981: 22560,
-    // Weapon — Superior Wizard Oil — caster
-    // (applied at use, not enchant slot in wowsims — skip)
-    // Ring — Enchant Ring - Stats (requires enchanting profession) (wowsims ID: 22538)
+    22560: 22560,
+
+    // ── Ring ──────────────────────────────────────────────────────────────────
+    // Ring - Stats
     27927: 22538,
-    // NOTE: Scope enchants (30252 Khorium Scope etc.) are NOT in wowsims — skip them
+    22538: 22538,
 };
 
 /**
@@ -216,9 +283,15 @@ const SIM_STAT_LABELS_TANK = {
     35: { label: 'Health',       fmt: v => Math.round(v) },
      2: { label: 'Stamina',      fmt: v => Math.round(v) },
     27: { label: 'Armor',        fmt: v => Math.round(v) },
-    // Defense: show rating AND skill value; wowsims formula: skill = CHARACTER_LEVEL*5 + rating/DEFENSE_RATING_PER_DEFENSE
-    29: { label: 'Defense',      fmt: v => {
+    // Defense: show rating AND skill value.
+    // Warriors/Paladins: need 490 skill for crit immunity (via defense gear/enchants)
+    // Bear Druids: crit immunity is via Survival of the Fittest talent — NOT defense
+    //   → badge shown only for warrior/paladin; bear shows plain skill value
+    29: { label: 'Defense',      fmt: (v, isBear) => {
         const skill = DEFENSE_BASE_SKILL + v / DEFENSE_RATING_PER_DEFENSE;
+        if (isBear) {
+            return `${Math.round(v)} (${skill.toFixed(1)} skill)`;
+        }
         const critImmune = skill >= DEFENSE_SKILL_FOR_CRIT_CAP;
         const badge = critImmune
             ? `<span class="sim-crit-immune">✔ Crit Immune</span>`
@@ -234,8 +307,12 @@ const SIM_STAT_LABELS_TANK = {
     18: { label: 'Attack Power', fmt: v => Math.round(v) },
     // 999 = computed: Total Avoidance (dodge% + parry% + block%) — handled specially in renderSimStats
     999: { label: 'Total Avoidance', fmt: v => `${v.toFixed(2)}%` },
+    // 998 = Bear Druid only: static crit-immunity badge via Survival of the Fittest
+    998: { label: 'Crit Immunity',   fmt: () => `<span class="sim-crit-immune">✔ Survival of the Fittest</span>` },
 };
-const SIM_STAT_ORDER_TANK = [35, 2, 27, 29, 32, 33, 30, 31, 999, 0, 1, 18];
+const SIM_STAT_ORDER_TANK      = [35, 2, 27, 29, 32, 33, 30, 31, 999, 0, 1, 18];
+const SIM_STAT_ORDER_TANK_BEAR = [35, 2, 27, 29, 998, 32, 33, 999, 0, 1, 18];
+// Bear has no Parry (can't parry in bear form) and no Block — but keep dodge, defense for info
 
 // Backwards-compat aliases used by renderSimStats
 const SIM_STAT_LABELS = SIM_STAT_LABELS_MELEE;

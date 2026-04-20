@@ -2334,29 +2334,37 @@
 
     function renderSimStats(stats, specKey) {
         const isCaster = specKey === 'Priest-Shadow';
-        const isTank   = specKey === 'Druid-Bear' || specKey === 'Warrior-Protection' || specKey === 'Paladin-Protection';
+        const isBear   = specKey === 'Druid-Bear';
+        const isTank   = isBear || specKey === 'Warrior-Protection' || specKey === 'Paladin-Protection';
         const labels = isCaster ? SIM_STAT_LABELS_CASTER
                      : isTank   ? SIM_STAT_LABELS_TANK
                      :            SIM_STAT_LABELS_MELEE;
+        // Bear uses a different stat order: no block/parry, has crit-immune badge via SotF
         const order  = isCaster ? SIM_STAT_ORDER_CASTER
+                     : isBear   ? SIM_STAT_ORDER_TANK_BEAR
                      : isTank   ? SIM_STAT_ORDER_TANK
                      :            SIM_STAT_ORDER_MELEE;
         const rows = order.map(idx => {
             const def = labels[idx];
             if (!def) return '';
-            // Sentinel 999 = Total Avoidance (computed from dodge + parry + block ratings)
+            // Sentinel 999 = Total Avoidance (dodge% + parry% + block%)
+            // Sentinel 998 = Bear crit-immunity static badge
             let val;
             if (idx === 999) {
                 const dodgePct = (stats[32] || 0) / DODGE_RATING_PER_PCT;
                 const parryPct = (stats[33] || 0) / PARRY_RATING_PER_PCT;
                 const blockPct = (stats[30] || 0) / BLOCK_RATING_PER_PCT;
-                val = dodgePct + parryPct + blockPct;
+                val = dodgePct + (isBear ? 0 : parryPct) + (isBear ? 0 : blockPct);
+            } else if (idx === 998) {
+                val = 0; // ignored — fmt returns static HTML
             } else {
                 val = stats[idx] || 0;
             }
+            // Defense (idx 29) fmt takes optional isBear flag
+            const formatted = idx === 29 ? def.fmt(val, isBear) : def.fmt(val);
             return `<div class="sim-stat-row">
                 <span class="sim-stat-label">${def.label}</span>
-                <span class="sim-stat-value">${def.fmt(val)}</span>
+                <span class="sim-stat-value">${formatted}</span>
             </div>`;
         }).join('');
 
