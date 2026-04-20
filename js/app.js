@@ -907,11 +907,12 @@
                 const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
                 // If no MH+OH items at all → must be 2h
                 if (!topMH) return '2h';
-                // Both exist: use rank to decide. BIS > Alt > Pre-BIS etc.
+                // Both exist: use rank to decide. BIS > Pre-BIS > Alt etc.
+                // Ties (both BIS) → prefer 'dw' (MH+OH gives stats from two items)
                 const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
                 const r2h = rankOrder[top2H.rank] ?? 99;
                 const rmh = rankOrder[topMH.rank] ?? 99;
-                return r2h <= rmh ? '2h' : 'dw';
+                return r2h < rmh ? '2h' : 'dw';  // strict: 2H only wins if strictly better ranked
             }
         }
         return WEAPON_MODE_DEFAULT[`${state.selectedClass}-${state.selectedSpec}`] || 'dw';
@@ -2379,6 +2380,7 @@
                     onSimReady(() => scheduleSimStats(slotGroups, enchantLookup, gems));
                 } else {
                     // WASM ready but this gear caused a crash — don't retry
+                    // (error details visible in browser console)
                     simStats.innerHTML = '<div class="sim-stat-loading">Stats unavailable for this phase</div>';
                 }
                 return;

@@ -373,7 +373,7 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
     try {
         return await _simBridge.computeStats(gearSlots, specKey);
     } catch (e) {
-        console.error('[sim] computeStats error:', e);
+        console.error('[sim] computeStats error:', e?.message || e);
         return null;
     }
 }
