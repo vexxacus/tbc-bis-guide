@@ -253,6 +253,7 @@ const RACE_HUMAN    = 5;
 const RACE_NIGHT_ELF = 6;
 // Player oneof spec field numbers (from proto/api.proto Player.oneof spec)
 const PLAYER_RET_PALADIN      = 9;   // retribution_paladin = 9
+const PLAYER_PROT_PALADIN     = 25;  // protection_paladin = 25
 const PLAYER_ROGUE            = 11;  // rogue = 11
 const PLAYER_ENH_SHAMAN       = 18;  // enhancement_shaman = 18
 const PLAYER_FERAL_DRUID      = 22;  // feral_druid = 22
@@ -807,6 +808,30 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_BUFFS, indBuffs);
         player.fieldMessage(PLAYER_RET_PALADIN, retSpec);
+
+    } else if (specKey === 'Paladin-Protection') {
+        // ── Protection Paladin — minimal spec for computeStats ──
+        const protPalSpec = new ProtoWriter();
+        protPalSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        protPalSpec.fieldMessageRequired(2, new ProtoWriter());  // talents
+        protPalSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_FLASK, 6);          // FlaskOfFortification = 6
+        consumes.fieldVarint(CONS_FOOD, 5);           // FoodGrilledMudfish = 5 (agi/stam)
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Prot Paladin'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_PALADIN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_PROT_PALADIN, protPalSpec);
 
     } else if (specKey === 'Shaman-Enhancement') {
         // ── Enhancement Shaman — minimal spec for computeStats ──

@@ -2271,7 +2271,7 @@
         'Warrior-Fury', 'Warrior-Arms', 'Warrior-Protection',
         'Priest-Shadow',
         'Rogue-Dps',
-        'Paladin-Retribution',
+        'Paladin-Retribution', 'Paladin-Protection',
         'Shaman-Enhancement',
         'Druid-Cat', 'Druid-Bear',
     ]);
@@ -2334,7 +2334,7 @@
 
     function renderSimStats(stats, specKey) {
         const isCaster = specKey === 'Priest-Shadow';
-        const isTank   = specKey === 'Druid-Bear' || specKey === 'Warrior-Protection';
+        const isTank   = specKey === 'Druid-Bear' || specKey === 'Warrior-Protection' || specKey === 'Paladin-Protection';
         const labels = isCaster ? SIM_STAT_LABELS_CASTER
                      : isTank   ? SIM_STAT_LABELS_TANK
                      :            SIM_STAT_LABELS_MELEE;
