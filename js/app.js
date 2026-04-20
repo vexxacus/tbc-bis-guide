@@ -878,25 +878,43 @@
         'Druid-Balance', 'Shaman-Elemental',
     ]);
 
-    // weaponMode: per selectionKey() → 'dw' | '2h' (default varies by spec)
-    // Default: 'dw' for most, '2h' for staff casters
-    const WEAPON_MODE_DEFAULT = {
-        'Priest-Shadow':       '2h',
-        'Mage-Fire':           '2h',
-        'Mage-Frost':          '2h',
-        'Mage-Arcane':         '2h',
-        'Warlock-Destruction': '2h',
-        'Warlock-Affliction':  '2h',
-        'Warlock-Demonology':  '2h',
-        'Druid-Balance':       '2h',
-        'Shaman-Elemental':    '2h',
-    };
+    // weaponMode: per selectionKey() → 'dw' | '2h'
+    // Automatically derived from the BiS item in the current phase/spec.
+    // If the #1 BIS item is a Two Hand → '2h'; otherwise → 'dw'.
+    // User can override per spec+phase; override is persisted in localStorage.
+    const WEAPON_MODE_DEFAULT = {};
     const weaponModeState = {};
-    function getWeaponMode() {
+
+    /**
+     * Return the effective weapon mode for the current spec+phase.
+     * If the user has explicitly chosen a mode it wins; otherwise auto-detect
+     * from slotGroups (the #1 ranked weapon in this phase).
+     * @param {object} [slotGroups] - current slot groups (used for auto-detect)
+     */
+    function getWeaponMode(slotGroups) {
         const key = selectionKey();
         if (key in weaponModeState) return weaponModeState[key];
-        const specKey = `${state.selectedClass}-${state.selectedSpec}`;
-        return WEAPON_MODE_DEFAULT[specKey] || 'dw';
+        // Auto-detect: if there's a Two Hand item ranked #1 (first entry), use '2h'
+        if (slotGroups) {
+            const twoHanders = slotGroups['Two Hand'];
+            const mainHanders = slotGroups['Main Hand'];
+            if (twoHanders && twoHanders.length) {
+                // Has a 2H — check if 2H or MH+OH is "first" (i.e. ranked higher / listed first)
+                // We treat whichever slot has the #1 BIS item as the preferred mode.
+                // Since data is ranked, index 0 = BIS for that slot type.
+                // If both exist, compare: does 2H exist at all? → prefer based on rank string
+                const top2H = twoHanders[0];
+                const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
+                // If no MH+OH items at all → must be 2h
+                if (!topMH) return '2h';
+                // Both exist: use rank to decide. BIS > Alt > Pre-BIS etc.
+                const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
+                const r2h = rankOrder[top2H.rank] ?? 99;
+                const rmh = rankOrder[topMH.rank] ?? 99;
+                return r2h <= rmh ? '2h' : 'dw';
+            }
+        }
+        return WEAPON_MODE_DEFAULT[`${state.selectedClass}-${state.selectedSpec}`] || 'dw';
     }
     function setWeaponMode(mode) {
         weaponModeState[selectionKey()] = mode;
@@ -2011,7 +2029,7 @@
 
         // ── Weapon mode — computed early, used by both paperdoll and slot rendering ──
         const showWeaponToggle = WEAPON_TOGGLE_SPECS.has(specKey) && hasOneHanders && has2H && !pvpSpecData;
-        const weaponMode = showWeaponToggle ? getWeaponMode() : null;
+        const weaponMode = showWeaponToggle ? getWeaponMode(slotGroups) : null;
         const effectiveDW = showWeaponToggle ? (weaponMode === 'dw') : showDW;
         const effective2H = showWeaponToggle ? (weaponMode === '2h') : show2H;
 
@@ -2340,8 +2358,17 @@
             const reqId = ++_simStatsReqId;
             simStats.innerHTML = '<div class="sim-stat-loading">Computing stats…</div>';
 
-            // Capture slotGroups + weaponMode at this moment
-            const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
+            // Capture slotGroups + weaponMode at this moment.
+            // For toggle specs: auto-detect from data (or use user override if set).
+            // For non-toggle specs: derive from WEAPON_STYLE so we don't
+            // accidentally skip weapons (e.g. Bear '2h' spec getting 'dw' default).
+            let wMode;
+            if (WEAPON_TOGGLE_SPECS.has(specKey)) {
+                wMode = typeof getWeaponMode === 'function' ? getWeaponMode(slotGroups) : null;
+            } else {
+                const ws = WEAPON_STYLE[specKey] || 'auto';
+                wMode = ws === '2h' ? '2h' : ws === 'dw' ? 'dw' : null;
+            }
             const stats = await computeStatsForBis(slotGroups, getActiveItem, wMode, enchantLookup, gems, specKey);
             if (reqId !== _simStatsReqId) return; // stale
 
@@ -2454,7 +2481,7 @@
             simDpsResult.style.display = 'none';
             simDpsFill.style.width = '0%';
 
-            const wMode = typeof getWeaponMode === 'function' ? getWeaponMode() : null;
+            const wMode = typeof getWeaponMode === 'function' ? getWeaponMode(_lastSlotGroups) : null;
             const specKey = `${state.selectedClass}-${state.selectedSpec}`;
             const simFn = specKey === 'Warrior-Arms'   ? simulateArmsWarrior
                         : specKey === 'Priest-Shadow'   ? simulateShadowPriest
