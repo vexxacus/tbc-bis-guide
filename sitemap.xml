@@ -213,14 +213,22 @@
 
   <!-- PvP — Arena BiS (Live Snapshot) -->
   <url><loc>https://tbc-bis-guide.web.app/warrior/arms/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://tbc-bis-guide.web.app/warrior/fury/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/paladin/retribution/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/beast-mastery/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/hunter/marksmanship/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://tbc-bis-guide.web.app/rogue/dps/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/hunter/survival/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/subtlety/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/rogue/combat/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/discipline/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/priest/holy/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/priest/shadow/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/shaman/elemental/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/enhancement/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/shaman/restoration/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/mage/arcane/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/mage/frost/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://tbc-bis-guide.web.app/warlock/affliction/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/warlock/demonology/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://tbc-bis-guide.web.app/druid/feral-combat/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://tbc-bis-guide.web.app/druid/restoration/pvp</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
 </urlset>

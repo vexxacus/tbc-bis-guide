@@ -142,7 +142,38 @@
         }
 
         const specSlug = parts[1];
-        const specEntry = SPEC_SLUG_MAP[`${clsSlug}-${specSlug}`];
+        let specEntry = SPEC_SLUG_MAP[`${clsSlug}-${specSlug}`];
+
+        // PvP specs may use a different name than PvE (e.g. "subtlety" instead of "dps" for Rogue)
+        // Check if this is a PvP-only spec slug that maps to a PvE spec
+        let forcePvP = false;
+        let forcePvPKey = null;
+        if (!specEntry && parts[2] === 'pvp') {
+            // Look through PVP_TO_PVE_SPEC for a match
+            const specName = specSlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            for (const [pvpKey, pveSpec] of Object.entries(PVP_TO_PVE_SPEC)) {
+                const [pvpCls, pvpSpec] = pvpKey.split('|');
+                if (toSlug(pvpCls) === clsSlug && toSlug(pvpSpec) === specSlug) {
+                    specEntry = { cls, spec: pvpSpec };
+                    forcePvP = true;
+                    forcePvPKey = pvpKey;
+                    break;
+                }
+            }
+            // Also check scraped PVP_DATA.specs keys directly
+            if (!specEntry && typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) {
+                for (const pvpKey of Object.keys(PVP_DATA.specs)) {
+                    const [pvpCls, pvpSpec] = pvpKey.split('|');
+                    if (toSlug(pvpCls) === clsSlug && toSlug(pvpSpec) === specSlug) {
+                        const pveSpec = PVP_TO_PVE_SPEC[pvpKey] || pvpSpec;
+                        specEntry = { cls, spec: pvpSpec };
+                        forcePvP = true;
+                        forcePvPKey = pvpKey;
+                        break;
+                    }
+                }
+            }
+        }
         if (!specEntry) return false;
 
         state.selectedClass = specEntry.cls;
@@ -167,7 +198,7 @@
             state.selectedClass = specEntry.cls;
             state.selectedSpec  = specEntry.spec;
             state.isPvP         = true;
-            state.pvpKey        = `${specEntry.cls}|${specEntry.spec}`;
+            state.pvpKey        = forcePvPKey || `${specEntry.cls}|${specEntry.spec}`;
             state.selectedPhase = null;
             const pvpTag = '<span class="pvp-tag">PvP</span>';
             headerTitle.innerHTML = `${cls} — ${specEntry.spec} PvP ${pvpTag}`;
