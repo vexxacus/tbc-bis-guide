@@ -454,12 +454,58 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
 }
 
 /**
+ * Pre-clean gear slots using the global unknown caches.
+ */
+function _cleanGearSlots(gearSlots) {
+    if (_stripAllEnchants) for (const s of gearSlots) s.enchant = 0;
+    for (const s of gearSlots) s.gems = s.gems.filter(g => !_unknownGemIds.has(g));
+    return gearSlots.filter(s => !_unknownItemIds.has(s.id));
+}
+
+/**
+ * Retry wrapper for DPS simulations — handles unknown items/enchants/gems.
+ */
+async function _retrySimDps(runFn, gearSlots) {
+    for (let attempt = 0; attempt < 20; attempt++) {
+        try {
+            return await runFn();
+        } catch (e) {
+            const msg = e?.message || String(e);
+            const matchItem = msg.match(/No item with id:\s*(\d+)/);
+            const matchEnchant = msg.match(/No enchant with id:\s*(\d+)/);
+            const matchGem = msg.match(/No gem with id:\s*(\d+)/);
+            if (matchItem) {
+                const badId = parseInt(matchItem[1]);
+                console.warn(`[sim-dps] item ${badId} unknown — skipping`);
+                _unknownItemIds.add(badId);
+                // Remove from gearSlots in-place
+                const idx = gearSlots.findIndex(s => s.id === badId);
+                if (idx >= 0) gearSlots.splice(idx, 1);
+            } else if (matchEnchant) {
+                console.warn(`[sim-dps] unknown enchant ${matchEnchant[1]} — stripping`);
+                for (const s of gearSlots) s.enchant = 0;
+                _stripAllEnchants = true;
+            } else if (matchGem) {
+                const badGem = parseInt(matchGem[1]);
+                console.warn(`[sim-dps] unknown gem ${badGem} — removing`);
+                _unknownGemIds.add(badGem);
+                for (const s of gearSlots) s.gems = s.gems.filter(g => !_unknownGemIds.has(g));
+            } else {
+                throw e; // re-throw non-item errors
+            }
+            if (!gearSlots.length) throw new Error('No gear left after removing unknown items');
+        }
+    }
+    throw new Error('Too many unknown items in DPS sim');
+}
+
+/**
  * Run DPS simulation for Fury Warrior.
  */
 async function simulateFuryWarrior(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
-    const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
     if (!gearSlots.length) throw new Error('No gear selected');
-    return _simBridge.runFuryWarrior(gearSlots, onProgress, iterations);
+    return _retrySimDps(() => _simBridge.runFuryWarrior(gearSlots, onProgress, iterations), gearSlots);
 }
 
 /**
@@ -467,9 +513,9 @@ async function simulateFuryWarrior(slotGroups, getActiveItemFn, weaponMode, ench
  */
 async function simulateArmsWarrior(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
     // Arms always uses 2H mode
-    const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, '2h', enchantLookup, gems);
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, '2h', enchantLookup, gems));
     if (!gearSlots.length) throw new Error('No gear selected');
-    return _simBridge.runArmsWarrior(gearSlots, onProgress, iterations);
+    return _retrySimDps(() => _simBridge.runArmsWarrior(gearSlots, onProgress, iterations), gearSlots);
 }
 
 /**
@@ -477,7 +523,7 @@ async function simulateArmsWarrior(slotGroups, getActiveItemFn, weaponMode, ench
  * Shadow Priest can use Staff (2h) or MH+OH — weapon mode follows BiS selection.
  */
 async function simulateShadowPriest(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
-    const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
     if (!gearSlots.length) throw new Error('No gear selected');
-    return _simBridge.runShadowPriest(gearSlots, onProgress, iterations);
+    return _retrySimDps(() => _simBridge.runShadowPriest(gearSlots, onProgress, iterations), gearSlots);
 }
