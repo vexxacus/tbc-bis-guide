@@ -386,19 +386,28 @@ function onSimReady(fn) {
  * cause a "No item with id: XXXXX" panic in the WASM runtime).
  * @param {string} specKey — e.g. 'Warrior-Fury', 'Priest-Shadow'
  */
+// Global caches for items/gems/enchants that wowsims doesn't know about,
+// so we don't rediscover them on every call.
+const _unknownItemIds    = new Set();
+const _unknownGemIds     = new Set();
+let   _stripAllEnchants  = false;
+
 async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, specKey) {
     if (!_simReady) return null;
     const gearSlots = buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems);
     if (!gearSlots.length) return null;
 
+    // Apply previously discovered bad enchants/gems immediately
+    if (_stripAllEnchants) for (const s of gearSlots) s.enchant = 0;
+    for (const s of gearSlots) s.gems = s.gems.filter(g => !_unknownGemIds.has(g));
+
     // Retry loop: if wowsims doesn't know an item, remove it and try again.
-    const unknownIds = new Set();
-    let enchantsStripped = false;
+    let enchantsStripped = _stripAllEnchants;
     let gemsStripped = false;
     for (let attempt = 0; attempt < 30; attempt++) {
-        const slots = gearSlots.filter(s => !unknownIds.has(s.id));
+        const slots = gearSlots.filter(s => !_unknownItemIds.has(s.id));
         if (!slots.length) return null;
-        console.log('[sim] computeStats attempt', attempt + 1, 'slots:', slots.length, 'ids:', JSON.stringify(slots.map(s => s.id)));
+        if (attempt === 0) console.log('[sim] computeStats slots:', slots.length, 'ids:', JSON.stringify(slots.map(s => s.id)));
         try {
             return await _simBridge.computeStats(slots, specKey);
         } catch (e) {
@@ -408,28 +417,30 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
             const matchGem = msg.match(/No gem with id:\s*(\d+)/);
             if (matchItem) {
                 const badId = parseInt(matchItem[1]);
-                console.warn(`[sim] item ${badId} unknown to wowsims — retrying without it`);
-                unknownIds.add(badId);
+                console.warn(`[sim] item ${badId} unknown — skipping`);
+                _unknownItemIds.add(badId);
             } else if (matchEnchant) {
                 console.warn(`[sim] unknown enchant ${matchEnchant[1]} — stripping all enchants`);
                 for (const s of gearSlots) s.enchant = 0;
+                _stripAllEnchants = true;
                 enchantsStripped = true;
             } else if (matchGem) {
-                console.warn(`[sim] unknown gem ${matchGem[1]} — stripping all gems`);
-                for (const s of gearSlots) s.gems = [];
-                gemsStripped = true;
+                const badGem = parseInt(matchGem[1]);
+                console.warn(`[sim] unknown gem ${badGem} — removing`);
+                _unknownGemIds.add(badGem);
+                for (const s of gearSlots) s.gems = s.gems.filter(g => !_unknownGemIds.has(g));
             } else if (msg.includes('unreachable') || msg.includes('RuntimeError') || msg.includes('panic')) {
-                // Generic WASM crash — progressively strip enchants, gems, then give up
                 if (!enchantsStripped) {
-                    console.warn(`[sim] WASM crash — stripping enchants: ${msg.substring(0, 120)}`);
+                    console.warn(`[sim] WASM crash — stripping enchants`);
                     for (const s of gearSlots) s.enchant = 0;
+                    _stripAllEnchants = true;
                     enchantsStripped = true;
                 } else if (!gemsStripped) {
-                    console.warn(`[sim] WASM crash — stripping gems: ${msg.substring(0, 120)}`);
+                    console.warn(`[sim] WASM crash — stripping gems`);
                     for (const s of gearSlots) s.gems = [];
                     gemsStripped = true;
                 } else {
-                    console.error('[sim] WASM crash after stripping enchants+gems:', msg.substring(0, 200));
+                    console.error('[sim] WASM crash — giving up:', msg.substring(0, 200));
                     return null;
                 }
             } else {
