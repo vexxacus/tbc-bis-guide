@@ -1092,6 +1092,169 @@ function buildRogueSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for Enhancement Shaman (Orc, DW) ─────────────────
+
+// EnhancementShaman message fields
+const ENH_ROTATION = 1;
+const ENH_TALENTS  = 2;
+const ENH_OPTIONS  = 3;
+
+// EnhancementShaman_Rotation fields
+const ENHR_TOTEMS                  = 1;  // ShamanTotems sub-message
+const ENHR_PRIMARY_SHOCK           = 2;  // enum: 0=None, 1=Earth, 2=Frost
+const ENHR_WEAVE_FLAME_SHOCK       = 3;  // bool
+const ENHR_FIRST_STORMSTRIKE_DELAY = 4;  // double
+
+// EnhancementShaman_Options fields
+const ENHO_WATER_SHIELD         = 1;  // bool
+const ENHO_BLOODLUST            = 2;  // bool
+const ENHO_DELAY_OFFHAND_SWINGS = 5;  // bool
+
+// ShamanTotems fields
+const TOTEM_EARTH              = 1;  // EarthTotem enum
+const TOTEM_AIR                = 2;  // AirTotem enum
+const TOTEM_FIRE               = 3;  // FireTotem enum
+const TOTEM_WATER              = 4;  // WaterTotem enum
+const TOTEM_TWIST_WINDFURY     = 5;  // bool
+const TOTEM_TWIST_FIRE_NOVA    = 6;  // bool
+const TOTEM_WINDFURY_RANK      = 11; // int32
+
+// ShamanTalents — additional fields for Enhancement build (Elemental dip)
+const ST_CONVECTION             = 1;   // 0-5
+const ST_CONCUSSION             = 2;   // 0-5
+const ST_CALL_OF_FLAME          = 3;   // 0-3
+const ST_ELEMENTAL_FOCUS        = 4;   // bool
+const ST_REVERBERATION          = 5;   // 0-5
+const ST_IMPROVED_FIRE_TOTEMS   = 7;   // 0-2
+const ST_ANCESTRAL_KNOWLEDGE    = 15;  // 0-5
+const ST_IMPROVED_WEAPON_TOTEMS = 20;  // 0-2
+
+function buildEnhShamanSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── ShamanTotems sub-message ──
+    const totems = new ProtoWriter();
+    totems.fieldVarint(TOTEM_EARTH, 1);           // StrengthOfEarthTotem
+    totems.fieldVarint(TOTEM_AIR, 1);             // GraceOfAirTotem
+    totems.fieldVarint(TOTEM_FIRE, 1);            // MagmaTotem
+    totems.fieldVarint(TOTEM_WATER, 1);           // ManaSpringTotem
+    totems.fieldVarint(TOTEM_TWIST_WINDFURY, 1);  // true
+    totems.fieldVarint(TOTEM_TWIST_FIRE_NOVA, 1); // true
+    totems.fieldVarint(TOTEM_WINDFURY_RANK, 5);   // rank 5
+
+    // ── EnhancementShaman_Rotation ──
+    const rotation = new ProtoWriter();
+    rotation.fieldMessage(ENHR_TOTEMS, totems);
+    rotation.fieldVarint(ENHR_PRIMARY_SHOCK, 1);       // Earth Shock
+    rotation.fieldVarint(ENHR_WEAVE_FLAME_SHOCK, 1);   // true
+
+    // ── ShamanTalents — Ele Sub: "250030502-502500210501133531151" ──
+    const enhTalents = new ProtoWriter();
+    // Elemental tree dip (25 pts)
+    enhTalents.fieldVarint(ST_CONVECTION, 2);
+    enhTalents.fieldVarint(ST_CONCUSSION, 5);
+    enhTalents.fieldVarint(ST_CALL_OF_FLAME, 3);
+    enhTalents.fieldVarint(ST_ELEMENTAL_FOCUS, 1);       // bool
+    enhTalents.fieldVarint(ST_REVERBERATION, 5);
+    enhTalents.fieldVarint(ST_IMPROVED_FIRE_TOTEMS, 1);
+    // Enhancement tree (46 pts)
+    enhTalents.fieldVarint(ST_ANCESTRAL_KNOWLEDGE, 5);
+    enhTalents.fieldVarint(ST_THUNDERING_STRIKES, 5);
+    enhTalents.fieldVarint(ST_ENHANCING_TOTEMS, 2);
+    enhTalents.fieldVarint(ST_SHAMANISTIC_FOCUS, 1);     // bool
+    enhTalents.fieldVarint(ST_FLURRY, 5);
+    enhTalents.fieldVarint(ST_IMPROVED_WEAPON_TOTEMS, 1);
+    enhTalents.fieldVarint(ST_SPIRIT_WEAPONS, 1);        // bool
+    enhTalents.fieldVarint(ST_ELEMENTAL_WEAPONS, 3);
+    enhTalents.fieldVarint(ST_MENTAL_QUICKNESS, 3);
+    enhTalents.fieldVarint(ST_WEAPON_MASTERY, 5);
+    enhTalents.fieldVarint(ST_DUAL_WIELD_SPEC, 3);
+    enhTalents.fieldVarint(ST_STORMSTRIKE, 1);           // bool
+    enhTalents.fieldVarint(ST_UNLEASHED_RAGE, 5);
+    enhTalents.fieldVarint(ST_SHAMANISTIC_RAGE, 1);      // bool
+
+    // ── EnhancementShaman_Options ──
+    const enhOptions = new ProtoWriter();
+    enhOptions.fieldVarint(ENHO_WATER_SHIELD, 1);         // true
+    enhOptions.fieldVarint(ENHO_BLOODLUST, 1);            // true
+    enhOptions.fieldVarint(ENHO_DELAY_OFFHAND_SWINGS, 1); // true
+
+    // ── EnhancementShaman spec message ──
+    const enhSpec = new ProtoWriter();
+    enhSpec.fieldMessage(ENH_ROTATION, rotation);
+    enhSpec.fieldMessage(ENH_TALENTS, enhTalents);
+    enhSpec.fieldMessage(ENH_OPTIONS, enhOptions);
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);           // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 4);            // FoodRoastedClefthoof
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);  // HastePotion
+    consumes.fieldVarint(CONS_MH_IMBUE, 9);        // ShamanWindfury
+    consumes.fieldVarint(CONS_OH_IMBUE, 9);        // ShamanWindfury
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Enh Shaman'));
+    player.fieldVarint(PLAYER_RACE, RACE_ORC);
+    player.fieldVarint(PLAYER_CLASS, CLASS_SHAMAN);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_ENH_SHAMAN, enhSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build ComputeStatsRequest ───────────────────────────────────────────────
 // ComputeStatsRequest { raid = 1 }
 // Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
@@ -2437,6 +2600,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildRogueSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runEnhShaman(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildEnhShamanSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {

@@ -544,3 +544,12 @@ async function simulateRogue(slotGroups, getActiveItemFn, weaponMode, enchantLoo
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runRogue(gearSlots, onProgress, iterations), gearSlots);
 }
+
+/**
+ * Run DPS simulation for Enhancement Shaman (Orc, DW).
+ */
+async function simulateEnhShaman(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runEnhShaman(gearSlots, onProgress, iterations), gearSlots);
+}
