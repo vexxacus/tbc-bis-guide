@@ -1056,6 +1056,7 @@
         'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
         'Druid-Balance', 'Shaman-Elemental',
+        'Priest-Holy', 'Shaman-Restoration', 'Druid-Restoration',
     ]);
 
     // weaponMode: per selectionKey() → 'dw' | '2h'

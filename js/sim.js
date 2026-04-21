@@ -393,7 +393,7 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
 
     // Retry loop: if wowsims doesn't know an item, remove it and try again.
     const unknownIds = new Set();
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 20; attempt++) {
         const slots = gearSlots.filter(s => !unknownIds.has(s.id));
         if (!slots.length) return null;
         console.log('[sim] computeStats attempt', attempt + 1, 'slots:', JSON.stringify(slots.map(s => s.id)));
@@ -406,6 +406,14 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
                 const badId = parseInt(match[1]);
                 console.warn(`[sim] item ${badId} unknown to wowsims — retrying without it`);
                 unknownIds.add(badId);
+            } else if (msg.includes('No enchant with id:')) {
+                // Unknown enchant — strip enchants and retry
+                console.warn(`[sim] unknown enchant — retrying without enchants`);
+                for (const s of gearSlots) s.enchant = 0;
+            } else if (msg.includes('unreachable') || msg.includes('RuntimeError') || msg.includes('panic')) {
+                // Generic WASM crash — try stripping enchants first, then give up
+                console.warn(`[sim] WASM crash: ${msg.substring(0, 120)} — stripping enchants and retrying`);
+                for (const s of gearSlots) s.enchant = 0;
             } else {
                 console.error('[sim] computeStats error:', msg);
                 return null;
