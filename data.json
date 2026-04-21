@@ -35975,6 +35975,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32218",
               "quality": 4,
               "isMeta": false,
@@ -36845,28 +36851,28 @@
               "name": "Chaotic Skyfire Diamond"
             },
             {
-              "itemId": "24056",
-              "quality": 3,
+              "itemId": "32215",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glowing Nightseye"
+              "name": "Glowing Shadowsong Amethyst"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             },
             {
-              "itemId": "31867",
-              "quality": 3,
+              "itemId": "32221",
+              "quality": 4,
               "isMeta": false,
-              "name": "Veiled Noble Topaz"
+              "name": "Veiled Pyrestone"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             }
           ],
           "enchants": [
@@ -37722,6 +37728,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -40553,6 +40565,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32212",
               "quality": 4,
               "isMeta": false,
@@ -41234,6 +41252,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32209",
               "quality": 4,
@@ -44241,6 +44265,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32194",
               "quality": 4,
               "isMeta": false,
@@ -45536,6 +45566,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32220",
               "quality": 4,
@@ -49113,6 +49149,12 @@
           ],
           "gems": [
             {
+              "itemId": "25897",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Bracing Earthstorm Diamond"
+            },
+            {
               "itemId": "32195",
               "quality": 4,
               "isMeta": false,
@@ -49845,10 +49887,10 @@
               "name": "Bracing Earthstorm Diamond"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             }
           ],
           "enchants": [
@@ -50687,10 +50729,10 @@
               "name": "Bracing Earthstorm Diamond"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             }
           ],
           "enchants": [
@@ -53809,6 +53851,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "33131",
               "quality": 4,
               "isMeta": false,
@@ -54979,6 +55027,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32212",
               "quality": 4,
               "isMeta": false,
@@ -55644,6 +55698,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32205",
               "quality": 4,
@@ -58789,6 +58849,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "33131",
               "quality": 4,
               "isMeta": false,
@@ -59953,6 +60019,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32212",
               "quality": 4,
               "isMeta": false,
@@ -60608,6 +60680,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32205",
               "quality": 4,
@@ -63535,6 +63613,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32194",
               "quality": 4,
               "isMeta": false,
@@ -64471,10 +64555,10 @@
               "name": "Jagged Chrysoprase"
             },
             {
-              "itemId": "24028",
-              "quality": 3,
+              "itemId": "32194",
+              "quality": 4,
               "isMeta": false,
-              "name": "Delicate Living Ruby"
+              "name": "Delicate Crimson Spinel"
             }
           ],
           "enchants": [
@@ -65155,10 +65239,10 @@
               "name": "Jagged Chrysoprase"
             },
             {
-              "itemId": "24028",
-              "quality": 3,
+              "itemId": "32194",
+              "quality": 4,
               "isMeta": false,
-              "name": "Delicate Living Ruby"
+              "name": "Delicate Crimson Spinel"
             }
           ],
           "enchants": [
@@ -68075,6 +68159,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32204",
               "quality": 4,
               "isMeta": false,
@@ -68525,10 +68615,16 @@
           ],
           "gems": [
             {
-              "itemId": "24047",
+              "itemId": "34220",
               "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
+              "itemId": "32204",
+              "quality": 4,
               "isMeta": false,
-              "name": "Brilliant Dawnstone"
+              "name": "Brilliant Lionseye"
             }
           ],
           "enchants": [
@@ -69036,6 +69132,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "32196",
               "quality": 4,
@@ -72670,6 +72772,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "25893",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Mystical Skyfire Diamond"
+            },
             {
               "itemId": "35488",
               "quality": 4,
@@ -76649,10 +76757,16 @@
           ],
           "gems": [
             {
-              "itemId": "24030",
+              "itemId": "34220",
               "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             }
           ],
           "enchants": [
@@ -77130,6 +77244,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -80137,10 +80257,10 @@
               "name": "Bracing Earthstorm Diamond"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             }
           ],
           "enchants": [
@@ -80865,10 +80985,10 @@
               "name": "Bracing Earthstorm Diamond"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             }
           ],
           "enchants": [
@@ -84315,6 +84435,12 @@
           ],
           "gems": [
             {
+              "itemId": "25896",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Powerful Earthstorm Diamond"
+            },
+            {
               "itemId": "32196",
               "quality": 4,
               "isMeta": false,
@@ -84926,6 +85052,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "25896",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Powerful Earthstorm Diamond"
+            },
             {
               "itemId": "32210",
               "quality": 4,
@@ -85586,6 +85718,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "25896",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Powerful Earthstorm Diamond"
+            },
             {
               "itemId": "35488",
               "quality": 4,
@@ -87963,6 +88101,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32193",
               "quality": 4,
               "isMeta": false,
@@ -88681,22 +88825,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24054",
-              "quality": 3,
+              "itemId": "32211",
+              "quality": 4,
               "isMeta": false,
-              "name": "Sovereign Nightseye"
+              "name": "Sovereign Shadowsong Amethyst"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             },
             {
-              "itemId": "24027",
-              "quality": 3,
+              "itemId": "32193",
+              "quality": 4,
               "isMeta": false,
-              "name": "Bold Living Ruby"
+              "name": "Bold Crimson Spinel"
             }
           ],
           "enchants": [
@@ -89595,22 +89739,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24054",
-              "quality": 3,
+              "itemId": "32211",
+              "quality": 4,
               "isMeta": false,
-              "name": "Sovereign Nightseye"
+              "name": "Sovereign Shadowsong Amethyst"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             },
             {
-              "itemId": "24027",
-              "quality": 3,
+              "itemId": "32193",
+              "quality": 4,
               "isMeta": false,
-              "name": "Bold Living Ruby"
+              "name": "Bold Crimson Spinel"
             }
           ],
           "enchants": [
@@ -91857,6 +92001,12 @@
           ],
           "gems": [
             {
+              "itemId": "25901",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Insightful Earthstorm Diamond"
+            },
+            {
               "itemId": "32219",
               "quality": 4,
               "isMeta": false,
@@ -92535,16 +92685,16 @@
               "name": "Insightful Earthstorm Diamond"
             },
             {
-              "itemId": "32836",
-              "quality": 3,
+              "itemId": "37503",
+              "quality": 4,
               "isMeta": false,
-              "name": "Purified Shadow Pearl"
+              "name": "Purified Shadowsong Amethyst"
             },
             {
-              "itemId": "24060",
-              "quality": 3,
+              "itemId": "32219",
+              "quality": 4,
               "isMeta": false,
-              "name": "Luminous Noble Topaz"
+              "name": "Luminous Pyrestone"
             }
           ],
           "enchants": [
@@ -93230,6 +93380,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "25901",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Insightful Earthstorm Diamond"
+            },
             {
               "itemId": "35489",
               "quality": 4,
@@ -95431,6 +95587,12 @@
           ],
           "gems": [
             {
+              "itemId": "25893",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Mystical Skyfire Diamond"
+            },
+            {
               "itemId": "32215",
               "quality": 4,
               "isMeta": false,
@@ -96087,16 +96249,22 @@
           ],
           "gems": [
             {
+              "itemId": "25893",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Mystical Skyfire Diamond"
+            },
+            {
               "itemId": "28118",
               "quality": 4,
               "isMeta": false,
               "name": "Runed Ornate Ruby"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             }
           ],
           "enchants": [
@@ -96845,16 +97013,22 @@
           ],
           "gems": [
             {
+              "itemId": "25893",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Mystical Skyfire Diamond"
+            },
+            {
               "itemId": "28118",
               "quality": 4,
               "isMeta": false,
               "name": "Runed Ornate Ruby"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             }
           ],
           "enchants": [
@@ -98671,6 +98845,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32206",
               "quality": 4,
               "isMeta": false,
@@ -99303,22 +99483,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24055",
-              "quality": 3,
+              "itemId": "32206",
+              "quality": 4,
               "isMeta": false,
-              "name": "Shifting Nightseye"
+              "name": "Rigid Lionseye"
             },
             {
-              "itemId": "24028",
-              "quality": 3,
+              "itemId": "32212",
+              "quality": 4,
               "isMeta": false,
-              "name": "Delicate Living Ruby"
+              "name": "Shifting Shadowsong Amethyst"
             },
             {
-              "itemId": "24061",
-              "quality": 3,
+              "itemId": "32220",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glinting Noble Topaz"
+              "name": "Glinting Pyrestone"
             }
           ],
           "enchants": [
@@ -99803,22 +99983,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24055",
-              "quality": 3,
+              "itemId": "32206",
+              "quality": 4,
               "isMeta": false,
-              "name": "Shifting Nightseye"
+              "name": "Rigid Lionseye"
             },
             {
-              "itemId": "24028",
-              "quality": 3,
+              "itemId": "32212",
+              "quality": 4,
               "isMeta": false,
-              "name": "Delicate Living Ruby"
+              "name": "Shifting Shadowsong Amethyst"
             },
             {
-              "itemId": "24061",
-              "quality": 3,
+              "itemId": "32220",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glinting Noble Topaz"
+              "name": "Glinting Pyrestone"
             }
           ],
           "enchants": [
@@ -102487,6 +102667,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32215",
               "quality": 4,
               "isMeta": false,
@@ -103453,28 +103639,28 @@
               "name": "Glowing Tanzanite"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             },
             {
-              "itemId": "31867",
-              "quality": 3,
+              "itemId": "32221",
+              "quality": 4,
               "isMeta": false,
-              "name": "Veiled Noble Topaz"
+              "name": "Veiled Pyrestone"
             },
             {
-              "itemId": "24056",
-              "quality": 3,
+              "itemId": "32215",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glowing Nightseye"
+              "name": "Glowing Shadowsong Amethyst"
             },
             {
-              "itemId": "24059",
-              "quality": 3,
+              "itemId": "32218",
+              "quality": 4,
               "isMeta": false,
-              "name": "Potent Noble Topaz"
+              "name": "Potent Pyrestone"
             }
           ],
           "enchants": [
@@ -104718,6 +104904,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -107725,6 +107917,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32193",
               "quality": 4,
               "isMeta": false,
@@ -108747,22 +108945,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24054",
-              "quality": 3,
+              "itemId": "32211",
+              "quality": 4,
               "isMeta": false,
-              "name": "Sovereign Nightseye"
+              "name": "Sovereign Shadowsong Amethyst"
             },
             {
-              "itemId": "24027",
-              "quality": 3,
+              "itemId": "32193",
+              "quality": 4,
               "isMeta": false,
-              "name": "Bold Living Ruby"
+              "name": "Bold Crimson Spinel"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             }
           ],
           "enchants": [
@@ -109957,22 +110155,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24054",
-              "quality": 3,
+              "itemId": "32211",
+              "quality": 4,
               "isMeta": false,
-              "name": "Sovereign Nightseye"
+              "name": "Sovereign Shadowsong Amethyst"
             },
             {
-              "itemId": "24027",
-              "quality": 3,
+              "itemId": "32193",
+              "quality": 4,
               "isMeta": false,
-              "name": "Bold Living Ruby"
+              "name": "Bold Crimson Spinel"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             }
           ],
           "enchants": [
@@ -113719,6 +113917,12 @@
           ],
           "gems": [
             {
+              "itemId": "25897",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Bracing Earthstorm Diamond"
+            },
+            {
               "itemId": "32219",
               "quality": 4,
               "isMeta": false,
@@ -114653,22 +114857,22 @@
               "name": "Insightful Earthstorm Diamond"
             },
             {
-              "itemId": "24057",
-              "quality": 3,
+              "itemId": "32216",
+              "quality": 4,
               "isMeta": false,
-              "name": "Royal Nightseye"
+              "name": "Royal Shadowsong Amethyst"
             },
             {
-              "itemId": "24029",
-              "quality": 3,
+              "itemId": "32195",
+              "quality": 4,
               "isMeta": false,
-              "name": "Teardrop Living Ruby"
+              "name": "Teardrop Crimson Spinel"
             },
             {
-              "itemId": "24060",
-              "quality": 3,
+              "itemId": "32219",
+              "quality": 4,
               "isMeta": false,
-              "name": "Luminous Noble Topaz"
+              "name": "Luminous Pyrestone"
             }
           ],
           "enchants": [
@@ -115934,6 +116138,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "25901",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Insightful Earthstorm Diamond"
+            },
             {
               "itemId": "35761",
               "quality": 4,
@@ -118077,6 +118287,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32218",
               "quality": 4,
               "isMeta": false,
@@ -118803,22 +119019,22 @@
               "name": "Chaotic Skyfire Diamond"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             },
             {
-              "itemId": "31867",
-              "quality": 3,
+              "itemId": "32221",
+              "quality": 4,
               "isMeta": false,
-              "name": "Veiled Noble Topaz"
+              "name": "Veiled Pyrestone"
             },
             {
-              "itemId": "24056",
-              "quality": 3,
+              "itemId": "32215",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glowing Nightseye"
+              "name": "Glowing Shadowsong Amethyst"
             }
           ],
           "enchants": [
@@ -119660,6 +119876,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -121859,6 +122081,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32215",
               "quality": 4,
               "isMeta": false,
@@ -122629,22 +122857,22 @@
               "name": "Chaotic Skyfire Diamond"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             },
             {
-              "itemId": "31867",
-              "quality": 3,
+              "itemId": "32221",
+              "quality": 4,
               "isMeta": false,
-              "name": "Veiled Noble Topaz"
+              "name": "Veiled Pyrestone"
             },
             {
-              "itemId": "24056",
-              "quality": 3,
+              "itemId": "32215",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glowing Nightseye"
+              "name": "Glowing Shadowsong Amethyst"
             }
           ],
           "enchants": [
@@ -123468,6 +123696,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -125779,6 +126013,12 @@
           ],
           "gems": [
             {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
+            {
               "itemId": "32218",
               "quality": 4,
               "isMeta": false,
@@ -126547,28 +126787,28 @@
               "name": "Chaotic Skyfire Diamond"
             },
             {
-              "itemId": "24030",
-              "quality": 3,
+              "itemId": "32196",
+              "quality": 4,
               "isMeta": false,
-              "name": "Runed Living Ruby"
+              "name": "Runed Crimson Spinel"
             },
             {
-              "itemId": "31867",
-              "quality": 3,
+              "itemId": "32221",
+              "quality": 4,
               "isMeta": false,
-              "name": "Veiled Noble Topaz"
+              "name": "Veiled Pyrestone"
             },
             {
-              "itemId": "24056",
-              "quality": 3,
+              "itemId": "32215",
+              "quality": 4,
               "isMeta": false,
-              "name": "Glowing Nightseye"
+              "name": "Glowing Shadowsong Amethyst"
             },
             {
-              "itemId": "31861",
-              "quality": 3,
+              "itemId": "32210",
+              "quality": 4,
               "isMeta": false,
-              "name": "Great Dawnstone"
+              "name": "Great Lionseye"
             }
           ],
           "enchants": [
@@ -127440,6 +127680,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "34220",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Chaotic Skyfire Diamond"
+            },
             {
               "itemId": "35760",
               "quality": 4,
@@ -129523,6 +129769,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32205",
               "quality": 4,
               "isMeta": false,
@@ -130111,22 +130363,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24048",
-              "quality": 3,
+              "itemId": "32205",
+              "quality": 4,
               "isMeta": false,
-              "name": "Smooth Dawnstone"
+              "name": "Smooth Lionseye"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             },
             {
-              "itemId": "24067",
-              "quality": 3,
+              "itemId": "32226",
+              "quality": 4,
               "isMeta": false,
-              "name": "Jagged Talasite"
+              "name": "Jagged Seaspray Emerald"
             }
           ],
           "enchants": [
@@ -130716,6 +130968,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32206",
               "quality": 4,
@@ -132895,6 +133153,12 @@
           ],
           "gems": [
             {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
+            {
               "itemId": "32205",
               "quality": 4,
               "isMeta": false,
@@ -133519,22 +133783,22 @@
               "name": "Relentless Earthstorm Diamond"
             },
             {
-              "itemId": "24048",
-              "quality": 3,
+              "itemId": "32205",
+              "quality": 4,
               "isMeta": false,
-              "name": "Smooth Dawnstone"
+              "name": "Smooth Lionseye"
             },
             {
-              "itemId": "24058",
-              "quality": 3,
+              "itemId": "32217",
+              "quality": 4,
               "isMeta": false,
-              "name": "Inscribed Noble Topaz"
+              "name": "Inscribed Pyrestone"
             },
             {
-              "itemId": "24067",
-              "quality": 3,
+              "itemId": "32226",
+              "quality": 4,
               "isMeta": false,
-              "name": "Jagged Talasite"
+              "name": "Jagged Seaspray Emerald"
             }
           ],
           "enchants": [
@@ -134172,6 +134436,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32206",
               "quality": 4,
@@ -136992,6 +137262,12 @@
             }
           ],
           "gems": [
+            {
+              "itemId": "32409",
+              "quality": 3,
+              "isMeta": true,
+              "name": "Relentless Earthstorm Diamond"
+            },
             {
               "itemId": "32226",
               "quality": 4,
