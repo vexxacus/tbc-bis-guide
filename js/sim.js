@@ -288,6 +288,25 @@ const SIM_STAT_LABELS_HUNTER = {
 const SIM_STAT_ORDER_HUNTER = [35, 2, 1, 28, 18, 19, 20, 21, 22];
 
 /**
+ * Stat labels for healer specs (Holy Priest, Holy Paladin, Resto Shaman, Resto Druid)
+ * Key stats: Health, Stamina, Intellect, Spirit, Spell Power, Healing Power,
+ *            Spell Crit, Spell Haste, MP5
+ * HealingPower=6
+ */
+const SIM_STAT_LABELS_HEALER = {
+    35: { label: 'Health',        fmt: v => Math.round(v) },
+     2: { label: 'Stamina',       fmt: v => Math.round(v) },
+     3: { label: 'Intellect',     fmt: v => Math.round(v) },
+     4: { label: 'Spirit',        fmt: v => Math.round(v) },
+     5: { label: 'Spell Power',   fmt: v => Math.round(v) },
+     6: { label: 'Healing Power', fmt: v => Math.round(v) },
+    15: { label: 'Spell Crit',    fmt: v => `${Math.round(v)} (${(v / SPELL_CRIT_RATING_PER_PCT).toFixed(2)}%)` },
+    16: { label: 'Spell Haste',   fmt: v => `${Math.round(v)} (${(v / SPELL_HASTE_RATING_PER_PCT).toFixed(2)}%)` },
+    13: { label: 'MP5',           fmt: v => Math.round(v) },
+};
+const SIM_STAT_ORDER_HEALER = [35, 2, 3, 4, 5, 6, 15, 16, 13];
+
+/**
  * Stat labels for tank specs (Bear Druid, Prot Warrior)
  * Key stats: Health, Stamina, Armor, Defense, Dodge, Parry, Block + some threat stats
  *

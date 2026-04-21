@@ -1045,6 +1045,9 @@
         'Warlock-Demonology':   'both',
         'Druid-Balance':        'both',
         'Shaman-Elemental':     'both',
+        'Priest-Holy':          'both',   // Staff or MH+OH
+        'Shaman-Restoration':   'both',   // MH+Shield or Staff
+        'Druid-Restoration':    'both',   // Staff or MH+OH
     };
 
     // Specs där user kan toggla mellan DW och 2H
@@ -2374,7 +2377,8 @@
         if (effectiveDW || effective2H) {
             const isCasterToggle = ['Mage-Fire','Mage-Frost','Mage-Arcane',
                 'Warlock-Destruction','Warlock-Affliction','Warlock-Demonology',
-                'Druid-Balance','Shaman-Elemental','Priest-Shadow'].includes(specKey);
+                'Druid-Balance','Shaman-Elemental','Priest-Shadow',
+                'Priest-Holy','Shaman-Restoration','Druid-Restoration'].includes(specKey);
             const toggleHtml = showWeaponToggle ? `
                 <div class="weapon-toggle">
                     <button class="weapon-toggle-btn${weaponMode === 'dw' ? ' active' : ''}" data-weapon-mode="dw">${isCasterToggle ? '🪄 MH + Off Hand' : '⚔️ Dual-Wield'}</button>
@@ -2521,11 +2525,11 @@
     // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
     const SIM_SUPPORTED_SPECS = new Set([
         'Warrior-Fury', 'Warrior-Arms', 'Warrior-Protection',
-        'Priest-Shadow',
+        'Priest-Shadow', 'Priest-Holy',
         'Rogue-Dps',
-        'Paladin-Retribution', 'Paladin-Protection',
-        'Shaman-Enhancement', 'Shaman-Elemental',
-        'Druid-Cat', 'Druid-Bear', 'Druid-Balance',
+        'Paladin-Retribution', 'Paladin-Protection', 'Paladin-Holy',
+        'Shaman-Enhancement', 'Shaman-Elemental', 'Shaman-Restoration',
+        'Druid-Cat', 'Druid-Bear', 'Druid-Balance', 'Druid-Restoration',
         'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
         'Hunter-BM', 'Hunter-MM', 'Hunter-Survival',
@@ -2602,16 +2606,20 @@
             'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
             'Shaman-Elemental', 'Druid-Balance']);
         const HUNTER_SPECS = new Set(['Hunter-BM', 'Hunter-MM', 'Hunter-Survival']);
+        const HEALER_SPECS = new Set(['Priest-Holy', 'Paladin-Holy', 'Shaman-Restoration', 'Druid-Restoration']);
         const isCaster = CASTER_SPECS.has(specKey);
         const isHunter = HUNTER_SPECS.has(specKey);
+        const isHealer = HEALER_SPECS.has(specKey);
         const isBear   = specKey === 'Druid-Bear';
         const isTank   = isBear || specKey === 'Warrior-Protection' || specKey === 'Paladin-Protection';
-        const labels = isCaster ? SIM_STAT_LABELS_CASTER
+        const labels = isHealer ? SIM_STAT_LABELS_HEALER
+                     : isCaster ? SIM_STAT_LABELS_CASTER
                      : isHunter ? SIM_STAT_LABELS_HUNTER
                      : isTank   ? SIM_STAT_LABELS_TANK
                      :            SIM_STAT_LABELS_MELEE;
         // Bear uses a different stat order: no block/parry, has crit-immune badge via SotF
-        const order  = isCaster ? SIM_STAT_ORDER_CASTER
+        const order  = isHealer ? SIM_STAT_ORDER_HEALER
+                     : isCaster ? SIM_STAT_ORDER_CASTER
                      : isHunter ? SIM_STAT_ORDER_HUNTER
                      : isBear   ? SIM_STAT_ORDER_TANK_BEAR
                      : isTank   ? SIM_STAT_ORDER_TANK
@@ -2642,7 +2650,7 @@
 
         // For Shadow Priest: visa hur mycket shadow power som kommer från random enchants
         let enchantNoteHtml = '';
-        if (isCaster && _lastSlotGroups) {
+        if ((isCaster || isHealer) && _lastSlotGroups) {
             let totalEnchantSP = 0;
             const enchantLines = [];
             for (const [slot, items] of Object.entries(_lastSlotGroups)) {

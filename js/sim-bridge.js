@@ -202,6 +202,17 @@ const DT_SURVIVAL_OF_THE_FITTEST   = 26;  // 3 → -6% crit chance taken (CRIT I
 const DT_LEADER_OF_THE_PACK        = 27;  // bool → aura (+5% crit)
 const DT_MANGLE                    = 30;  // bool → key ability
 
+// DruidTalents — Restoration tree
+const DT_IMP_MARK_OF_THE_WILD     = 31;  // 0-5
+const DT_FUROR                     = 32;  // 0-5
+const DT_NATURALIST                = 33;  // 0-5 → -10% GHT cast time
+const DT_NATURAL_SHAPESHIFTER      = 34;  // 0-3
+const DT_INTENSITY                 = 35;  // 0-3 → mana regen in casting
+const DT_OMEN_OF_CLARITY           = 36;  // bool → clearcasting
+const DT_NATURES_SWIFTNESS         = 37;  // bool → instant cast
+const DT_LIVING_SPIRIT             = 38;  // 0-3 → +15% spirit
+const DT_NATURAL_PERFECTION        = 39;  // 0-3 → +3% spell crit
+
 // ─── RogueTalents fields (from proto/rogue.proto) ────────────────────────────
 // Assassination tree
 const RT_MALICE                    = 2;   // 5 → +5% crit
@@ -250,6 +261,16 @@ const PAL_ARDENT_DEFENDER           = 45;  // 3 → survive killing blows
 const PAL_COMBAT_EXPERTISE          = 16;  // 5 → +10 expertise / +6% stam
 const PAL_AVENGERS_SHIELD           = 17;  // bool → pull ability
 
+// PaladinTalents — Holy tree
+const PAL_DIVINE_STRENGTH           = 1;   // 0-5 → +10% str
+const PAL_DIVINE_INTELLECT          = 2;   // 0-5 → +10% int
+const PAL_ILLUMINATION              = 34;  // 0-5 → mana return on crit
+const PAL_IMP_BLESSING_OF_WISDOM    = 4;   // 0-2 → better BoW
+const PAL_DIVINE_FAVOR              = 5;   // bool → guaranteed crit
+const PAL_HOLY_POWER                = 7;   // 0-5 → +5% holy crit
+const PAL_HOLY_GUIDANCE             = 9;   // 0-5 → 35% int → spell power
+const PAL_DIVINE_ILLUMINATION       = 10;  // bool → 50% mana cost reduction
+
 // ─── ShamanTalents fields (from proto/shaman.proto) ──────────────────────────
 // Enhancement tree
 const ST_THUNDERING_STRIKES         = 16;  // 5 → +5% melee crit
@@ -266,6 +287,13 @@ const ST_SPIRIT_WEAPONS             = 36;  // bool → -30% threat
 const ST_SHAMANISTIC_RAGE           = 35;  // bool → mana return on hit
 // Restoration dip for Enhancement
 const ST_NATURES_GUIDANCE           = 27;  // 3 → +3% hit/spell hit
+// Restoration tree — for Resto Shaman
+const ST_TOTEMIC_FOCUS              = 26;  // 0-5 → reduced totem cost
+const ST_RESTORATIVE_TOTEMS         = 28;  // 0-5 → stronger mana spring
+const ST_TIDAL_MASTERY              = 29;  // 0-5 → +5% heal/spell crit
+const ST_NATURES_SWIFTNESS_SHAM     = 30;  // bool → instant cast
+const ST_MANA_TIDE_TOTEM            = 31;  // bool → mana regen totem
+const ST_NATURES_BLESSING           = 32;  // 0-3 → +30% spell power from int
 // Player spec oneof field for Shadow Priest (from proto/api.proto)
 const PLAYER_SHADOW_PRIEST = 10;  // ShadowPriest spec field in Player oneof (proto: shadow_priest = 10)
 
@@ -306,6 +334,24 @@ const PT_SHADOW_POWER             = 28;  // 0-5
 const PT_MISERY                   = 29;  // 0-5
 const PT_VAMPIRIC_TOUCH           = 30;  // bool
 const PT_SHADOW_AFFINITY          = 32;  // 0-3
+
+// PriestTalents — Discipline tree (additional fields for Holy spec)
+const PT_MENTAL_AGILITY           = 4;   // 0-5
+const PT_MENTAL_STRENGTH          = 5;   // 0-5 → +10% max mana
+const PT_DIVINE_SPIRIT            = 6;   // bool
+const PT_IMPROVED_DIVINE_SPIRIT   = 7;   // 0-2 → 10% spirit → spell power
+const PT_FOCUSED_POWER            = 8;   // 0-2
+const PT_FORCE_OF_WILL            = 9;   // 0-5
+const PT_POWER_INFUSION           = 10;  // bool
+const PT_ENLIGHTENMENT            = 11;  // 0-3 → +6% int/stam/spirit
+
+// PriestTalents — Holy tree
+const PT_HOLY_SPECIALIZATION      = 12;  // 0-5 → +5% holy crit
+const PT_DIVINE_FURY              = 13;  // 0-5 → faster GHeal/Smite
+const PT_SEARING_LIGHT            = 15;  // 0-2
+const PT_SPIRITUAL_GUIDANCE       = 16;  // 0-5 → 25% spirit → spell power
+const PT_SURGE_OF_LIGHT           = 17;  // 0-2
+const PT_SPIRIT_OF_REDEMPTION     = 33;  // bool → +5% spirit
 
 // MageTalents fields — verified against proto/mage.proto
 const MT_ARCANE_SUBTLETY      = 1;
@@ -440,6 +486,12 @@ const ELE_SHAMAN_OPTIONS  = 3;
 const ESO_WATER_SHIELD    = 1;  // bool
 const ESO_BLOODLUST       = 2;  // bool
 
+// SmitePriest spec message field numbers (proto/priest.proto SmitePriest)
+const SMITE_ROTATION = 1;
+const SMITE_TALENTS  = 2;
+const SMITE_OPTIONS  = 3;
+const SMITE_OPT_USE_SHADOWFIEND = 1;  // bool
+
 // Shadow Priest consumes (field numbers from proto/common.proto Consumes + enum values)
 const CONS_SP_FLASK          = 38;  // enum: FlaskOfPureDeath = 3
 const CONS_SP_FOOD           = 41;  // enum: FoodBlackenedBasilisk = 1
@@ -495,6 +547,7 @@ const PLAYER_WARLOCK          = 13;  // warlock = 13
 const PLAYER_ENH_SHAMAN       = 18;  // enhancement_shaman = 18
 const PLAYER_FERAL_DRUID      = 22;  // feral_druid = 22
 const PLAYER_FERAL_TANK_DRUID = 26;  // feral_tank_druid = 26
+const PLAYER_SMITE_PRIEST     = 20;  // smite_priest = 20 (used for Holy Priest computeStats)
 
 // Consumes fields (melee — kept for warrior)
 const CONS_FLASK          = 38;  // enum: 4 = FlaskOfRelentlessAssault
@@ -1696,6 +1749,167 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_BALANCE_DRUID, balanceSpec);
 
+    } else if (specKey === 'Priest-Holy') {
+        // ── Holy Priest — uses SmitePriest proto with Holy/Disc talents ──
+        const holyTalents = new ProtoWriter();
+        // Discipline tree
+        holyTalents.fieldVarint(PT_MEDITATION,            3);  // 3/3 Meditation
+        holyTalents.fieldVarint(PT_INNER_FOCUS,           1);  // Inner Focus
+        holyTalents.fieldVarint(PT_MENTAL_AGILITY,        5);  // 5/5 Mental Agility
+        holyTalents.fieldVarint(PT_MENTAL_STRENGTH,       5);  // 5/5 Mental Strength (+10% mana)
+        holyTalents.fieldVarint(PT_DIVINE_SPIRIT,         1);  // Divine Spirit
+        holyTalents.fieldVarint(PT_IMPROVED_DIVINE_SPIRIT,2);  // 2/2 IDS → spirit → SP
+        holyTalents.fieldVarint(PT_ENLIGHTENMENT,         3);  // 3/3 → +6% int/stam/spirit
+        // Holy tree
+        holyTalents.fieldVarint(PT_HOLY_SPECIALIZATION,   5);  // 5/5 → +5% holy crit
+        holyTalents.fieldVarint(PT_DIVINE_FURY,           5);  // 5/5 → faster GHeal
+        holyTalents.fieldVarint(PT_SPIRITUAL_GUIDANCE,    5);  // 5/5 → 25% spirit → SP
+        holyTalents.fieldVarint(PT_SURGE_OF_LIGHT,        2);  // 2/2
+        holyTalents.fieldVarint(PT_SPIRIT_OF_REDEMPTION,  1);  // +5% spirit
+
+        const holyOptions = new ProtoWriter();
+        holyOptions.fieldVarint(SMITE_OPT_USE_SHADOWFIEND, 1);
+
+        const holySpec = new ProtoWriter();
+        holySpec.fieldMessageRequired(SMITE_ROTATION, new ProtoWriter());
+        holySpec.fieldMessage(SMITE_TALENTS, holyTalents);
+        holySpec.fieldMessage(SMITE_OPTIONS, holyOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath → sp flask
+        consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+        consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Holy Priest'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_PRIEST);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_SMITE_PRIEST, holySpec);
+
+    } else if (specKey === 'Paladin-Holy') {
+        // ── Holy Paladin — uses RetributionPaladin proto with Holy talents ──
+        const holyPalTalents = new ProtoWriter();
+        // Holy tree
+        holyPalTalents.fieldVarint(PAL_DIVINE_STRENGTH,      5);  // 5/5 → +10% str
+        holyPalTalents.fieldVarint(PAL_DIVINE_INTELLECT,      5);  // 5/5 → +10% int
+        holyPalTalents.fieldVarint(PAL_ILLUMINATION,          5);  // 5/5 → mana on crit
+        holyPalTalents.fieldVarint(PAL_IMP_BLESSING_OF_WISDOM,2);  // 2/2
+        holyPalTalents.fieldVarint(PAL_DIVINE_FAVOR,          1);  // Divine Favor
+        holyPalTalents.fieldVarint(PAL_HOLY_POWER,            5);  // 5/5 → +5% holy crit
+        holyPalTalents.fieldVarint(PAL_HOLY_GUIDANCE,         5);  // 5/5 → 35% int → SP
+        holyPalTalents.fieldVarint(PAL_DIVINE_ILLUMINATION,   1);  // Divine Illumination
+        // Protection dip
+        holyPalTalents.fieldVarint(PAL_PRECISION,             3);  // 3/3 → +3% hit
+
+        const retSpec = new ProtoWriter();
+        retSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        retSpec.fieldMessage(2, holyPalTalents);             // talents
+        retSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Holy Paladin'));
+        player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_PALADIN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_RET_PALADIN, retSpec);
+
+    } else if (specKey === 'Shaman-Restoration') {
+        // ── Resto Shaman — uses ElementalShaman proto with Resto talents ──
+        const restoShamTalents = new ProtoWriter();
+        // Restoration tree
+        restoShamTalents.fieldVarint(ST_TOTEMIC_FOCUS,        5);  // 5/5 → reduced totem cost
+        restoShamTalents.fieldVarint(ST_NATURES_GUIDANCE,     3);  // 3/3 → +3% hit/spell hit
+        restoShamTalents.fieldVarint(ST_RESTORATIVE_TOTEMS,   5);  // 5/5 → stronger mana spring
+        restoShamTalents.fieldVarint(ST_TIDAL_MASTERY,        5);  // 5/5 → +5% heal/spell crit
+        restoShamTalents.fieldVarint(ST_NATURES_SWIFTNESS_SHAM, 1); // NS
+        restoShamTalents.fieldVarint(ST_MANA_TIDE_TOTEM,      1);  // MTT
+        restoShamTalents.fieldVarint(ST_NATURES_BLESSING,     3);  // 3/3 → +30% SP from int
+
+        const restoShamOptions = new ProtoWriter();
+        restoShamOptions.fieldVarint(ESO_WATER_SHIELD, 1);
+
+        const restoShamSpec = new ProtoWriter();
+        restoShamSpec.fieldMessageRequired(ELE_SHAMAN_ROTATION, new ProtoWriter());
+        restoShamSpec.fieldMessage(ELE_SHAMAN_TALENTS, restoShamTalents);
+        restoShamSpec.fieldMessage(ELE_SHAMAN_OPTIONS, restoShamOptions);
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Resto Shaman'));
+        player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+        player.fieldVarint(PLAYER_CLASS, CLASS_SHAMAN);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_ELE_SHAMAN, restoShamSpec);
+
+    } else if (specKey === 'Druid-Restoration') {
+        // ── Resto Druid — uses BalanceDruid proto with Resto talents ──
+        const restoDruidTalents = new ProtoWriter();
+        // Restoration tree
+        restoDruidTalents.fieldVarint(DT_IMP_MARK_OF_THE_WILD, 5);  // 5/5
+        restoDruidTalents.fieldVarint(DT_FUROR,                 5);  // 5/5
+        restoDruidTalents.fieldVarint(DT_NATURALIST,            5);  // 5/5 → -10% GHT
+        restoDruidTalents.fieldVarint(DT_NATURAL_SHAPESHIFTER,  3);  // 3/3
+        restoDruidTalents.fieldVarint(DT_INTENSITY,             3);  // 3/3 → mana regen in casting
+        restoDruidTalents.fieldVarint(DT_OMEN_OF_CLARITY,       1);  // Clearcasting
+        restoDruidTalents.fieldVarint(DT_NATURES_SWIFTNESS,     1);  // NS
+        restoDruidTalents.fieldVarint(DT_LIVING_SPIRIT,         3);  // 3/3 → +15% spirit
+        restoDruidTalents.fieldVarint(DT_NATURAL_PERFECTION,    3);  // 3/3 → +3% crit
+
+        const restoDruidSpec = new ProtoWriter();
+        restoDruidSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
+        restoDruidSpec.fieldMessage(2, restoDruidTalents);          // talents
+        restoDruidSpec.fieldMessageRequired(3, new ProtoWriter());  // options
+
+        const consumes = new ProtoWriter();
+        consumes.fieldVarint(CONS_SP_FLASK, 3);
+        consumes.fieldVarint(CONS_SP_FOOD, 1);
+        consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);
+        consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);
+
+        const indBuffs = new ProtoWriter();
+        indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+        indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+
+        player = new ProtoWriter();
+        player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Resto Druid'));
+        player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+        player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+        player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+        player.fieldMessage(PLAYER_CONSUMES, consumes);
+        player.fieldMessage(PLAYER_BUFFS, indBuffs);
+        player.fieldMessage(PLAYER_BALANCE_DRUID, restoDruidSpec);
+
     } else {
         // ── Fury Warrior spec for ComputeStats (default) ──
         const rotation = new ProtoWriter();
@@ -1758,7 +1972,8 @@ function buildComputeStatsRequest(gearSlots, specKey) {
     const raidBuffs = new ProtoWriter();
     const isCasterSpec = ['Priest-Shadow','Mage-Fire','Mage-Frost','Mage-Arcane',
         'Warlock-Destruction','Warlock-Affliction','Warlock-Demonology',
-        'Shaman-Elemental','Druid-Balance'].includes(specKey);
+        'Shaman-Elemental','Druid-Balance',
+        'Priest-Holy','Paladin-Holy','Shaman-Restoration','Druid-Restoration'].includes(specKey);
     if (isCasterSpec) {
         raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
         raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
