@@ -161,6 +161,7 @@ const SPELL_TO_ENCHANT_ID = {
  */
 function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems) {
     const gearSlots = [];
+    const usedWsSlots = new Set();  // Track which sim slots are already filled
     const regularGems = (gems || []).filter(g => !g.isMeta).map(g => parseInt(g.itemId));
     const metaGem     = (gems || []).find(g => g.isMeta);
     const metaGemId   = metaGem ? parseInt(metaGem.itemId) : 0;
@@ -171,15 +172,22 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
         // Skip inactive weapon slots based on weapon mode
         if (weaponMode === '2h' && (bisSlot === 'Main Hand' || bisSlot === 'Off Hand')) continue;
         if (weaponMode === 'dw' && bisSlot === 'Two Hand') continue;
+        // In DW mode, skip "Weapon" if we already have "Main Hand" (avoid double MainHand)
+        if (weaponMode === 'dw' && bisSlot === 'Weapon') continue;
 
         const wsSlot = SLOT_MAP[bisSlot];
         if (!wsSlot) continue;
+
+        // Prevent duplicate sim slots (e.g. "Weapon" + "Main Hand" both → MainHand)
+        if (usedWsSlots.has(wsSlot)) continue;
 
         const item = getActiveItemFn(bisSlot, items);
         if (!item || !item.itemId) continue;
 
         const id = parseInt(item.itemId);
         if (!id) continue;
+
+        usedWsSlots.add(wsSlot);
 
         // Enchant: look up by slot, normalise "Main Hand~Off Hand" → "Main Hand"
         const slotDisplayName = bisSlot.replace(/ [12]$/, '');
