@@ -1183,7 +1183,9 @@
     // Automatically derived from the BiS item in the current phase/spec.
     // If the #1 BIS item is a Two Hand → '2h'; otherwise → 'dw'.
     // User can override per spec+phase; override is persisted in localStorage.
-    const WEAPON_MODE_DEFAULT = {};
+    const WEAPON_MODE_DEFAULT = {
+        'Paladin-Retribution': '2h',
+    };
     const weaponModeState = {};
 
     /**
@@ -1195,28 +1197,24 @@
     function getWeaponMode(slotGroups) {
         const key = selectionKey();
         if (key in weaponModeState) return weaponModeState[key];
+        // Specs with a fixed default bypass auto-detect
+        const specKey = `${state.selectedClass}-${state.selectedSpec}`;
+        if (WEAPON_MODE_DEFAULT[specKey]) return WEAPON_MODE_DEFAULT[specKey];
         // Auto-detect: if there's a Two Hand item ranked #1 (first entry), use '2h'
         if (slotGroups) {
             const twoHanders = slotGroups['Two Hand'];
             const mainHanders = slotGroups['Main Hand'];
             if (twoHanders && twoHanders.length) {
-                // Has a 2H — check if 2H or MH+OH is "first" (i.e. ranked higher / listed first)
-                // We treat whichever slot has the #1 BIS item as the preferred mode.
-                // Since data is ranked, index 0 = BIS for that slot type.
-                // If both exist, compare: does 2H exist at all? → prefer based on rank string
                 const top2H = twoHanders[0];
                 const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
-                // If no MH+OH items at all → must be 2h
                 if (!topMH) return '2h';
-                // Both exist: use rank to decide. BIS > Pre-BIS > Alt etc.
-                // Ties (both BIS) → prefer 'dw' (MH+OH gives stats from two items)
                 const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
                 const r2h = rankOrder[top2H.rank] ?? 99;
                 const rmh = rankOrder[topMH.rank] ?? 99;
-                return r2h < rmh ? '2h' : 'dw';  // strict: 2H only wins if strictly better ranked
+                return r2h < rmh ? '2h' : 'dw';
             }
         }
-        return WEAPON_MODE_DEFAULT[`${state.selectedClass}-${state.selectedSpec}`] || 'dw';
+        return 'dw';
     }
     function setWeaponMode(mode) {
         weaponModeState[selectionKey()] = mode;
