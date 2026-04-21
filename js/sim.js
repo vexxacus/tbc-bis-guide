@@ -527,3 +527,12 @@ async function simulateShadowPriest(slotGroups, getActiveItemFn, weaponMode, enc
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runShadowPriest(gearSlots, onProgress, iterations), gearSlots);
 }
+
+/**
+ * Run DPS simulation for Combat Rogue (Swords).
+ */
+async function simulateRogue(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runRogue(gearSlots, onProgress, iterations), gearSlots);
+}

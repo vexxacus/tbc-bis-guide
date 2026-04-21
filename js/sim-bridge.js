@@ -975,6 +975,123 @@ function buildShadowPriestSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for Combat Rogue (Human, Swords) ──────────────────
+
+function buildRogueSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── Rogue Rotation (Combat: Auto builder, Rupture+Shiv, maintain Expose Armor) ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(1, 1);  // maintain_expose_armor = true
+    rotation.fieldVarint(2, 1);  // use_rupture = true
+    rotation.fieldVarint(3, 1);  // builder = Auto (enum 1)
+    rotation.fieldVarint(4, 3);  // min_combo_points_for_damage_finisher = 3
+    rotation.fieldVarint(5, 1);  // use_shiv = true
+
+    // ── RogueTalents — Combat Swords 20/41/0 ──
+    const rogueTalents = new ProtoWriter();
+    // Assassination tree (20 pts)
+    rogueTalents.fieldVarint(RT_MALICE,                   5);
+    rogueTalents.fieldVarint(RT_RUTHLESSNESS,             3);
+    rogueTalents.fieldVarint(RT_MURDER,                   2);
+    rogueTalents.fieldVarint(RT_LETHALITY,                5);
+    rogueTalents.fieldVarint(RT_RELENTLESS_STRIKES,       1);
+    // Improved Expose Armor 2/2 (field 7)
+    rogueTalents.fieldVarint(7, 2);
+    // Combat tree (41 pts)
+    rogueTalents.fieldVarint(RT_IMPROVED_SINISTER_STRIKE, 2);
+    // Improved Slice and Dice 3/3 (field 19)
+    rogueTalents.fieldVarint(19, 3);
+    rogueTalents.fieldVarint(RT_PRECISION,                5);
+    rogueTalents.fieldVarint(RT_DUAL_WIELD_SPEC,          5);
+    rogueTalents.fieldVarint(RT_BLADE_FLURRY,             1);
+    rogueTalents.fieldVarint(RT_SWORD_SPEC,               5);
+    rogueTalents.fieldVarint(RT_WEAPON_EXPERTISE,         2);
+    rogueTalents.fieldVarint(RT_AGGRESSION,               3);
+    rogueTalents.fieldVarint(RT_VITALITY,                 2);
+    rogueTalents.fieldVarint(RT_ADRENALINE_RUSH,          1);
+    rogueTalents.fieldVarint(RT_COMBAT_POTENCY,           5);
+    rogueTalents.fieldVarint(RT_SURPRISE_ATTACKS,         1);
+
+    // ── Rogue Options (empty) ──
+    const rogueOptions = new ProtoWriter();
+
+    // ── Rogue spec message ──
+    const rogueSpec = new ProtoWriter();
+    rogueSpec.fieldMessage(1, rotation);
+    rogueSpec.fieldMessage(2, rogueTalents);
+    rogueSpec.fieldMessageRequired(3, rogueOptions);
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);           // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 3);            // FoodGrilledMudfish (agi)
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);  // HastePotion
+    consumes.fieldVarint(CONS_MH_IMBUE, 1);        // AdamantiteSharpeningStone
+    consumes.fieldVarint(CONS_OH_IMBUE, 10);       // RogueDeadlyPoison
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Combat Rogue'));
+    player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+    player.fieldVarint(PLAYER_CLASS, CLASS_ROGUE);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_ROGUE, rogueSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build ComputeStatsRequest ───────────────────────────────────────────────
 // ComputeStatsRequest { raid = 1 }
 // Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
@@ -2304,6 +2421,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildShadowPriestSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runRogue(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildRogueSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {

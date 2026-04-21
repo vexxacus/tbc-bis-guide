@@ -2764,12 +2764,14 @@
         'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival',
     ]);
 
-    // Specs där DPS-simulering är aktiv (Shadow Priest har bara stats, ingen sim-knapp)
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms']);
+    // Specs där DPS-simulering är aktiv
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Warrior-Arms':  'Simulation uses standard Arms Warrior rotation (Mortal Strike → Overpower priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
+        'Rogue-Dps':     'Simulation uses Combat Swords rotation (Sinister Strike → Slice and Dice / Rupture / Eviscerate). Expose Armor maintained, Blade Flurry + Adrenaline Rush on cooldown. 3 000 iterations, 300s fight, Human vs. boss-level target.',
+        'Priest-Shadow': 'Simulation uses Ideal Shadow Priest rotation (VT → MB → SW:D → MF, Devouring Plague on CD). Shadowfiend used on cooldown. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
     };
 
     const simPanel       = document.getElementById('simPanel');
@@ -2932,6 +2934,7 @@
             const specKey = `${state.selectedClass}-${state.selectedSpec}`;
             const simFn = specKey === 'Warrior-Arms'   ? simulateArmsWarrior
                         : specKey === 'Priest-Shadow'   ? simulateShadowPriest
+                        : specKey === 'Rogue-Dps'       ? simulateRogue
                         : simulateFuryWarrior;
 
             try {
