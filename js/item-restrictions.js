@@ -44,22 +44,91 @@ const ITEM_UNIQUE = new Set([
 
 // Items that can ONLY be equipped in the Main Hand (not Off Hand)
 // These should never appear as OH recommendations for any spec
+// Auto-generated from Wowhead tooltip data (inventoryType = "Main Hand")
 const ITEM_MAIN_HAND_ONLY = new Set([
-    28438,  // Dragonmaw (axe — MH only in game)
-    28439,  // Dragonstrike (axe — MH only)
-    28767,  // The Decapitator
-    29348,  // The Bladefist
-    30103,  // Fang of Vashj
-    32471,  // Shard of Azzinoth
-    32837,  // Warglaive of Azzinoth (MH version)
-    32944,  // Talon of the Phoenix
-    32946,  // Claw of Molten Fury
-    33495,  // Rage
-    34331,  // Hand of the Deceiver
+    21673,  // Silithid Claw
+    23056,  // Hammer of the Twisting Nether
+    23554,  // Eternium Runed Blade
+    23556,  // Hand of Eternity
+    24453,  // Zangartooth Shortblade
+    27512,  // The Willbreaker
+    27538,  // Lightsworn Hammer
+    27543,  // Starlight Dagger
+    27741,  // Bleeding Hollow Warhammer
+    27846,  // Claw of the Watcher
+    27868,  // Runesong Dagger
+    27899,  // Mana Wrath
+    27905,  // Greatsword of Horrid Dreams
+    27937,  // Sky Breaker
+    28216,  // Dathrohan's Ceremonial Hammer
+    28257,  // Hammer of the Penitent
+    28297,  // Gladiator's Spellblade
+    28313,  // Gladiator's Right Ripper
+    28392,  // Reflex Blades
     28432,  // Black Planar Edge
     28433,  // Wicked Edge of the Planes
-    28657,  // Fool's Bane (Main Hand only)
-    29962,  // Heartrazor
-    32236,  // Rising Tide
-    32262,  // Syphon of the Nathrezim
+    28438,  // Dragonmaw
+    28439,  // Dragonstrike
+    28522,  // Shard of the Virtuous
+    28584,  // Big Bad Wolf's Paw
+    28657,  // Fool's Bane
+    28767,  // The Decapitator
+    28770,  // Nathrezim Mindblade
+    28771,  // Light's Justice
+    28802,  // Bloodmaw Magus-Blade
+    28931,  // High Warlord's Spellblade
+    29153,  // Blade of the Archmage
+    29155,  // Stormcaller
+    29175,  // Gavel of Pure Light
+    29185,  // Continuum Blade
+    29348,  // The Bladefist
+    29353,  // Shockwave Truncheon
+    29371,  // Nexus-Claw
+    30058,  // Mallet of the Tides
+    30095,  // Fang of the Leviathan
+    30108,  // Lightfathom Scepter
+    30277,  // Ripfang Paw
+    30723,  // Talon of the Tempest
+    30787,  // Illidari-Bane Mageblade
+    30832,  // Gavel of Unearthed Secrets
+    30910,  // Tempest of Chaos
+    30918,  // Hammer of Atonement
+    31142,  // Blade of Trapped Knowledge
+    31304,  // The Essence Focuser
+    31336,  // Blade of Wizardry
+    31342,  // The Ancient Scepter of Sue-Min
+    32053,  // Merciless Gladiator's Spellblade
+    32237,  // The Maelstrom's Fury
+    32450,  // Gladiator's Gavel
+    32451,  // Gladiator's Salvation
+    32500,  // Crystal Spire of Karabor
+    32660,  // Crystalforged Sword
+    32837,  // Warglaive of Azzinoth (MH)
+    32944,  // Talon of the Phoenix
+    32946,  // Claw of Molten Fury
+    32963,  // Merciless Gladiator's Gavel
+    32964,  // Merciless Gladiator's Salvation
+    33283,  // Amani Punisher
+    33354,  // Wub's Cursed Hexblade
+    33467,  // Blade of Twisted Visions
+    33468,  // Dark Blessing
+    33495,  // Rage
+    33687,  // Vengeful Gladiator's Gavel
+    33737,  // Vengeful Gladiator's Right Ripper
+    33743,  // Vengeful Gladiator's Salvation
+    33763,  // Vengeful Gladiator's Spellblade
+    34009,  // Hammer of Judgement
+    34176,  // Reign of Misery
+    34199,  // Archon's Gavel
+    34331,  // Hand of the Deceiver
+    34335,  // Hammer of Sanctification
+    34336,  // Sunflare
+    34604,  // Jaded Crystal Dagger
+    34611,  // Cudgel of Consecration
+    34893,  // Vanir's Right Fist of Brutality
+    34895,  // Scryer's Blade of Focus
+    34896,  // Gavel of Naaru Blessings
+    35014,  // Brutal Gladiator's Gavel
+    35082,  // Brutal Gladiator's Salvation
+    35102,  // Brutal Gladiator's Spellblade
 ]);

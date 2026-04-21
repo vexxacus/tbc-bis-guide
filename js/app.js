@@ -1322,6 +1322,27 @@
     }
     backBtn.addEventListener('click', goBack);
 
+    // ─── Home link (logo + title) ────────────────────────────────────
+    const headerHomeLink = document.getElementById('headerHomeLink');
+    if (headerHomeLink) {
+        headerHomeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            state.selectedClass = null;
+            state.selectedSpec  = null;
+            state.selectedPhase = null;
+            state.isPvP         = false;
+            state.pvpKey        = null;
+            state.history       = [];
+            headerTitle.textContent = 'TBC Best in Slot';
+            headerTitle.style.color = '';
+            headerSub.textContent = 'Choose your class';
+            if (stepStaticPage) stepStaticPage.classList.add('hidden');
+            showStep(stepClass);
+            history.pushState({}, '', '/');
+            updateSeoMeta();
+        });
+    }
+
     // ─── Step 1: Class ───────────────────────────────────────────────
     document.querySelectorAll('.class-card').forEach(card => {
         card.addEventListener('click', (e) => {

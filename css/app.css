@@ -105,6 +105,21 @@ body {
     background: var(--bg-card-hover);
 }
 
+.header-home-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.header-home-link:hover .header-title h1 {
+    color: var(--accent, #e2b53a);
+}
+
 .header-title {
     flex: 1;
     min-width: 0;
