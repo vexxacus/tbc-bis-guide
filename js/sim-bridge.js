@@ -1331,7 +1331,7 @@ function buildRetPaladinSimRequest(gearSlots, iterations, randomSeed) {
 
     // ── RetributionPaladin spec message ──
     const retSpec = new ProtoWriter();
-    retSpec.fieldMessage(RET_ROTATION, rotation);
+    retSpec.fieldMessageRequired(RET_ROTATION, rotation);
     retSpec.fieldMessage(RET_TALENTS, retTalents);
     retSpec.fieldMessage(RET_OPTIONS, retOptions);
 
