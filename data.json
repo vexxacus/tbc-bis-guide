@@ -99211,6 +99211,18 @@
               "name": "Vengeful Gladiator's Shanker"
             },
             {
+              "itemId": "32838",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Warglaive of Azzinoth"
+            },
+            {
+              "itemId": "32369",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Blade of Savagery"
+            },
+            {
               "itemId": "33762",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -99227,6 +99239,12 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Shard of Azzinoth"
+            },
+            {
+              "itemId": "33734",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Vengeful Gladiator's Quickblade"
             },
             {
               "itemId": "30082",
@@ -99253,18 +99271,6 @@
               "name": "Vengeful Gladiator's Shanker"
             },
             {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "32369",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of Savagery"
-            },
-            {
               "itemId": "33756",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -99281,12 +99287,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Akil'zon's Talonblade"
-            },
-            {
-              "itemId": "33734",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Vengeful Gladiator's Quickblade"
             },
             {
               "itemId": "30865",
@@ -99735,40 +99735,10 @@
               "name": "Brutal Gladiator's Shanker"
             },
             {
-              "itemId": "34214",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Muramasa"
-            },
-            {
-              "itemId": "35101",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Brutal Gladiator's Slicer"
-            },
-            {
-              "itemId": "34329",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Crux of the Apocalypse"
-            },
-            {
-              "itemId": "35093",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Brutal Gladiator's Shanker"
-            },
-            {
               "itemId": "32838",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Warglaive of Azzinoth"
-            },
-            {
-              "itemId": "34165",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Fang of Kalecgos"
             },
             {
               "itemId": "32369",
@@ -99783,10 +99753,40 @@
               "name": "Dragonscale-Encrusted Longblade"
             },
             {
+              "itemId": "34214",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Muramasa"
+            },
+            {
+              "itemId": "35101",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Brutal Gladiator's Slicer"
+            },
+            {
               "itemId": "35072",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Brutal Gladiator's Quickblade"
+            },
+            {
+              "itemId": "34329",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Crux of the Apocalypse"
+            },
+            {
+              "itemId": "35093",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Brutal Gladiator's Shanker"
+            },
+            {
+              "itemId": "34165",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Fang of Kalecgos"
             },
             {
               "itemId": "35095",
@@ -133463,6 +133463,12 @@
               "name": "Merciless Gladiator's Slicer"
             },
             {
+              "itemId": "32838",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Warglaive of Azzinoth"
+            },
+            {
               "itemId": "33669",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -133503,12 +133509,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Merciless Gladiator's Slicer"
-            },
-            {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Warglaive of Azzinoth"
             }
           ],
           "gems": [
@@ -134129,6 +134129,12 @@
               "name": "Talon of Azshara"
             },
             {
+              "itemId": "32838",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Warglaive of Azzinoth"
+            },
+            {
               "itemId": "35101",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -134151,12 +134157,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Warglaive of Azzinoth"
             },
             {
               "itemId": "34346",
