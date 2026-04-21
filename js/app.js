@@ -52,6 +52,8 @@
         try {
             localStorage.setItem('tbc-bis-selected-items', JSON.stringify(state.selectedItems));
         } catch (_) {}
+        // Update URL with build param
+        updateUrlWithBuild();
     }
 
     /** Load persisted selections from localStorage */
@@ -62,6 +64,105 @@
         } catch (_) { state.selectedItems = {}; }
     }
     loadSelectedItems();
+
+    // ─── Share Build helpers ─────────────────────────────────────────
+
+    /** Slot name → short code for compact URL encoding */
+    const SLOT_CODES = {
+        'Head':'H','Neck':'N','Shoulder':'Sh','Back':'B','Chest':'C',
+        'Wrist':'Wr','Hands':'G','Waist':'W','Legs':'L','Feet':'F',
+        'Ring 1':'R1','Ring 2':'R2','Trinket 1':'T1','Trinket 2':'T2',
+        'Main Hand':'MH','Off Hand':'OH','Two-Hand':'2H','Ranged':'Ra',
+        'Relic':'Re','Totem':'To','Libram':'Li','Idol':'Id','Sigil':'Si',
+        'Wand':'Wa'
+    };
+    const CODE_TO_SLOT = Object.fromEntries(Object.entries(SLOT_CODES).map(([k,v])=>[v,k]));
+
+    /** Encode current overrides for the active spec+phase into a compact query string value */
+    function encodeBuild() {
+        const key = selectionKey();
+        const overrides = state.selectedItems[key];
+        if (!overrides || !Object.keys(overrides).length) return null;
+        // Format: SlotCode.ItemId~SlotCode.ItemId  (e.g. MH.28767~OH.28573)
+        const parts = [];
+        for (const [slot, itemId] of Object.entries(overrides)) {
+            const code = SLOT_CODES[slot] || slot;
+            parts.push(`${code}.${itemId}`);
+        }
+        return parts.join('~');
+    }
+
+    /** Encode filter toggles into a compact string for URL */
+    function encodeFilters() {
+        const parts = [];
+        if (state.excludedProfessions.size) {
+            // Short profession codes
+            const profCodes = { 'Blacksmithing':'bs','Jewelcrafting':'jc','Leatherworking':'lw','Tailoring':'tw','Engineering':'en','Alchemy':'al','Enchanting':'ec' };
+            const excluded = [...state.excludedProfessions].map(p => profCodes[p] || p.substring(0,2).toLowerCase()).join(',');
+            parts.push(`xp=${excluded}`);
+        }
+        if (state.hidePvpRating) parts.push('pvp=0');
+        if (state.hideWorldBoss) parts.push('wb=0');
+        return parts.join('&');
+    }
+
+    /** Decode filter params from URL search params */
+    function decodeFilters(params) {
+        const profMap = { 'bs':'Blacksmithing','jc':'Jewelcrafting','lw':'Leatherworking','tw':'Tailoring','en':'Engineering','al':'Alchemy','ec':'Enchanting' };
+        const xp = params.get('xp');
+        if (xp) {
+            state.excludedProfessions = new Set(xp.split(',').map(c => profMap[c] || c));
+            try { localStorage.setItem('tbc-bis-excluded-profs', JSON.stringify([...state.excludedProfessions])); } catch(_) {}
+        }
+        if (params.get('pvp') === '0') {
+            state.hidePvpRating = true;
+            try { localStorage.setItem('tbc-bis-hide-pvp-rating', '1'); } catch(_) {}
+        }
+        if (params.get('wb') === '0') {
+            state.hideWorldBoss = true;
+            try { localStorage.setItem('tbc-bis-hide-world-boss', '1'); } catch(_) {}
+        }
+    }
+
+    /** Decode a build string from URL and apply as overrides for the active spec+phase */
+    function decodeBuild(buildStr) {
+        if (!buildStr) return;
+        const key = selectionKey();
+        if (!state.selectedItems[key]) state.selectedItems[key] = {};
+        for (const part of buildStr.split('~')) {
+            const dot = part.indexOf('.');
+            if (dot === -1) continue;
+            const code = part.substring(0, dot);
+            const itemId = part.substring(dot + 1);
+            const slot = CODE_TO_SLOT[code] || code;
+            state.selectedItems[key][slot] = String(itemId);
+        }
+        // Persist to localStorage too
+        try { localStorage.setItem('tbc-bis-selected-items', JSON.stringify(state.selectedItems)); } catch(_) {}
+    }
+
+    /** Check if there's a ?build= param and return its value */
+    function getBuildFromUrl() {
+        const params = new URLSearchParams(location.search);
+        return params.get('build');
+    }
+
+    /** Build the full shareable URL including build overrides and filter state */
+    function buildShareUrl() {
+        const base = location.origin + buildPath();
+        const parts = [];
+        const build = encodeBuild();
+        if (build) parts.push(`build=${build}`);
+        const filters = encodeFilters();
+        if (filters) parts.push(filters);
+        return parts.length ? `${base}?${parts.join('&')}` : base;
+    }
+
+    /** Update the URL with or without build/filter params (replaceState) */
+    function updateUrlWithBuild() {
+        const url = buildShareUrl();
+        history.replaceState(history.state, '', url);
+    }
 
     // ─── SEO / URL routing ───────────────────────────────────────────
 
@@ -225,6 +326,11 @@
         if (phase === undefined) return false;
 
         state.selectedPhase = phase;
+        // Restore shared build overrides and filters from URL params
+        const urlParams = new URLSearchParams(location.search);
+        const buildParam = urlParams.get('build');
+        if (buildParam) decodeBuild(buildParam);
+        decodeFilters(urlParams);
         const phInfo = PHASE_NAMES[phase] || { label: `Phase ${phase}`, desc: '' };
         headerTitle.innerHTML = `${specEntry.spec} — ${phInfo.label}`;
         headerTitle.style.color = CLASS_META[cls].color;
@@ -700,6 +806,10 @@
     const specGrid = $('specGrid');
     const phaseTabs = $('phaseTabs');
     const phaseSwitcher = $('phaseSwitcher');
+    const shareBuildBar = $('shareBuildBar');
+    const shareBuildBtn = $('shareBuildBtn');
+    const shareResetBtn = $('shareResetBtn');
+    const shareToast    = $('shareToast');
     const slotList = $('slotList');
     const gsSummary = $('gsSummary');
     const professionFilter = $('professionFilter');
@@ -1830,6 +1940,7 @@
                     state.hidePvpRating = !state.hidePvpRating;
                     localStorage.setItem('tbc-bis-hide-pvp-rating', state.hidePvpRating ? '1' : '0');
                     renderBisList();
+                    updateUrlWithBuild();
                 });
                 return;
             }
@@ -1838,6 +1949,7 @@
                     state.hideWorldBoss = !state.hideWorldBoss;
                     localStorage.setItem('tbc-bis-hide-world-boss', state.hideWorldBoss ? '1' : '0');
                     renderBisList();
+                    updateUrlWithBuild();
                 });
                 return;
             }
@@ -1851,7 +1963,84 @@
                 // Persist
                 localStorage.setItem('tbc-bis-excluded-profs', JSON.stringify([...state.excludedProfessions]));
                 renderBisList();
+                updateUrlWithBuild();
             });
+        });
+    }
+
+    // ─── Share Build bar ────────────────────────────────────────────
+    function renderShareBar() {
+        if (!shareBuildBar) return;
+        // Show only when a phase/pvp view is active
+        if (state.selectedPhase == null && !state.isPvP) {
+            shareBuildBar.classList.add('hidden');
+            return;
+        }
+        shareBuildBar.classList.remove('hidden');
+
+        // Show reset button only if there are overrides or non-default filters
+        const key = selectionKey();
+        const overrides = state.selectedItems[key];
+        const hasOverrides = overrides && Object.keys(overrides).length > 0;
+        const hasFilters = state.excludedProfessions.size > 0 || state.hidePvpRating || state.hideWorldBoss;
+        shareResetBtn.classList.toggle('hidden', !hasOverrides && !hasFilters);
+
+        // Update share button text if there are customizations
+        const btnLabel = shareBuildBtn.querySelector('span');
+        if (btnLabel) {
+            btnLabel.textContent = (hasOverrides || hasFilters) ? 'Share Custom Build' : 'Share Build';
+        }
+    }
+
+    function showShareToast(msg) {
+        shareToast.textContent = msg || '✓ Link copied to clipboard!';
+        shareToast.classList.remove('hidden');
+        shareToast.classList.add('show');
+        clearTimeout(shareToast._timer);
+        shareToast._timer = setTimeout(() => {
+            shareToast.classList.remove('show');
+            setTimeout(() => shareToast.classList.add('hidden'), 300);
+        }, 2200);
+    }
+
+    // Wire up share button
+    if (shareBuildBtn) {
+        shareBuildBtn.addEventListener('click', () => {
+            const url = buildShareUrl();
+            navigator.clipboard.writeText(url).then(() => {
+                showShareToast('✓ Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback
+                const input = document.createElement('input');
+                input.value = url;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showShareToast('✓ Link copied to clipboard!');
+            });
+        });
+    }
+
+    // Wire up reset button
+    if (shareResetBtn) {
+        shareResetBtn.addEventListener('click', () => {
+            const key = selectionKey();
+            delete state.selectedItems[key];
+            try { localStorage.setItem('tbc-bis-selected-items', JSON.stringify(state.selectedItems)); } catch(_) {}
+            // Reset filters to defaults
+            state.excludedProfessions = new Set();
+            state.hidePvpRating = false;
+            state.hideWorldBoss = false;
+            try {
+                localStorage.removeItem('tbc-bis-excluded-profs');
+                localStorage.setItem('tbc-bis-hide-pvp-rating', '0');
+                localStorage.setItem('tbc-bis-hide-world-boss', '0');
+            } catch(_) {}
+            // Remove query params from URL
+            history.replaceState(history.state, '', buildPath());
+            renderBisList();
+            showShareToast('↺ Reset to default BiS!');
         });
     }
 
@@ -1859,6 +2048,7 @@
     function renderBisList() {
         // Render inline phase tabs
         renderPhaseSwitcher();
+        renderShareBar();
 
         const pveSpec = getPveSpecForCurrentState();
         const specData = findSpec(state.selectedClass, pveSpec);

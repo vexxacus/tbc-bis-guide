@@ -440,6 +440,82 @@ body {
     opacity: 1;
 }
 
+/* ─── Share Build Bar ─────────────────────────────────────────────── */
+.share-build-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 6px;
+    flex-wrap: wrap;
+}
+.share-build-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    background: linear-gradient(135deg, rgba(76,175,80,0.18), rgba(76,175,80,0.08));
+    border: 1px solid rgba(76,175,80,0.35);
+    border-radius: 8px;
+    color: #8fd694;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+}
+.share-build-btn:hover {
+    background: linear-gradient(135deg, rgba(76,175,80,0.30), rgba(76,175,80,0.15));
+    border-color: rgba(76,175,80,0.55);
+    color: #a8e6ac;
+}
+.share-build-btn:active { transform: scale(0.96); }
+.share-build-btn svg { flex-shrink: 0; }
+
+.share-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, rgba(244,67,54,0.12), rgba(244,67,54,0.04));
+    border: 1px solid rgba(244,67,54,0.30);
+    border-radius: 8px;
+    color: #ef9a9a;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+}
+.share-reset-btn:hover {
+    background: linear-gradient(135deg, rgba(244,67,54,0.22), rgba(244,67,54,0.10));
+    border-color: rgba(244,67,54,0.50);
+    color: #ffab91;
+}
+.share-reset-btn:active { transform: scale(0.96); }
+
+/* Toast notification */
+.share-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30,30,30,0.95);
+    border: 1px solid rgba(76,175,80,0.5);
+    color: #8fd694;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s, transform .3s;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.share-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 /* ─── GearScore Summary ──────────────────────────────────────────── */
 .gs-summary {
     display: flex;
@@ -1973,4 +2049,78 @@ a[data-wh-item]:hover {
     font-size: .85rem;
     color: rgba(255,255,255,.55);
     margin-top: 2px;
+}
+
+/* ═══ Share Build Bar ═══════════════════════════════════════════════ */
+.share-build-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 4px;
+    flex-wrap: wrap;
+}
+.share-build-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(88,101,242,.25), rgba(88,101,242,.10));
+    color: #c8cdf8;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+    white-space: nowrap;
+}
+.share-build-btn:hover {
+    background: linear-gradient(135deg, rgba(88,101,242,.45), rgba(88,101,242,.25));
+    border-color: rgba(88,101,242,.5);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(88,101,242,.25);
+}
+.share-build-btn:active { transform: scale(.97); }
+.share-build-btn svg { flex-shrink: 0; }
+
+.share-reset-btn {
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,.05);
+    color: rgba(255,255,255,.55);
+    font-size: .8rem;
+    cursor: pointer;
+    transition: all .2s ease;
+    white-space: nowrap;
+}
+.share-reset-btn:hover {
+    background: rgba(255,80,80,.15);
+    border-color: rgba(255,80,80,.3);
+    color: #ff9090;
+}
+
+/* Toast notification */
+.share-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30,200,100,.92);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .3s ease;
+    z-index: 9999;
+    box-shadow: 0 6px 20px rgba(0,0,0,.35);
+    backdrop-filter: blur(8px);
+}
+.share-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
