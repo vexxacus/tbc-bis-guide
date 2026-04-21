@@ -254,6 +254,152 @@
         if (ogDescEl)    ogDescEl.setAttribute('content', metaDesc);
         if (twTitleEl)   twTitleEl.setAttribute('content', pageTitle);
         if (twDescEl)    twDescEl.setAttribute('content', metaDesc);
+
+        // Update H1 to match the SEO-friendly page title (without "— TBC Classic" suffix)
+        if (headerTitle) {
+            const h1Text = pageTitle.replace(/\s*—\s*TBC Classic$/, '');
+            // Preserve any existing PvP tag HTML
+            const pvpTag = state.isPvP ? ' <span class="pvp-tag">PvP</span>' : '';
+            headerTitle.innerHTML = h1Text + pvpTag;
+        }
+
+        updateStructuredData(pageTitle, metaDesc, fullUrl);
+    }
+
+    // ─── JSON-LD Structured Data ─────────────────────────────────────
+
+    /**
+     * Inject/update JSON-LD structured data so Google understands each
+     * SPA "page" as a distinct entity with breadcrumbs.
+     */
+    function updateStructuredData(pageTitle, metaDesc, fullUrl) {
+        // Remove any previous structured data we injected
+        document.querySelectorAll('script[data-bis-jsonld]').forEach(el => el.remove());
+
+        const schemas = [];
+
+        // 1. WebPage schema for every page
+        schemas.push({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: pageTitle,
+            description: metaDesc,
+            url: fullUrl,
+            isPartOf: {
+                '@type': 'WebSite',
+                name: 'TBC BiS Guide',
+                url: BASE_URL + '/'
+            }
+        });
+
+        // 2. BreadcrumbList when we have class/spec/phase
+        if (state.selectedClass) {
+            const items = [];
+            let pos = 1;
+
+            items.push({
+                '@type': 'ListItem',
+                position: pos++,
+                name: 'Home',
+                item: BASE_URL + '/'
+            });
+
+            items.push({
+                '@type': 'ListItem',
+                position: pos++,
+                name: state.selectedClass,
+                item: BASE_URL + '/' + toSlug(state.selectedClass)
+            });
+
+            if (state.selectedSpec) {
+                items.push({
+                    '@type': 'ListItem',
+                    position: pos++,
+                    name: state.selectedSpec,
+                    item: BASE_URL + '/' + toSlug(state.selectedClass) + '/' + toSlug(state.selectedSpec)
+                });
+
+                if (state.isPvP) {
+                    items.push({
+                        '@type': 'ListItem',
+                        position: pos++,
+                        name: 'PvP',
+                        item: fullUrl
+                    });
+                } else if (state.selectedPhase != null) {
+                    const phInfo = PHASE_NAMES[state.selectedPhase] || { label: 'Phase ' + state.selectedPhase };
+                    items.push({
+                        '@type': 'ListItem',
+                        position: pos++,
+                        name: phInfo.label,
+                        item: fullUrl
+                    });
+                }
+            }
+
+            schemas.push({
+                '@context': 'https://schema.org',
+                '@type': 'BreadcrumbList',
+                itemListElement: items
+            });
+        }
+
+        // 3. ItemList schema for gear list pages (phase or pvp selected)
+        if (state.selectedSpec && (state.selectedPhase != null || state.isPvP)) {
+            schemas.push({
+                '@context': 'https://schema.org',
+                '@type': 'ItemList',
+                name: pageTitle,
+                description: metaDesc,
+                url: fullUrl,
+                numberOfItems: document.querySelectorAll('.bis-row').length || undefined
+            });
+        }
+
+        // 4. FAQPage schema for spec+phase pages (helps get rich results)
+        if (state.selectedSpec && state.selectedPhase != null && state.selectedClass && !state.isPvP) {
+            const cls = state.selectedClass;
+            const spec = state.selectedSpec;
+            const phInfo = PHASE_NAMES[state.selectedPhase] || { label: 'Phase ' + state.selectedPhase };
+            const ph = phInfo.label;
+            const faq = [
+                {
+                    q: 'What is BiS for ' + spec + ' ' + cls + ' in ' + ph + '?',
+                    a: metaDesc
+                },
+                {
+                    q: 'Where do I get ' + spec + ' ' + cls + ' ' + ph + ' gear?',
+                    a: 'The best gear comes from ' + (state.selectedPhase === 0
+                        ? 'dungeons, heroics, reputation vendors, and crafting.'
+                        : 'raid drops, Badge of Justice vendor, arena, and crafted items.')
+                    + ' See the full list above with item sources for each slot.'
+                },
+                {
+                    q: 'What enchants should ' + spec + ' ' + cls + ' use in ' + ph + '?',
+                    a: 'Each slot has a recommended enchant shown next to the item. Enchants are chosen based on stat weights for ' + spec + ' ' + cls + ' in TBC Classic.'
+                }
+            ];
+            schemas.push({
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: faq.map(function(f) {
+                    return {
+                        '@type': 'Question',
+                        name: f.q,
+                        acceptedAnswer: { '@type': 'Answer', text: f.a }
+                    };
+                })
+            });
+        }
+
+        // Inject all schemas
+        schemas.forEach(function(schema) {
+            var script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.setAttribute('data-bis-jsonld', '');
+            script.textContent = JSON.stringify(schema);
+            document.head.appendChild(script);
+        });
     }
 
     // ─── Spec/phase contextual descriptions ──────────────────────────
@@ -1133,7 +1279,8 @@
 
     // ─── Step 1: Class ───────────────────────────────────────────────
     document.querySelectorAll('.class-card').forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
             const cls = card.dataset.class;
             state.selectedClass = cls;
             headerTitle.textContent = cls;
@@ -1161,15 +1308,16 @@
 
         // PvE specs
         for (const spec of meta.specs) {
+            const specSlug = toSlug(spec);
             html += `
-                <button class="spec-card" data-spec="${spec}" data-pvp="false">
+                <a class="spec-card" href="/${toSlug(cls)}/${specSlug}" data-spec="${spec}" data-pvp="false">
                     <div class="spec-emoji">${specIcon(cls, spec)}</div>
                     <div class="spec-info">
                         <div class="spec-name" style="color:${meta.color}">${spec}</div>
                         <div class="spec-role">${SPEC_ROLES[spec] || 'DPS'} · PvE</div>
                     </div>
                     <div class="spec-arrow">▸</div>
-                </button>`;
+                </a>`;
         }
 
         // PvP specs — show ALL specs from scraped data, with player counts
@@ -1185,7 +1333,7 @@
                     ? `${pvp.ratingRange.min}–${pvp.ratingRange.max} rating`
                     : '';
                 html += `
-                    <button class="spec-card is-pvp" data-spec="${pvp.spec}" data-pvp="true" data-pvp-key="${pvp.key}">
+                    <a class="spec-card is-pvp" href="/${toSlug(cls)}/${toSlug(pvp.spec)}/pvp" data-spec="${pvp.spec}" data-pvp="true" data-pvp-key="${pvp.key}">
                         <div class="spec-emoji">${pvpSpecIconForSpec(cls, pvp.spec)}</div>
                         <div class="spec-info">
                             <div class="spec-name" style="color:#c41e3a">${pvp.spec} PvP</div>
@@ -1193,14 +1341,14 @@
                         </div>
                         <span class="spec-pvp-badge">PVP</span>
                         <div class="spec-arrow">▸</div>
-                    </button>`;
+                    </a>`;
             }
         } else {
             // Fallback: show single PvP entry from fallback map
             const fb = PVP_SPEC_MAP_FALLBACK[cls];
             if (fb) {
                 html += `
-                    <button class="spec-card is-pvp" data-spec="${fb.pveSpec}" data-pvp="true">
+                    <a class="spec-card is-pvp" href="/${toSlug(cls)}/${toSlug(fb.pveSpec)}/pvp" data-spec="${fb.pveSpec}" data-pvp="true">
                         <div class="spec-emoji">${pvpSpecIcon(cls)}</div>
                         <div class="spec-info">
                             <div class="spec-name" style="color:#c41e3a">${fb.label}</div>
@@ -1208,7 +1356,7 @@
                         </div>
                         <span class="spec-pvp-badge">PVP</span>
                         <div class="spec-arrow">▸</div>
-                    </button>`;
+                    </a>`;
             }
         }
 
@@ -1216,7 +1364,8 @@
         bindHintDismiss(specGrid);
 
         specGrid.querySelectorAll('.spec-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
                 state.selectedSpec = card.dataset.spec;
                 state.isPvP = card.dataset.pvp === 'true';
                 state.pvpKey = card.dataset.pvpKey || null;
@@ -1275,17 +1424,20 @@
 
         phaseHtml += phases.map(p => {
             const info = PHASE_NAMES[p] || { num: `P${p}`, label: `Phase ${p}`, desc: '' };
-            return `<button class="phase-btn" data-phase="${p}">
+            const phSlug = PHASE_TO_SLUG[p] || `phase-${p}`;
+            const phaseHref = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/${phSlug}`;
+            return `<a class="phase-btn" href="${phaseHref}" data-phase="${p}">
                 <span class="phase-num">${info.num}</span>
                 <span class="phase-label">${info.label}</span>
-            </button>`;
+            </a>`;
         }).join('');
 
         phaseTabs.innerHTML = phaseHtml;
         bindHintDismiss(phaseTabs);
 
         phaseTabs.querySelectorAll('.phase-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 state.selectedPhase = parseInt(btn.dataset.phase);
                 const info = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}`, desc: '' };
                 const pvpTag = state.isPvP ? ' <span class="pvp-tag">PvP</span>' : '';
@@ -1319,16 +1471,19 @@
         phaseSwitcher.innerHTML = phases.map(p => {
             const info = PHASE_NAMES[p] || { num: `P${p}`, label: `Phase ${p}` };
             const isActive = parseInt(p) === state.selectedPhase;
-            return `<button class="ps-tab${isActive ? ' active' : ''}" data-phase="${p}">
+            const phSlug = PHASE_TO_SLUG[p] || `phase-${p}`;
+            const phaseHref = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/${phSlug}`;
+            return `<a class="ps-tab${isActive ? ' active' : ''}" href="${phaseHref}" data-phase="${p}">
                 <span class="ps-num">${info.num}</span>
                 <span class="ps-label">${info.label}</span>
-            </button>`;
+            </a>`;
         }).join('');
 
         phaseSwitcher.classList.remove('hidden');
 
         phaseSwitcher.querySelectorAll('.ps-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
                 const newPhase = parseInt(tab.dataset.phase);
                 if (newPhase === state.selectedPhase) return;
 
@@ -1401,7 +1556,7 @@
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
                 <div class="slot-content">
-                    <div class="slot-name">${slotDisplayName}${isOverridden ? ' <span class="slot-custom-tag">Custom</span>' : ''}</div>
+                    <h2 class="slot-name">${slotDisplayName}${isOverridden ? ' <span class="slot-custom-tag">Custom</span>' : ''}</h2>
                     <div class="slot-bis-item">
                         <div class="slot-bis-name ${bisQuality}">${whItem(bis.itemId, bis.name || 'Item #'+bis.itemId, bisQuality)}</div>
                     </div>

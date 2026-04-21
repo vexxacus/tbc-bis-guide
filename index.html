@@ -21,6 +21,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
     <title>TBC Classic BiS Guide — Best in Slot for Every Class & Spec</title>
     <meta id="metaDescription" name="description" content="Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell. Includes enchants, gems, and phase-by-phase progression.">
     <meta name="google-site-verification" content="nJSmG2u_8xaBrIqzzBENf4AhZh44OvHVht6pBi_AzfA">
@@ -32,6 +38,8 @@
     <meta id="ogTitle" property="og:title" content="TBC Classic BiS Guide — Best in Slot for Every Class & Spec">
     <meta id="ogDescription" property="og:description" content="Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell.">
     <meta property="og:image" content="https://tbc-bis-guide.web.app/og-image.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
     <meta property="og:site_name" content="TBC BiS Guide">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
@@ -46,6 +54,25 @@
     <script src="https://wow.zamimg.com/js/tooltips.js"></script>
 </head>
 <body>
+    <noscript>
+        <style>.class-grid,.spec-grid,.phase-tabs,.slot-list{display:none!important}</style>
+        <div style="max-width:800px;margin:0 auto;padding:20px;color:#e0e0e0;font-family:sans-serif">
+            <h1>TBC Classic Best in Slot Guide</h1>
+            <p>Complete gear guide for every class and spec in TBC Classic — Pre-BiS through Sunwell.</p>
+            <h2>Classes</h2>
+            <ul>
+                <li><a href="/warrior">Warrior</a> — <a href="/warrior/arms/phase-1">Arms</a>, <a href="/warrior/fury/phase-1">Fury</a>, <a href="/warrior/protection/phase-1">Protection</a></li>
+                <li><a href="/paladin">Paladin</a> — <a href="/paladin/holy/phase-1">Holy</a>, <a href="/paladin/protection/phase-1">Protection</a>, <a href="/paladin/retribution/phase-1">Retribution</a></li>
+                <li><a href="/hunter">Hunter</a> — <a href="/hunter/beast-mastery/phase-1">Beast Mastery</a>, <a href="/hunter/survival/phase-1">Survival</a></li>
+                <li><a href="/rogue">Rogue</a> — <a href="/rogue/dps/phase-1">DPS</a></li>
+                <li><a href="/priest">Priest</a> — <a href="/priest/holy/phase-1">Holy</a>, <a href="/priest/shadow/phase-1">Shadow</a></li>
+                <li><a href="/shaman">Shaman</a> — <a href="/shaman/elemental/phase-1">Elemental</a>, <a href="/shaman/enhancement/phase-1">Enhancement</a>, <a href="/shaman/restoration/phase-1">Restoration</a></li>
+                <li><a href="/mage">Mage</a> — <a href="/mage/arcane/phase-1">Arcane</a>, <a href="/mage/fire/phase-1">Fire</a></li>
+                <li><a href="/warlock">Warlock</a> — <a href="/warlock/affliction/phase-1">Affliction</a>, <a href="/warlock/destruction/phase-1">Destruction</a></li>
+                <li><a href="/druid">Druid</a> — <a href="/druid/balance/phase-1">Balance</a>, <a href="/druid/bear/phase-1">Bear</a>, <a href="/druid/cat/phase-1">Cat</a>, <a href="/druid/restoration/phase-1">Restoration</a></li>
+            </ul>
+        </div>
+    </noscript>
     <div id="app">
         <!-- Header -->
         <header class="app-header">
@@ -67,42 +94,42 @@
                 <button class="ctx-hint-dismiss" data-dismiss="class-pick" aria-label="Dismiss">✕</button>
             </div>
             <div class="class-grid">
-                <button class="class-card" data-class="Warrior">
-                    <div class="class-icon warrior"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warrior.jpg" alt="Warrior"></div>
+                <a class="class-card" href="/warrior" data-class="Warrior">
+                    <div class="class-icon warrior"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warrior.jpg" alt="Warrior BiS Guide"></div>
                     <span>Warrior</span>
-                </button>
-                <button class="class-card" data-class="Paladin">
-                    <div class="class-icon paladin"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_paladin.jpg" alt="Paladin"></div>
+                </a>
+                <a class="class-card" href="/paladin" data-class="Paladin">
+                    <div class="class-icon paladin"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_paladin.jpg" alt="Paladin BiS Guide"></div>
                     <span>Paladin</span>
-                </button>
-                <button class="class-card" data-class="Hunter">
-                    <div class="class-icon hunter"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_hunter.jpg" alt="Hunter"></div>
+                </a>
+                <a class="class-card" href="/hunter" data-class="Hunter">
+                    <div class="class-icon hunter"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_hunter.jpg" alt="Hunter BiS Guide"></div>
                     <span>Hunter</span>
-                </button>
-                <button class="class-card" data-class="Rogue">
-                    <div class="class-icon rogue"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_rogue.jpg" alt="Rogue"></div>
+                </a>
+                <a class="class-card" href="/rogue" data-class="Rogue">
+                    <div class="class-icon rogue"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_rogue.jpg" alt="Rogue BiS Guide"></div>
                     <span>Rogue</span>
-                </button>
-                <button class="class-card" data-class="Priest">
-                    <div class="class-icon priest"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_priest.jpg" alt="Priest"></div>
+                </a>
+                <a class="class-card" href="/priest" data-class="Priest">
+                    <div class="class-icon priest"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_priest.jpg" alt="Priest BiS Guide"></div>
                     <span>Priest</span>
-                </button>
-                <button class="class-card" data-class="Shaman">
-                    <div class="class-icon shaman"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_shaman.jpg" alt="Shaman"></div>
+                </a>
+                <a class="class-card" href="/shaman" data-class="Shaman">
+                    <div class="class-icon shaman"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_shaman.jpg" alt="Shaman BiS Guide"></div>
                     <span>Shaman</span>
-                </button>
-                <button class="class-card" data-class="Mage">
-                    <div class="class-icon mage"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_mage.jpg" alt="Mage"></div>
+                </a>
+                <a class="class-card" href="/mage" data-class="Mage">
+                    <div class="class-icon mage"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_mage.jpg" alt="Mage BiS Guide"></div>
                     <span>Mage</span>
-                </button>
-                <button class="class-card" data-class="Warlock">
-                    <div class="class-icon warlock"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warlock.jpg" alt="Warlock"></div>
+                </a>
+                <a class="class-card" href="/warlock" data-class="Warlock">
+                    <div class="class-icon warlock"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_warlock.jpg" alt="Warlock BiS Guide"></div>
                     <span>Warlock</span>
-                </button>
-                <button class="class-card" data-class="Druid">
-                    <div class="class-icon druid"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_druid.jpg" alt="Druid"></div>
+                </a>
+                <a class="class-card" href="/druid" data-class="Druid">
+                    <div class="class-icon druid"><img src="https://wow.zamimg.com/images/wow/icons/medium/classicon_druid.jpg" alt="Druid BiS Guide"></div>
                     <span>Druid</span>
-                </button>
+                </a>
             </div>
         </section>
 
@@ -156,7 +183,7 @@
         <div class="modal-overlay hidden" id="modalOverlay">
             <div class="modal" id="itemModal">
                 <div class="modal-header">
-                    <h2 id="modalTitle">Item Name</h2>
+                    <span class="modal-title" id="modalTitle">Item Name</span>
                     <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
                 </div>
                 <div class="modal-body" id="modalBody"></div>

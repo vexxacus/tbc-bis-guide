@@ -215,6 +215,7 @@ body {
     font-size: 0.85rem;
     font-weight: 600;
     font-family: inherit;
+    text-decoration: none;
 }
 
 .class-card:active {
@@ -286,6 +287,7 @@ body {
     color: var(--text-primary);
     font-family: inherit;
     text-align: left;
+    text-decoration: none;
 }
 
 .spec-card:active { transform: scale(0.97); }
@@ -342,6 +344,7 @@ body {
     color: var(--text-primary);
     font-family: inherit;
     text-align: center;
+    text-decoration: none;
 }
 
 .phase-btn:active { transform: scale(0.95); }
@@ -390,6 +393,7 @@ body {
     font-family: inherit;
     white-space: nowrap;
     min-width: 56px;
+    text-decoration: none;
 }
 .phase-switcher .ps-tab:hover { background: var(--bg-card-hover); }
 .phase-switcher .ps-tab:active { transform: scale(0.95); }
@@ -803,6 +807,8 @@ body {
     letter-spacing: 0.8px;
     color: var(--text-muted);
     line-height: 1;
+    margin: 0;
+    font-weight: normal;
 }
 
 .slot-bis-item {
@@ -1394,7 +1400,7 @@ body {
     flex-shrink: 0;
 }
 
-.modal-header h2 {
+.modal-header .modal-title {
     font-size: 1rem;
     font-weight: 700;
     white-space: nowrap;
