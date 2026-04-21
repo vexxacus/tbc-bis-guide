@@ -553,3 +553,12 @@ async function simulateEnhShaman(slotGroups, getActiveItemFn, weaponMode, enchan
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runEnhShaman(gearSlots, onProgress, iterations), gearSlots);
 }
+
+/**
+ * Run DPS simulation for Retribution Paladin (2H).
+ */
+async function simulateRetPaladin(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runRetPaladin(gearSlots, onProgress, iterations), gearSlots);
+}

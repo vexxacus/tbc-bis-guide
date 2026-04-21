@@ -1255,6 +1255,148 @@ function buildEnhShamanSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for Retribution Paladin (Blood Elf, 2H) ──────────
+
+// RetributionPaladin message fields
+const RET_ROTATION = 1;
+const RET_TALENTS  = 2;
+const RET_OPTIONS  = 3;
+
+// RetributionPaladin_Rotation fields
+const RETR_CONSECRATION_RANK = 1;  // enum: 0=None
+const RETR_USE_EXORCISM      = 2;  // bool
+
+// RetributionPaladin_Options fields
+const RETO_JUDGEMENT               = 1;  // enum: 0=None, 1=Wisdom, 2=Crusader
+const RETO_CRUSADER_STRIKE_DELAY   = 2;  // int32 (ms)
+const RETO_HASTE_LEEWAY            = 3;  // int32 (ms)
+const RETO_DAMAGE_TAKEN_PER_SECOND = 4;  // double
+const RETO_AURA                    = 5;  // PaladinAura enum: 1=Sanctity
+
+// PaladinTalents — additional Ret fields not yet declared
+const PAL_IMPROVED_SEAL_OF_CRUSADER = 21;  // 0-3
+const PAL_SANCTITY_AURA             = 27;  // bool
+const PAL_IMPROVED_SANCTITY_AURA    = 28;  // 0-2
+const PAL_SANCTIFIED_JUDGEMENT       = 30;  // 0-2
+
+function buildRetPaladinSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── RetributionPaladin_Rotation — no consecration, no exorcism ──
+    const rotation = new ProtoWriter();
+    // consecration_rank = None (0) — default, skip
+    // use_exorcism = false — default, skip
+
+    // ── PaladinTalents — Ret w/ Kings: "5-503201-0523005130033125231051"  ──
+    // DivineStrength 5, Precision 3, BlessingOfKings, Benediction 5,
+    // ImprovedJudgement 2, ImprovedSealOfCrusader 3, Conviction 5,
+    // SealOfCommand, Crusade 3, SanctityAura, TwoHandedWeaponSpec 3,
+    // ImprovedSanctityAura 2, Vengeance 5, SanctifiedJudgement 2,
+    // SanctifiedSeals 3, Fanaticism 5, CrusaderStrike
+    const retTalents = new ProtoWriter();
+    // Holy tree
+    retTalents.fieldVarint(PAL_DIVINE_STRENGTH, 5);
+    // Protection tree
+    retTalents.fieldVarint(PAL_PRECISION, 3);
+    retTalents.fieldVarint(12, 1);  // blessing_of_kings = bool (field 12)
+    // Retribution tree
+    retTalents.fieldVarint(PAL_BENEDICTION, 5);
+    retTalents.fieldVarint(PAL_IMPROVED_JUDGEMENT, 2);
+    retTalents.fieldVarint(PAL_IMPROVED_SEAL_OF_CRUSADER, 3);
+    retTalents.fieldVarint(PAL_CONVICTION, 5);
+    retTalents.fieldVarint(PAL_SEAL_OF_COMMAND, 1);
+    retTalents.fieldVarint(PAL_CRUSADE, 3);
+    retTalents.fieldVarint(PAL_SANCTITY_AURA, 1);        // bool
+    retTalents.fieldVarint(PAL_TWO_HAND_SPEC, 3);
+    retTalents.fieldVarint(PAL_IMPROVED_SANCTITY_AURA, 2);
+    retTalents.fieldVarint(PAL_VENGEANCE, 5);
+    retTalents.fieldVarint(PAL_SANCTIFIED_JUDGEMENT, 2);
+    retTalents.fieldVarint(PAL_SANCTIFIED_SEALS, 3);
+    retTalents.fieldVarint(PAL_FANATICISM, 5);
+    retTalents.fieldVarint(PAL_CRUSADER_STRIKE, 1);       // bool
+
+    // ── RetributionPaladin_Options ──
+    const retOptions = new ProtoWriter();
+    retOptions.fieldVarint(RETO_JUDGEMENT, 2);             // Crusader
+    retOptions.fieldVarint(RETO_CRUSADER_STRIKE_DELAY, 1700);
+    retOptions.fieldVarint(RETO_HASTE_LEEWAY, 100);
+    retOptions.fieldVarint(RETO_AURA, 1);                  // SanctityAura
+
+    // ── RetributionPaladin spec message ──
+    const retSpec = new ProtoWriter();
+    retSpec.fieldMessage(RET_ROTATION, rotation);
+    retSpec.fieldMessage(RET_TALENTS, retTalents);
+    retSpec.fieldMessage(RET_OPTIONS, retOptions);
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);           // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 4);            // FoodRoastedClefthoof
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);  // HastePotion
+    consumes.fieldVarint(CONS_MH_IMBUE, 1);        // AdamantiteSharpeningStone
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Ret Paladin'));
+    player.fieldVarint(PLAYER_RACE, RACE_HUMAN);
+    player.fieldVarint(PLAYER_CLASS, CLASS_PALADIN);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_RET_PALADIN, retSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build ComputeStatsRequest ───────────────────────────────────────────────
 // ComputeStatsRequest { raid = 1 }
 // Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
@@ -2616,6 +2758,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildEnhShamanSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runRetPaladin(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildRetPaladinSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {

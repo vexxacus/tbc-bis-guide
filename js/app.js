@@ -2765,7 +2765,7 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Paladin-Retribution']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
@@ -2941,6 +2941,7 @@
                         : specKey === 'Priest-Shadow'   ? simulateShadowPriest
                         : specKey === 'Rogue-Dps'       ? simulateRogue
                         : specKey === 'Shaman-Enhancement' ? simulateEnhShaman
+                        : specKey === 'Paladin-Retribution' ? simulateRetPaladin
                         : simulateFuryWarrior;
 
             try {
