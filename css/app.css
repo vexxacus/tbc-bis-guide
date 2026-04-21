@@ -1872,3 +1872,90 @@ a[data-wh-item]:hover {
     margin-top: 2px;
     flex-wrap: wrap;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Footer
+   ═══════════════════════════════════════════════════════════════════════ */
+.site-footer {
+    margin-top: 40px;
+    padding: 20px 16px 24px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    text-align: center;
+    font-size: .78rem;
+    color: rgba(255,255,255,.4);
+    line-height: 1.6;
+}
+.footer-inner { max-width: 600px; margin: 0 auto; }
+.footer-links { margin-bottom: 6px; }
+.footer-link {
+    color: rgba(255,255,255,.55);
+    text-decoration: none;
+    transition: color .15s;
+}
+.footer-link:hover { color: var(--accent, #e8b827); }
+.footer-sep { margin: 0 6px; opacity: .4; }
+.footer-credits { margin-bottom: 4px; }
+.footer-credits a {
+    color: rgba(255,255,255,.55);
+    text-decoration: underline;
+    text-decoration-color: rgba(255,255,255,.2);
+    transition: color .15s;
+}
+.footer-credits a:hover { color: var(--accent, #e8b827); }
+.footer-copy { opacity: .6; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Static Pages (About / Privacy)
+   ═══════════════════════════════════════════════════════════════════════ */
+.static-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+    color: rgba(255,255,255,.85);
+    line-height: 1.7;
+    font-size: .95rem;
+}
+.static-page h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: #fff;
+}
+.static-page h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 24px 0 8px;
+    color: rgba(255,255,255,.9);
+}
+.static-page p { margin: 0 0 12px; }
+.static-page a {
+    color: var(--accent, #e8b827);
+    text-decoration: underline;
+    text-decoration-color: rgba(232,184,39,.3);
+}
+.static-page a:hover { text-decoration-color: var(--accent, #e8b827); }
+.static-page ul {
+    margin: 0 0 12px 20px;
+    padding: 0;
+}
+.static-page li { margin-bottom: 4px; }
+.static-page .credits-list {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+}
+.static-page .credits-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.static-page .credits-list li:last-child { border-bottom: none; }
+.static-page .credit-name {
+    font-weight: 600;
+    color: #fff;
+}
+.static-page .credit-desc {
+    display: block;
+    font-size: .85rem;
+    color: rgba(255,255,255,.55);
+    margin-top: 2px;
+}

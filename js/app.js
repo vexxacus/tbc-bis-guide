@@ -125,6 +125,12 @@
         const parts = location.pathname.replace(/^\//, '').split('/').filter(Boolean);
         if (!parts.length) return false;
 
+        // Static pages: /about, /privacy
+        if (parts[0] === 'about' || parts[0] === 'privacy') {
+            showStaticPage(parts[0]);
+            return true;
+        }
+
         const clsSlug = parts[0];
         const cls = CLASS_SLUG_MAP[clsSlug];
         if (!cls) return false;
@@ -1269,7 +1275,7 @@
 
     // ─── Navigation ──────────────────────────────────────────────────
     function showStep(el) {
-        [stepClass, stepSpec, stepPhase, stepBis].forEach(s => s.classList.add('hidden'));
+        [stepClass, stepSpec, stepPhase, stepBis, stepStaticPage].forEach(s => { if (s) s.classList.add('hidden'); });
         el.classList.remove('hidden');
         backBtn.classList.toggle('hidden', state.history.length === 0);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2948,6 +2954,132 @@
         return { Drop:'💀', Quest:'❗', Profession:'🔨', PvP:'⚔️', Vendor:'🏪', Reputation:'⭐', Badge:'🎖️' }[t] || '📦';
     }
 
+    // ─── Static Pages (About / Privacy) ─────────────────────────────
+    const stepStaticPage = $('stepStaticPage');
+    const staticPageContent = $('staticPageContent');
+
+    const STATIC_PAGES = {
+        about: {
+            title: 'About — TBC BiS Guide',
+            description: 'About TBC BiS Guide — a community-driven Best in Slot gear guide for TBC Classic.',
+            html: `
+                <h1>About TBC BiS Guide</h1>
+                <p>TBC BiS Guide is a free, community-driven tool that helps World of Warcraft: The Burning Crusade Classic players find the <strong>best in slot gear</strong> for every class, spec, and phase — from Pre-BiS dungeon gear all the way through Sunwell Plateau.</p>
+
+                <h2>What we offer</h2>
+                <ul>
+                    <li>📋 <strong>Complete BiS lists</strong> for all 9 classes and every viable spec</li>
+                    <li>💎 <strong>Gems &amp; enchants</strong> recommendations per phase</li>
+                    <li>📊 <strong>Character stats</strong> computed via wowsims WASM engine — see your stats with buffs &amp; consumables</li>
+                    <li>⚔️ <strong>DPS simulation</strong> for select specs</li>
+                    <li>🏟️ <strong>PvP gear snapshots</strong> based on real arena data</li>
+                    <li>🔄 <strong>Phase-by-phase progression</strong> from P0 Pre-BiS to P5 Sunwell</li>
+                </ul>
+
+                <h2>Credits &amp; Acknowledgements</h2>
+                <p>This project wouldn't be possible without the amazing WoW community and open-source tools:</p>
+                <ul class="credits-list">
+                    <li>
+                        <span class="credit-name"><a href="https://www.wowhead.com/tbc" target="_blank" rel="noopener">Wowhead</a></span>
+                        <span class="credit-desc">Item data, icons, and tooltips. The backbone of WoW theorycrafting.</span>
+                    </li>
+                    <li>
+                        <span class="credit-name"><a href="https://wowsims.github.io/tbc/" target="_blank" rel="noopener">wowsims / TBC</a></span>
+                        <span class="credit-desc">The open-source WoW TBC simulator. We use their WASM engine for character stats and DPS simulation.</span>
+                    </li>
+                    <li>
+                        <span class="credit-name"><a href="https://www.curseforge.com/wow/addons/atlaslootclassic" target="_blank" rel="noopener">AtlasLoot Classic</a></span>
+                        <span class="credit-desc">Community BiS lists that form the foundation of our gear recommendations.</span>
+                    </li>
+                    <li>
+                        <span class="credit-name"><a href="https://seventyupgrades.com" target="_blank" rel="noopener">Seventy Upgrades</a></span>
+                        <span class="credit-desc">Inspiration for gear planning and stat computation UX.</span>
+                    </li>
+                </ul>
+
+                <h2>Contact</h2>
+                <p>Found a bug or have a suggestion? Open an issue on <a href="https://github.com/vexxacus/tbc-bis-guide" target="_blank" rel="noopener">GitHub</a>.</p>
+            `
+        },
+        privacy: {
+            title: 'Privacy Policy — TBC BiS Guide',
+            description: 'Privacy Policy for TBC BiS Guide.',
+            html: `
+                <h1>Privacy Policy</h1>
+                <p><em>Last updated: April 2026</em></p>
+
+                <h2>Overview</h2>
+                <p>TBC BiS Guide is a free tool for the World of Warcraft community. We respect your privacy and collect minimal data.</p>
+
+                <h2>What we collect</h2>
+                <ul>
+                    <li><strong>Local storage:</strong> Your gear selections and UI preferences are saved in your browser's localStorage. This data never leaves your device.</li>
+                    <li><strong>Firebase Hosting:</strong> Our site is hosted on Firebase (Google). Standard web server logs may include your IP address, browser type, and pages visited. See <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase Privacy Policy</a>.</li>
+                </ul>
+
+                <h2>What we don't collect</h2>
+                <ul>
+                    <li>We do not use analytics or tracking cookies</li>
+                    <li>We do not collect personal information (name, email, etc.)</li>
+                    <li>We do not sell or share any data with third parties</li>
+                </ul>
+
+                <h2>Third-party services</h2>
+                <ul>
+                    <li><strong>Wowhead tooltips:</strong> We load tooltip scripts from <code>wow.zamimg.com</code>. Wowhead may set cookies — see their <a href="https://www.wowhead.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</li>
+                    <li><strong>Google Fonts:</strong> We load the Inter font from Google Fonts. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</li>
+                </ul>
+
+                <h2>Your choices</h2>
+                <p>You can clear your saved preferences at any time by clearing your browser's localStorage for this site. No account or login is required to use this tool.</p>
+
+                <h2>Changes</h2>
+                <p>We may update this policy occasionally. Changes will be reflected on this page with an updated date.</p>
+            `
+        }
+    };
+
+    function showStaticPage(page) {
+        const data = STATIC_PAGES[page];
+        if (!data) return;
+
+        // Reset main app state
+        state.selectedClass = null;
+        state.selectedSpec  = null;
+        state.selectedPhase = null;
+        state.isPvP         = false;
+
+        // Update header
+        headerTitle.textContent = 'TBC Best in Slot';
+        headerTitle.style.color = '';
+        headerSub.textContent = '';
+
+        // Hide all steps, show static page
+        [stepClass, stepSpec, stepPhase, stepBis].forEach(s => s.classList.add('hidden'));
+        staticPageContent.innerHTML = data.html;
+        stepStaticPage.classList.remove('hidden');
+
+        // Update SEO
+        document.title = data.title;
+        const metaDesc = document.getElementById('metaDescription');
+        if (metaDesc) metaDesc.setAttribute('content', data.description);
+        const canonical = document.getElementById('canonicalLink');
+        if (canonical) canonical.setAttribute('href', `https://tbc-bis-guide.web.app/${page}`);
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+    }
+
+    // Footer link clicks — SPA navigation
+    document.addEventListener('click', e => {
+        const link = e.target.closest('.footer-link[data-page]');
+        if (!link) return;
+        e.preventDefault();
+        const page = link.dataset.page;
+        history.pushState({}, '', `/${page}`);
+        showStaticPage(page);
+    });
+
     // ─── Browser back/forward (popstate) ────────────────────────────
     // When the user presses the browser's Back/Forward buttons, re-read the URL
     // and restore state accordingly.
@@ -2964,6 +3096,9 @@
         headerTitle.textContent = 'TBC Best in Slot';
         headerTitle.style.color = '';
         headerSub.textContent = 'Choose your class';
+
+        // Hide static page if it was showing
+        if (stepStaticPage) stepStaticPage.classList.add('hidden');
 
         const restored = restoreFromUrl();
         if (!restored) {
