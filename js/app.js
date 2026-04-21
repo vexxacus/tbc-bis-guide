@@ -2793,6 +2793,11 @@
         if (simDpsSection) simDpsSection.style.display = SIM_DPS_SPECS.has(specKey) ? 'block' : 'none';
         if (simDisclaimer) simDisclaimer.textContent = SIM_DISCLAIMER[specKey] || '';
 
+        // Reset DPS sim result when gear context changes (phase / class / spec switch)
+        if (simDpsResult)  simDpsResult.style.display = 'none';
+        if (simDpsProgress) simDpsProgress.style.display = 'none';
+        if (simDpsBtn)     { simDpsBtn.disabled = false; simDpsBtn.textContent = 'Simulate DPS'; }
+
         _lastSlotGroups    = slotGroups;
         _lastEnchantLookup = enchantLookup;
         _lastGems          = gems;
