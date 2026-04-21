@@ -2121,6 +2121,17 @@
             }
         }
 
+        // ── Remove Two-Hand weapons from Main Hand / Off Hand groups ──
+        if (slotGroups['Two Hand']) {
+            const twoHandIds = new Set(slotGroups['Two Hand'].map(i => String(i.itemId)));
+            for (const s of ['Main Hand', 'Off Hand']) {
+                if (slotGroups[s]) {
+                    slotGroups[s] = slotGroups[s].filter(i => !twoHandIds.has(String(i.itemId)));
+                    if (!slotGroups[s].length) delete slotGroups[s];
+                }
+            }
+        }
+
         // ── Split Ring and Trinket into two independent slots ──
         // BIS items 1 and 2 become the primary item for slot 1 and 2 respectively.
         // Remaining items are alts for both slots.
