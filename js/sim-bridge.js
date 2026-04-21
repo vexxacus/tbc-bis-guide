@@ -1541,7 +1541,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_WARLOCK, wlSpec);
 
-    } else if (specKey === 'Hunter-MM') {
+    } else if (specKey === 'Hunter-Marksmanship') {
         const hunterTalents = new ProtoWriter();
         hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
         hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);
@@ -1588,7 +1588,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_HUNTER, hunterSpec);
 
-    } else if (specKey === 'Hunter-BM') {
+    } else if (specKey === 'Hunter-Beast Mastery') {
         const hunterTalents = new ProtoWriter();
         hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
         hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);

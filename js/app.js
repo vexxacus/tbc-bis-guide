@@ -1048,6 +1048,9 @@
         'Priest-Holy':          'both',   // Staff or MH+OH
         'Shaman-Restoration':   'both',   // MH+Shield or Staff
         'Druid-Restoration':    'both',   // Staff or MH+OH
+        'Hunter-Beast Mastery':  'both',   // DW or 2H
+        'Hunter-Marksmanship':  'both',
+        'Hunter-Survival':      'both',
     };
 
     // Specs där user kan toggla mellan DW och 2H
@@ -1057,6 +1060,7 @@
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
         'Druid-Balance', 'Shaman-Elemental',
         'Priest-Holy', 'Shaman-Restoration', 'Druid-Restoration',
+        'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival',
     ]);
 
     // weaponMode: per selectionKey() → 'dw' | '2h'
@@ -1912,14 +1916,10 @@
             const allSorted = buf;
 
             const primary1 = allSorted[0];
-            // For slot 2: skip any item that is Unique AND same as primary1
-            // (you can't wear two of the same Unique ring/trinket)
-            const hasUnique = typeof ITEM_UNIQUE !== 'undefined';
-            const primary2 = allSorted.slice(1).find(i => {
-                if (!hasUnique) return true;
-                if (ITEM_UNIQUE.has(parseInt(i.itemId)) && i.itemId === primary1?.itemId) return false;
-                return true;
-            });
+            // For slot 2: always pick a DIFFERENT item than primary1.
+            // In TBC virtually all rings and trinkets are Unique-Equipped,
+            // so you can never wear two of the same.
+            const primary2 = allSorted.slice(1).find(i => i.itemId !== primary1?.itemId);
             // If no valid second item exists (e.g. only one unique ring in filtered data),
             // skip slot 2 entirely rather than showing a duplicate.
             if (!primary2) {
@@ -2230,7 +2230,7 @@
         else { showDW = hasOneHanders; show2H = has2H; } // auto
 
         // ── Weapon mode — computed early, used by both paperdoll and slot rendering ──
-        const showWeaponToggle = WEAPON_TOGGLE_SPECS.has(specKey) && hasOneHanders && has2H && !pvpSpecData;
+        const showWeaponToggle = WEAPON_TOGGLE_SPECS.has(specKey) && hasOneHanders && has2H;
         const weaponMode = showWeaponToggle ? getWeaponMode(slotGroups) : null;
         const effectiveDW = showWeaponToggle ? (weaponMode === 'dw') : showDW;
         const effective2H = showWeaponToggle ? (weaponMode === '2h') : show2H;
@@ -2533,7 +2533,7 @@
         'Druid-Cat', 'Druid-Bear', 'Druid-Balance', 'Druid-Restoration',
         'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
-        'Hunter-BM', 'Hunter-MM', 'Hunter-Survival',
+        'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival',
     ]);
 
     // Specs där DPS-simulering är aktiv (Shadow Priest har bara stats, ingen sim-knapp)
@@ -2606,7 +2606,7 @@
         const CASTER_SPECS = new Set(['Priest-Shadow', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
             'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
             'Shaman-Elemental', 'Druid-Balance']);
-        const HUNTER_SPECS = new Set(['Hunter-BM', 'Hunter-MM', 'Hunter-Survival']);
+        const HUNTER_SPECS = new Set(['Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival']);
         const HEALER_SPECS = new Set(['Priest-Holy', 'Paladin-Holy', 'Shaman-Restoration', 'Druid-Restoration']);
         const isCaster = CASTER_SPECS.has(specKey);
         const isHunter = HUNTER_SPECS.has(specKey);
