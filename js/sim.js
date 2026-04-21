@@ -393,34 +393,52 @@ async function computeStatsForBis(slotGroups, getActiveItemFn, weaponMode, encha
 
     // Retry loop: if wowsims doesn't know an item, remove it and try again.
     const unknownIds = new Set();
-    for (let attempt = 0; attempt < 20; attempt++) {
+    let enchantsStripped = false;
+    let gemsStripped = false;
+    for (let attempt = 0; attempt < 30; attempt++) {
         const slots = gearSlots.filter(s => !unknownIds.has(s.id));
         if (!slots.length) return null;
-        console.log('[sim] computeStats attempt', attempt + 1, 'slots:', JSON.stringify(slots.map(s => s.id)));
+        console.log('[sim] computeStats attempt', attempt + 1, 'slots:', slots.length, 'ids:', JSON.stringify(slots.map(s => s.id)));
         try {
             return await _simBridge.computeStats(slots, specKey);
         } catch (e) {
             const msg = e?.message || String(e);
-            const match = msg.match(/No item with id:\s*(\d+)/);
-            if (match) {
-                const badId = parseInt(match[1]);
+            const matchItem = msg.match(/No item with id:\s*(\d+)/);
+            const matchEnchant = msg.match(/No enchant with id:\s*(\d+)/);
+            const matchGem = msg.match(/No gem with id:\s*(\d+)/);
+            if (matchItem) {
+                const badId = parseInt(matchItem[1]);
                 console.warn(`[sim] item ${badId} unknown to wowsims — retrying without it`);
                 unknownIds.add(badId);
-            } else if (msg.includes('No enchant with id:')) {
-                // Unknown enchant — strip enchants and retry
-                console.warn(`[sim] unknown enchant — retrying without enchants`);
+            } else if (matchEnchant) {
+                console.warn(`[sim] unknown enchant ${matchEnchant[1]} — stripping all enchants`);
                 for (const s of gearSlots) s.enchant = 0;
+                enchantsStripped = true;
+            } else if (matchGem) {
+                console.warn(`[sim] unknown gem ${matchGem[1]} — stripping all gems`);
+                for (const s of gearSlots) s.gems = [];
+                gemsStripped = true;
             } else if (msg.includes('unreachable') || msg.includes('RuntimeError') || msg.includes('panic')) {
-                // Generic WASM crash — try stripping enchants first, then give up
-                console.warn(`[sim] WASM crash: ${msg.substring(0, 120)} — stripping enchants and retrying`);
-                for (const s of gearSlots) s.enchant = 0;
+                // Generic WASM crash — progressively strip enchants, gems, then give up
+                if (!enchantsStripped) {
+                    console.warn(`[sim] WASM crash — stripping enchants: ${msg.substring(0, 120)}`);
+                    for (const s of gearSlots) s.enchant = 0;
+                    enchantsStripped = true;
+                } else if (!gemsStripped) {
+                    console.warn(`[sim] WASM crash — stripping gems: ${msg.substring(0, 120)}`);
+                    for (const s of gearSlots) s.gems = [];
+                    gemsStripped = true;
+                } else {
+                    console.error('[sim] WASM crash after stripping enchants+gems:', msg.substring(0, 200));
+                    return null;
+                }
             } else {
                 console.error('[sim] computeStats error:', msg);
                 return null;
             }
         }
     }
-    console.error('[sim] computeStats: too many unknown items, giving up');
+    console.error('[sim] computeStats: too many retries, giving up');
     return null;
 }
 
