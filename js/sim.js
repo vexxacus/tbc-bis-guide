@@ -562,3 +562,13 @@ async function simulateRetPaladin(slotGroups, getActiveItemFn, weaponMode, encha
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runRetPaladin(gearSlots, onProgress, iterations), gearSlots);
 }
+
+/**
+ * Run DPS simulation for Feral Druid (Cat).
+ * Cat always uses 2H (staff/polearm equipped as 2H weapon).
+ */
+async function simulateFeralDruid(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, '2h', enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runFeralCat(gearSlots, onProgress, iterations), gearSlots);
+}

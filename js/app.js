@@ -2763,13 +2763,14 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Paladin-Retribution']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Paladin-Retribution', 'Druid-Cat']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Warrior-Arms':  'Simulation uses standard Arms Warrior rotation (Mortal Strike → Overpower priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Rogue-Dps':     'Simulation uses Combat Swords rotation (Sinister Strike → Slice and Dice / Rupture / Eviscerate). Expose Armor maintained, Blade Flurry + Adrenaline Rush on cooldown. 3 000 iterations, 300s fight, Human vs. boss-level target.',
         'Priest-Shadow': 'Simulation uses Ideal Shadow Priest rotation (VT → MB → SW:D → MF, Devouring Plague on CD). Shadowfiend used on cooldown. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
+        'Druid-Cat':     'Simulation uses Feral Cat rotation (Mangle → Shred → Rip/Bite weave, Rake maintained). Omen of Clarity procs, Faerie Fire maintained. 3 000 iterations, 300s fight, Tauren vs. boss-level target.',
     };
 
     const simPanel       = document.getElementById('simPanel');
@@ -2940,6 +2941,7 @@
                         : specKey === 'Rogue-Dps'       ? simulateRogue
                         : specKey === 'Shaman-Enhancement' ? simulateEnhShaman
                         : specKey === 'Paladin-Retribution' ? simulateRetPaladin
+                        : specKey === 'Druid-Cat'       ? simulateFeralDruid
                         : simulateFuryWarrior;
 
             try {

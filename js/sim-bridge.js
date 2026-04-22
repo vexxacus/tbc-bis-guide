@@ -199,8 +199,13 @@ const DT_PREDATORY_STRIKES         = 21;  // 3
 const DT_PRIMAL_FURY               = 22;  // 2 → extra combo point on crit
 const DT_HEART_OF_THE_WILD         = 25;  // 5 → +20% stam in bear form
 const DT_SURVIVAL_OF_THE_FITTEST   = 26;  // 3 → -6% crit chance taken (CRIT IMMUNITY)
+const DT_SAVAGE_FURY                = 23;  // 2 → +20% Mangle/Claw/Rake dmg
+const DT_FAERIE_FIRE_FERAL         = 24;  // bool → feral faerie fire
 const DT_LEADER_OF_THE_PACK        = 27;  // bool → aura (+5% crit)
+const DT_IMP_LEADER_OF_THE_PACK    = 28;  // 2 → 4% heal on crit
+const DT_PREDATORY_INSTINCTS       = 29;  // 3 → +10% melee crit dmg
 const DT_MANGLE                    = 30;  // bool → key ability
+const DT_SHREDDING_ATTACKS         = 20;  // 2 → -18 energy on Shred
 
 // DruidTalents — Restoration tree
 const DT_IMP_MARK_OF_THE_WILD     = 31;  // 0-5
@@ -1397,6 +1402,140 @@ function buildRetPaladinSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build FeralDruid (Cat) DPS SimRequest ──────────────────────────────────
+
+// FeralDruid rotation fields (from proto/druid.proto)
+const FDR_FINISHING_MOVE        = 1;  // enum: 0=Rip, 1=Bite, 2=None
+const FDR_MANGLE_TRICK          = 2;  // bool
+const FDR_BITEWEAVE             = 3;  // bool
+const FDR_RIPWEAVE              = 8;  // bool
+const FDR_RIP_MIN_CP            = 5;  // int32
+const FDR_BITE_MIN_CP           = 6;  // int32
+const FDR_RAKE_TRICK            = 7;  // bool
+const FDR_MAINTAIN_FAERIE_FIRE  = 9;  // bool
+
+// FeralDruid options fields
+const FDO_INNERVATE_TARGET = 1;  // RaidTarget (skip)
+const FDO_LATENCY_MS       = 2;  // int32
+
+function buildFeralDruidSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── FeralDruid_Rotation — standard cat DPS rotation ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(FDR_FINISHING_MOVE, 0);        // Rip (primary finisher)
+    rotation.fieldVarint(FDR_MANGLE_TRICK, 1);          // mangle trick (true)
+    rotation.fieldVarint(FDR_BITEWEAVE, 1);             // biteweave (true) — weave Ferocious Bite
+    rotation.fieldVarint(FDR_RIP_MIN_CP, 5);            // 5 CP for Rip
+    rotation.fieldVarint(FDR_BITE_MIN_CP, 5);           // 5 CP for Bite
+    rotation.fieldVarint(FDR_RAKE_TRICK, 1);            // rake trick (true)
+    rotation.fieldVarint(FDR_MAINTAIN_FAERIE_FIRE, 1);  // maintain Faerie Fire (Feral)
+
+    // ── DruidTalents — Cat DPS: 0/47/14 ──
+    // Standard cat spec: full feral + Omen of Clarity + Naturalist from Resto
+    // Talent string: "-503232132322010353120300-05"
+    const catTalents = new ProtoWriter();
+    // Feral Combat tree (47 points)
+    catTalents.fieldVarint(DT_FEROCITY,                5);  // -5 energy cost
+    catTalents.fieldVarint(DT_FERAL_AGGRESSION,        0);  // skip for cat
+    catTalents.fieldVarint(DT_SHREDDING_ATTACKS,       2);  // -18 energy on Shred
+    catTalents.fieldVarint(DT_PREDATORY_STRIKES,       3);  // +150% weapon AP bonus
+    catTalents.fieldVarint(DT_PRIMAL_FURY,             2);  // extra CP on crit
+    catTalents.fieldVarint(DT_SAVAGE_FURY,             2);  // +20% Mangle/Claw/Rake dmg
+    catTalents.fieldVarint(DT_FAERIE_FIRE_FERAL,       1);  // Faerie Fire (Feral)
+    catTalents.fieldVarint(DT_SHARPENED_CLAWS,         3);  // +6% crit
+    catTalents.fieldVarint(DT_HEART_OF_THE_WILD,       5);  // +20% AP in cat
+    catTalents.fieldVarint(DT_SURVIVAL_OF_THE_FITTEST, 3);  // +3% all stats
+    catTalents.fieldVarint(DT_LEADER_OF_THE_PACK,      1);  // +5% crit aura
+    catTalents.fieldVarint(DT_IMP_LEADER_OF_THE_PACK,  2);  // 4% heal on crit
+    catTalents.fieldVarint(DT_PREDATORY_INSTINCTS,     3);  // +10% melee crit dmg
+    catTalents.fieldVarint(DT_MANGLE,                  1);  // Mangle ability
+    // Restoration tree (14 points)
+    catTalents.fieldVarint(DT_FUROR,                   5);  // +40 energy on shift
+    catTalents.fieldVarint(DT_NATURALIST,              5);  // -0.5s cast time (also +10% phys dmg in forms)
+    catTalents.fieldVarint(DT_NATURAL_SHAPESHIFTER,    1);  // reduced mana cost for shifting
+    catTalents.fieldVarint(DT_OMEN_OF_CLARITY,         1);  // Clearcasting procs
+    catTalents.fieldVarint(DT_INTENSITY,               2);  // mana regen — filler
+
+    // ── FeralDruid_Options ──
+    const feralOptions = new ProtoWriter();
+    feralOptions.fieldVarint(FDO_LATENCY_MS, 100);   // 100ms latency
+
+    // ── FeralDruid spec message ──
+    const feralSpec = new ProtoWriter();
+    feralSpec.fieldMessageRequired(1, rotation);     // rotation
+    feralSpec.fieldMessage(2, catTalents);            // talents
+    feralSpec.fieldMessage(3, feralOptions);          // options
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);           // FlaskOfRelentlessAssault (+120 AP)
+    consumes.fieldVarint(CONS_FOOD, 4);            // FoodRoastedClefthoof (+20 str, +20 spirit)
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);  // HastePotion
+    consumes.fieldVarint(CONS_MH_IMBUE, 1);        // AdamantiteSharpeningStone (only weapon imbue for feral)
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);  // Improved
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Feral Cat'));
+    player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+    player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_FERAL_DRUID, feralSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);  // Improved MotW
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);           // Improved
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    writeDouble(target, 7, 4000.0);   // armor
+    writeDouble(target, 8, 2.0);      // speed
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.2);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build ComputeStatsRequest ───────────────────────────────────────────────
 // ComputeStatsRequest { raid = 1 }
 // Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
@@ -1632,19 +1771,28 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_ENH_SHAMAN, enhSpec);
 
     } else if (specKey === 'Druid-Cat') {
-        // ── Feral Druid (Cat DPS) — BiS P1 talents ──
+        // ── Feral Druid (Cat DPS) — 0/47/14 talents ──
         // Key talents: Heart of the Wild (+20% AP in cat), Leader of the Pack, Mangle
         const catTalents = new ProtoWriter();
         catTalents.fieldVarint(DT_FEROCITY,              5);  // -5 energy cost
-        catTalents.fieldVarint(DT_FERAL_AGGRESSION,      2);  // improved demo roar
-        catTalents.fieldVarint(DT_THICK_HIDE,            3);  // +10% armor
+        catTalents.fieldVarint(DT_SHREDDING_ATTACKS,     2);  // -18 energy on Shred
         catTalents.fieldVarint(DT_SHARPENED_CLAWS,       3);  // +6% crit
         catTalents.fieldVarint(DT_PREDATORY_STRIKES,     3);  // +150% weapon bonus
         catTalents.fieldVarint(DT_PRIMAL_FURY,           2);  // extra CP on crit
+        catTalents.fieldVarint(DT_SAVAGE_FURY,           2);  // +20% Mangle/Claw/Rake dmg
+        catTalents.fieldVarint(DT_FAERIE_FIRE_FERAL,     1);  // Faerie Fire (Feral)
         catTalents.fieldVarint(DT_HEART_OF_THE_WILD,     5);  // +20% AP in cat form
         catTalents.fieldVarint(DT_SURVIVAL_OF_THE_FITTEST, 3); // +3% all stats
         catTalents.fieldVarint(DT_LEADER_OF_THE_PACK,   1);  // +5% melee crit aura
+        catTalents.fieldVarint(DT_IMP_LEADER_OF_THE_PACK, 2); // 4% heal on crit
+        catTalents.fieldVarint(DT_PREDATORY_INSTINCTS,  3);  // +10% melee crit dmg
         catTalents.fieldVarint(DT_MANGLE,                1);  // key ability
+        // Resto dip
+        catTalents.fieldVarint(DT_FUROR,                 5);  // +40 energy on shift
+        catTalents.fieldVarint(DT_NATURALIST,            5);  // +10% phys dmg
+        catTalents.fieldVarint(DT_NATURAL_SHAPESHIFTER,  1);
+        catTalents.fieldVarint(DT_OMEN_OF_CLARITY,       1);  // Clearcasting
+        catTalents.fieldVarint(DT_INTENSITY,             2);
 
         const feralSpec = new ProtoWriter();
         feralSpec.fieldMessageRequired(1, new ProtoWriter());  // rotation
@@ -2774,6 +2922,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildRetPaladinSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runFeralCat(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildFeralDruidSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {
