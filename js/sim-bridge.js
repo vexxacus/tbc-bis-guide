@@ -981,6 +981,130 @@ function buildShadowPriestSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for Balance Druid (Tauren, Starfire + Moonfire) ───
+
+function buildBalanceDruidSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── BalanceDruid Rotation — Adaptive (auto-picks best rotation) ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(1, 4);  // primary_spell = Adaptive (4)
+    rotation.fieldVarint(2, 1);  // faerie_fire = true
+    // moonfire (field 4) and insect_swarm (field 3) left to adaptive logic
+
+    // ── DruidTalents — Standard 41/0/20 Balance build ──
+    const talents = new ProtoWriter();
+    // Balance tree
+    talents.fieldVarint(1,  5);  // starlight_wrath = 5
+    talents.fieldVarint(2,  2);  // focused_starlight = 2
+    talents.fieldVarint(3,  2);  // improved_moonfire = 2
+    talents.fieldVarint(4,  3);  // brambles = 3
+    talents.fieldVarint(5,  1);  // insect_swarm (bool)
+    talents.fieldVarint(6,  5);  // vengeance = 5
+    talents.fieldVarint(7,  3);  // lunar_guidance = 3
+    talents.fieldVarint(8,  1);  // natures_grace (bool)
+    talents.fieldVarint(9,  3);  // moonglow = 3
+    talents.fieldVarint(10, 5);  // moonfury = 5
+    talents.fieldVarint(11, 2);  // balance_of_power = 2
+    talents.fieldVarint(12, 3);  // dreamstate = 3
+    talents.fieldVarint(13, 1);  // moonkin_form (bool)
+    talents.fieldVarint(14, 3);  // improved_faerie_fire = 3
+    talents.fieldVarint(15, 5);  // wrath_of_cenarius = 5
+    talents.fieldVarint(16, 1);  // force_of_nature (bool)
+    // Restoration tree
+    talents.fieldVarint(31, 5);  // improved_mark_of_the_wild = 5
+    talents.fieldVarint(32, 2);  // furor = 2
+    talents.fieldVarint(34, 3);  // natural_shapeshifter = 3
+    talents.fieldVarint(35, 3);  // intensity = 3
+
+    // ── BalanceDruid Options — self-innervate ──
+    const options = new ProtoWriter();
+    const innervateTarget = new ProtoWriter();
+    innervateTarget.fieldVarint(1, 0);  // target_index = 0 (self)
+    options.fieldMessage(1, innervateTarget);  // innervate_target
+
+    // ── BalanceDruid spec message ──
+    const balanceSpec = new ProtoWriter();
+    balanceSpec.fieldMessage(1, rotation);   // rotation
+    balanceSpec.fieldMessage(2, talents);     // talents
+    balanceSpec.fieldMessage(3, options);     // options
+
+    // ── Consumes (caster) ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath = 3 (or BlindingLight)
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // FoodBlackenedBasilisk = 1
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion = 2
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // WeaponImbueSuperiorWizardOil = 4
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);      // true
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);     // Improved Blessing of Wisdom
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);  // true
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Balance Druid'));
+    player.fieldVarint(PLAYER_RACE, RACE_TAUREN);
+    player.fieldVarint(PLAYER_CLASS, CLASS_DRUID);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_BALANCE_DRUID, balanceSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    // ── Raid buffs ──
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);  // true
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);       // Improved Divine Spirit
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);   // Improved Gift of the Wild
+
+    // ── Debuffs ──
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1); // Judgement of Wisdom
+    debuffs.fieldVarint(DB_MISERY, 1);              // Misery (5% spell hit)
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);   // Curse of Elements
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);         // Improved Faerie Fire
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    // ── Target (level 73 Unknown mob type) ──
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);  // armor
+    writeDouble(target, 8, 2.0);     // armor pen
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build RaidSimRequest for Combat Rogue (Human, Swords) ──────────────────
 
 function buildRogueSimRequest(gearSlots, iterations, randomSeed) {
@@ -2288,24 +2412,33 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
     } else if (specKey === 'Druid-Balance') {
         const druidTalents = new ProtoWriter();
-        // Balance tree field numbers (from proto/druid.proto BalanceDruidTalents)
-        druidTalents.fieldVarint(4,  5);  // focused_starlight
-        druidTalents.fieldVarint(5,  5);  // improved_starfire
-        druidTalents.fieldVarint(6,  1);  // insect_swarm (bool)
-        druidTalents.fieldVarint(9,  5);  // vengeance
-        druidTalents.fieldVarint(10, 3);  // lunar_guidance
-        druidTalents.fieldVarint(11, 5);  // starlight_wrath
-        druidTalents.fieldVarint(14, 3);  // celestial_focus
-        druidTalents.fieldVarint(15, 5);  // moonfury
-        druidTalents.fieldVarint(16, 2);  // balance_of_power
-        druidTalents.fieldVarint(17, 1);  // moonkin_form (bool)
-        druidTalents.fieldVarint(18, 5);  // empowered_starfire
-        druidTalents.fieldVarint(20, 5);  // wrath_of_cenarius
+        // Balance tree (field numbers from proto/druid.proto DruidTalents)
+        druidTalents.fieldVarint(1,  5);  // starlight_wrath = 5
+        druidTalents.fieldVarint(2,  2);  // focused_starlight = 2
+        druidTalents.fieldVarint(3,  2);  // improved_moonfire = 2
+        druidTalents.fieldVarint(4,  3);  // brambles = 3
+        druidTalents.fieldVarint(5,  1);  // insect_swarm (bool)
+        druidTalents.fieldVarint(6,  5);  // vengeance = 5
+        druidTalents.fieldVarint(7,  3);  // lunar_guidance = 3
+        druidTalents.fieldVarint(8,  1);  // natures_grace (bool)
+        druidTalents.fieldVarint(9,  3);  // moonglow = 3
+        druidTalents.fieldVarint(10, 5);  // moonfury = 5
+        druidTalents.fieldVarint(11, 2);  // balance_of_power = 2
+        druidTalents.fieldVarint(12, 3);  // dreamstate = 3
+        druidTalents.fieldVarint(13, 1);  // moonkin_form (bool)
+        druidTalents.fieldVarint(14, 3);  // improved_faerie_fire = 3
+        druidTalents.fieldVarint(15, 5);  // wrath_of_cenarius = 5
+        druidTalents.fieldVarint(16, 1);  // force_of_nature (bool)
+        // Restoration tree
+        druidTalents.fieldVarint(31, 5);  // improved_mark_of_the_wild = 5
+        druidTalents.fieldVarint(32, 2);  // furor = 2
+        druidTalents.fieldVarint(34, 3);  // natural_shapeshifter = 3
+        druidTalents.fieldVarint(35, 3);  // intensity = 3
 
         const balanceSpec = new ProtoWriter();
-        balanceSpec.fieldMessageRequired(1, new ProtoWriter());
+        balanceSpec.fieldMessageRequired(1, new ProtoWriter());  // empty rotation for stats
         balanceSpec.fieldMessage(2, druidTalents);
-        balanceSpec.fieldMessageRequired(3, new ProtoWriter());
+        balanceSpec.fieldMessageRequired(3, new ProtoWriter());  // empty options for stats
 
         const consumes = new ProtoWriter();
         consumes.fieldVarint(CONS_SP_FLASK, 3);
@@ -2939,6 +3072,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildFeralDruidSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runBalanceDruid(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildBalanceDruidSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {
