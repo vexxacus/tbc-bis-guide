@@ -579,6 +579,7 @@ const RACE_ORC = 7;
 // Class enum
 const CLASS_WARRIOR = 9;
 // MobType enum
+const MOB_TYPE_UNKNOWN = 0;
 const MOB_TYPE_DEMON = 2;
 
 // ─── Double → little-endian IEEE 754 bytes ──────────────────────────────────
@@ -1514,7 +1515,7 @@ function buildFeralDruidSimRequest(gearSlots, iterations, randomSeed) {
 
     const target = new ProtoWriter();
     target.fieldVarint(TARGET_LEVEL, 73);
-    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_DEMON);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);  // neutral — no Mark of the Champion bonus
     writeDouble(target, 7, 4000.0);   // armor
     writeDouble(target, 8, 2.0);      // speed
 
