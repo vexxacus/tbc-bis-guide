@@ -54,11 +54,17 @@ const SPELL_TO_ENCHANT_ID = {
     // Greater Inscription of Vengeance (+30 AP, +10 crit) — Aldor exalted
     29483: 28888,
     28888: 28888,
+    35407: 28888,   // Classic variant spellId for Greater Inscription of Vengeance
+    // Greater Inscription of the Blade (+15 agi, +20 hit) — Scryer exalted
+    28910: 28910,
     // Greater Inscription of the Orb (+12 SP, +15 spell crit) — Scryer exalted
     29467: 28909,
     28909: 28909,
+    // Might of the Scourge (+26 AP, +14 crit) — Naxx shoulder
+    29475: 23548,
+    23548: 23548,
     // Inscription of the Knight (Lesser) — fallback
-    29467: 28911,
+    // 29467: 28911,  // duplicate key removed
 
     // ── Back ──────────────────────────────────────────────────────────────────
     // Enchant Cloak - Dodge (+12 dodge) — tank cloak
@@ -97,13 +103,15 @@ const SPELL_TO_ENCHANT_ID = {
     // Enchant Gloves - Spell Strike (+15 spell hit)
     33997: 28271,
     28271: 28271,
-    // Enchant Gloves - Major Agility (+15 agi)
+    // Enchant Gloves - Major Agility / Superior Agility (+15 agi)
     34082: 33152,
     33152: 33152,
+    25080: 33152,   // Superior Agility — same effect, different spellId
 
     // ── Legs ──────────────────────────────────────────────────────────────────
     // Nethercobra Leg Armor (+50 AP, +12 crit) — DPS
     35490: 29535,
+    35488: 29535,   // Classic variant spellId
     29535: 29535,
     // Nethercleft Leg Armor (+40 stam, +12 agi) — tank/hybrid
     35495: 29536,
@@ -117,10 +125,11 @@ const SPELL_TO_ENCHANT_ID = {
 
     // ── Feet ──────────────────────────────────────────────────────────────────
     // Enchant Boots - Dexterity (+12 agi)
-    34007: 28279,
-    28279: 28279,
+    34007: 22544,
+    22544: 22544,
     // Enchant Boots - Cat's Swiftness (+6 agi + run speed)
     34008: 28279,
+    28279: 28279,
     // Enchant Boots - Fortitude (+12 stam)
     22543: 22543,
     // Enchant Boots - Boar's Speed (+9 stam + run speed)
@@ -131,6 +140,9 @@ const SPELL_TO_ENCHANT_ID = {
     // Mongoose
     27984: 22559,
     22559: 22559,
+    // Enchant 2H Weapon - Major Agility (+35 agi)
+    27977: 22556,
+    22556: 22556,
     // Executioner (Phase 4)
     42974: 33307,
     33307: 33307,
@@ -142,9 +154,12 @@ const SPELL_TO_ENCHANT_ID = {
     22560: 22560,
 
     // ── Ring ──────────────────────────────────────────────────────────────────
-    // Ring - Stats
+    // Ring - Stats (+4 all stats)
     27927: 22538,
     22538: 22538,
+    // Ring - Striking (+2 weapon damage) — great for feral druids
+    27920: 22535,
+    22535: 22535,
 };
 
 /**
