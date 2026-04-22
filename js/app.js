@@ -2756,7 +2756,7 @@
         refreshWH();
 
         // Uppdatera stats-panel om spec har sim-stöd
-        scheduleSimStats(slotGroups, enchantLookup, gems);
+        scheduleSimStats(slotGroups, enchantLookup, gemsForSim);
     }
 
     // ─── Sim Stats Panel ─────────────────────────────────────────────
@@ -2812,7 +2812,7 @@
 
         _lastSlotGroups    = slotGroups;
         _lastEnchantLookup = enchantLookup;
-        _lastGems          = gemsForSim;
+        _lastGems          = gems;
 
         clearTimeout(_simStatsDebounce);
         _simStatsDebounce = setTimeout(async () => {
