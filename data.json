@@ -34789,12 +34789,6 @@
               "name": "Idol of the Moon"
             },
             {
-              "itemId": "32963",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Merciless Gladiator's Gavel Merciless Gladiator's Spellblade"
-            },
-            {
               "itemId": "30723",
               "slot": "Main Hand",
               "rank": "BIS",
@@ -34805,6 +34799,12 @@
               "slot": "Main Hand",
               "rank": "BIS",
               "name": "Nathrezim Mindblade"
+            },
+            {
+              "itemId": "32963",
+              "slot": "Main Hand",
+              "rank": "Alt",
+              "name": "Merciless Gladiator's Gavel Merciless Gladiator's Spellblade"
             },
             {
               "itemId": "28297",
@@ -37789,18 +37789,6 @@
         "0": {
           "items": [
             {
-              "itemId": "29502",
-              "slot": "Head",
-              "rank": "BIS Mit",
-              "name": "Cobrascale Hood"
-            },
-            {
-              "itemId": "28182",
-              "slot": "Head",
-              "rank": "BIS Thrt",
-              "name": "Helm of the Claw"
-            },
-            {
               "itemId": "28224",
               "slot": "Head",
               "rank": "Alt",
@@ -37817,6 +37805,18 @@
               "slot": "Head",
               "rank": "Alt",
               "name": "Cowl of Beastly Rage"
+            },
+            {
+              "itemId": "29502",
+              "slot": "Head",
+              "rank": "BIS Mit",
+              "name": "Cobrascale Hood"
+            },
+            {
+              "itemId": "28182",
+              "slot": "Head",
+              "rank": "BIS Thrt",
+              "name": "Helm of the Claw"
             },
             {
               "itemId": "27434",
@@ -37879,18 +37879,6 @@
               "name": "Bogstrok Scale Cloak"
             },
             {
-              "itemId": "25689",
-              "slot": "Chest",
-              "rank": "BIS Mit",
-              "name": "Heavy Clefthoof Vest"
-            },
-            {
-              "itemId": "28204",
-              "slot": "Chest",
-              "rank": "BIS Thrt",
-              "name": "Tunic of Assassination"
-            },
-            {
               "itemId": "23226",
               "slot": "Chest",
               "rank": "Alt",
@@ -37907,6 +37895,18 @@
               "slot": "Chest",
               "rank": "Alt",
               "name": "Wastewalker Tunic"
+            },
+            {
+              "itemId": "25689",
+              "slot": "Chest",
+              "rank": "BIS Mit",
+              "name": "Heavy Clefthoof Vest"
+            },
+            {
+              "itemId": "28204",
+              "slot": "Chest",
+              "rank": "BIS Thrt",
+              "name": "Tunic of Assassination"
             },
             {
               "itemId": "30944",
@@ -37933,18 +37933,6 @@
               "name": "Forestheart Bracers"
             },
             {
-              "itemId": "30943",
-              "slot": "Hands",
-              "rank": "BIS Mit",
-              "name": "Verdant Gloves"
-            },
-            {
-              "itemId": "30341",
-              "slot": "Hands",
-              "rank": "BIS Thrt",
-              "name": "Flesh Handler's Gauntlets"
-            },
-            {
               "itemId": "27531",
               "slot": "Hands",
               "rank": "Alt",
@@ -37969,22 +37957,22 @@
               "name": "Cobrascale Gloves"
             },
             {
+              "itemId": "30943",
+              "slot": "Hands",
+              "rank": "BIS Mit",
+              "name": "Verdant Gloves"
+            },
+            {
+              "itemId": "30341",
+              "slot": "Hands",
+              "rank": "BIS Thrt",
+              "name": "Flesh Handler's Gauntlets"
+            },
+            {
               "itemId": "30942",
               "slot": "Waist",
               "rank": "BIS",
               "name": "Manimal's Cinch"
-            },
-            {
-              "itemId": "29264",
-              "slot": "Waist",
-              "rank": "BIS Mit",
-              "name": "Tree-Mender's Belt"
-            },
-            {
-              "itemId": "29247",
-              "slot": "Waist",
-              "rank": "BIS Thrt",
-              "name": "Girdle of the Deathdealer"
             },
             {
               "itemId": "28986",
@@ -37999,16 +37987,16 @@
               "name": "General's Leather Belt"
             },
             {
-              "itemId": "25690",
-              "slot": "Legs",
+              "itemId": "29264",
+              "slot": "Waist",
               "rank": "BIS Mit",
-              "name": "Heavy Clefthoof Leggings"
+              "name": "Tree-Mender's Belt"
             },
             {
-              "itemId": "31544",
-              "slot": "Legs",
+              "itemId": "29247",
+              "slot": "Waist",
               "rank": "BIS Thrt",
-              "name": "Clefthoof Hide Leggings"
+              "name": "Girdle of the Deathdealer"
             },
             {
               "itemId": "30941",
@@ -38035,6 +38023,18 @@
               "name": "Forestwalker Kilt"
             },
             {
+              "itemId": "25690",
+              "slot": "Legs",
+              "rank": "BIS Mit",
+              "name": "Heavy Clefthoof Leggings"
+            },
+            {
+              "itemId": "31544",
+              "slot": "Legs",
+              "rank": "BIS Thrt",
+              "name": "Clefthoof Hide Leggings"
+            },
+            {
               "itemId": "28987",
               "slot": "Feet",
               "rank": "BIS",
@@ -38045,18 +38045,6 @@
               "slot": "Feet",
               "rank": "BIS",
               "name": "General's Leather Boots"
-            },
-            {
-              "itemId": "25691",
-              "slot": "Feet",
-              "rank": "BIS Mit",
-              "name": "Heavy Clefthoof Boots"
-            },
-            {
-              "itemId": "28339",
-              "slot": "Feet",
-              "rank": "BIS Thrt",
-              "name": "Boots of the Shifting Sands"
             },
             {
               "itemId": "29248",
@@ -38081,6 +38069,18 @@
               "slot": "Feet",
               "rank": "Alt",
               "name": "Barkchip Boots"
+            },
+            {
+              "itemId": "25691",
+              "slot": "Feet",
+              "rank": "BIS Mit",
+              "name": "Heavy Clefthoof Boots"
+            },
+            {
+              "itemId": "28339",
+              "slot": "Feet",
+              "rank": "BIS Thrt",
+              "name": "Boots of the Shifting Sands"
             },
             {
               "itemId": "29815",
@@ -38167,6 +38167,24 @@
               "name": "Ravenclaw Band"
             },
             {
+              "itemId": "23836",
+              "slot": "Trinket",
+              "rank": "BIS",
+              "name": "Goblin Rocket Launcher"
+            },
+            {
+              "itemId": "23835",
+              "slot": "Trinket",
+              "rank": "BIS",
+              "name": "Gnomish Poultryizer"
+            },
+            {
+              "itemId": "27770",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Argussian Compass"
+            },
+            {
               "itemId": "23206",
               "slot": "Trinket",
               "rank": "BIS Thrt",
@@ -38183,18 +38201,6 @@
               "slot": "Trinket",
               "rank": "BIS Thrt",
               "name": "Icon of Unyielding Courage"
-            },
-            {
-              "itemId": "23836",
-              "slot": "Trinket",
-              "rank": "BIS",
-              "name": "Goblin Rocket Launcher"
-            },
-            {
-              "itemId": "23835",
-              "slot": "Trinket",
-              "rank": "BIS",
-              "name": "Gnomish Poultryizer"
             },
             {
               "itemId": "19406",
@@ -38219,12 +38225,6 @@
               "slot": "Trinket",
               "rank": "Alt Thrt",
               "name": "Hourglass of the Unraveller"
-            },
-            {
-              "itemId": "27770",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Argussian Compass"
             },
             {
               "itemId": "29171",
@@ -39519,22 +39519,10 @@
               "name": "Idol of the Raven Goddess"
             },
             {
-              "itemId": "33946",
-              "slot": "Ranged/Relic",
-              "rank": "Alt Mit",
-              "name": "Merciless Gladiator's Idol of Resolve"
-            },
-            {
               "itemId": "23198",
               "slot": "Ranged/Relic",
               "rank": "Alt",
               "name": "Idol of Brutality"
-            },
-            {
-              "itemId": "33945",
-              "slot": "Ranged/Relic",
-              "rank": "Alt Mit",
-              "name": "Gladiator's Idol of Resolve"
             },
             {
               "itemId": "28064",
@@ -39547,6 +39535,18 @@
               "slot": "Ranged/Relic",
               "rank": "Alt",
               "name": "Idol of Ursoc"
+            },
+            {
+              "itemId": "33946",
+              "slot": "Ranged/Relic",
+              "rank": "Alt Mit",
+              "name": "Merciless Gladiator's Idol of Resolve"
+            },
+            {
+              "itemId": "33945",
+              "slot": "Ranged/Relic",
+              "rank": "Alt Mit",
+              "name": "Gladiator's Idol of Resolve"
             },
             {
               "itemId": "30021",
@@ -51289,18 +51289,6 @@
               "name": "Void-Talon"
             },
             {
-              "itemId": "23242",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Claw of the Frost Wyrm"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
               "itemId": "28263",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -51311,6 +51299,18 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Stormreaver Warblades"
+            },
+            {
+              "itemId": "23242",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Claw of the Frost Wyrm"
+            },
+            {
+              "itemId": "29121",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Guile of Khoraazi"
             },
             {
               "itemId": "28435",
@@ -56281,16 +56281,16 @@
               "name": "Claw of the Frost Wyrm"
             },
             {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
               "itemId": "28315",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Stormreaver Warblades"
+            },
+            {
+              "itemId": "29121",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Guile of Khoraazi"
             },
             {
               "itemId": "28263",
@@ -61247,16 +61247,16 @@
               "name": "Stellaris"
             },
             {
-              "itemId": "30277",
-              "slot": "Main Hand",
-              "rank": "Alt",
-              "name": "Ripfang Paw"
-            },
-            {
               "itemId": "27846",
               "slot": "Main Hand",
               "rank": "BIS",
               "name": "Claw of the Watcher"
+            },
+            {
+              "itemId": "30277",
+              "slot": "Main Hand",
+              "rank": "Alt",
+              "name": "Ripfang Paw"
             },
             {
               "itemId": "29372",
@@ -61271,6 +61271,12 @@
               "name": "Talon of Anzu"
             },
             {
+              "itemId": "28263",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Stellaris"
+            },
+            {
               "itemId": "28315",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -61281,12 +61287,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Claw of the Frost Wyrm"
-            },
-            {
-              "itemId": "28263",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Stellaris"
             },
             {
               "itemId": "29372",
@@ -65143,12 +65143,6 @@
               "name": "Black Bow of the Betrayer"
             },
             {
-              "itemId": "34329",
-              "slot": "Main Hand~Off Hand",
-              "rank": "Alt/BIS",
-              "name": "Crux of the Apocalypse"
-            },
-            {
               "itemId": "34197",
               "slot": "Main Hand~Off Hand",
               "rank": "Alt",
@@ -65159,6 +65153,12 @@
               "slot": "Main Hand~Off Hand",
               "rank": "Alt",
               "name": "Dagger of Bad Mojo"
+            },
+            {
+              "itemId": "34329",
+              "slot": "Main Hand~Off Hand",
+              "rank": "Alt/BIS",
+              "name": "Crux of the Apocalypse"
             },
             {
               "itemId": "34331",
@@ -66681,16 +66681,16 @@
               "name": "Icon of the Silver Crescent"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Quagmirran's Eye"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "28789",
@@ -68051,12 +68051,6 @@
               "name": "Serpent-Coil Braid"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "29370",
               "slot": "Trinket",
               "rank": "BIS",
@@ -68085,6 +68079,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Quagmirran's Eye"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "32374",
@@ -70721,16 +70721,16 @@
               "name": "Quagmirran's Eye"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "19339",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Mind Quickening Gem"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "28418",
@@ -73989,16 +73989,16 @@
               "name": "Icon of the Silver Crescent"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "29132",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Scryer's Bloodgem"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "23046",
@@ -74807,16 +74807,16 @@
               "name": "Quagmirran's Eye"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "19339",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Mind Quickening Gem"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "28418",
@@ -81477,12 +81477,6 @@
               "name": "Maladaar's Blessed Chaplet"
             },
             {
-              "itemId": "29336",
-              "slot": "Neck",
-              "rank": "BIS Stam",
-              "name": "Mark of the Ravenguard"
-            },
-            {
               "itemId": "30378",
               "slot": "Neck",
               "rank": "BIS",
@@ -81537,16 +81531,10 @@
               "name": "Medallion of the Valiant Guardian"
             },
             {
-              "itemId": "28407",
-              "slot": "Ring",
-              "rank": "BIS Mit",
-              "name": "Elementium Band of the Sentry"
-            },
-            {
-              "itemId": "29172",
-              "slot": "Ring",
-              "rank": "BIS Thrt",
-              "name": "Ashyen's Gift"
+              "itemId": "29336",
+              "slot": "Neck",
+              "rank": "BIS Stam",
+              "name": "Mark of the Ravenguard"
             },
             {
               "itemId": "28265",
@@ -81571,12 +81559,6 @@
               "slot": "Ring",
               "rank": "Alt",
               "name": "Seer's Signet"
-            },
-            {
-              "itemId": "31319",
-              "slot": "Ring",
-              "rank": "Alt Stam",
-              "name": "Band of Impenetrable Defenses"
             },
             {
               "itemId": "27822",
@@ -81621,6 +81603,24 @@
               "name": "Delicate Eternium Ring"
             },
             {
+              "itemId": "28407",
+              "slot": "Ring",
+              "rank": "BIS Mit",
+              "name": "Elementium Band of the Sentry"
+            },
+            {
+              "itemId": "29172",
+              "slot": "Ring",
+              "rank": "BIS Thrt",
+              "name": "Ashyen's Gift"
+            },
+            {
+              "itemId": "31319",
+              "slot": "Ring",
+              "rank": "Alt Stam",
+              "name": "Band of Impenetrable Defenses"
+            },
+            {
               "itemId": "29370",
               "slot": "Trinket",
               "rank": "BIS",
@@ -81633,28 +81633,10 @@
               "name": "Figurine of the Colossus"
             },
             {
-              "itemId": "23836",
-              "slot": "Trinket",
-              "rank": "BIS Thrt",
-              "name": "Goblin Rocket Launcher"
-            },
-            {
-              "itemId": "27891",
-              "slot": "Trinket",
-              "rank": "BIS Mit",
-              "name": "Adamantine Figurine"
-            },
-            {
               "itemId": "23835",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Gnomish Poultryizer"
-            },
-            {
-              "itemId": "32534",
-              "slot": "Trinket",
-              "rank": "BIS Mit",
-              "name": "Brooch of the Immortal King"
             },
             {
               "itemId": "32864",
@@ -81675,28 +81657,10 @@
               "name": "Argussian Compass"
             },
             {
-              "itemId": "30300",
-              "slot": "Trinket",
-              "rank": "Alt Mit",
-              "name": "Dabiri's Enigma"
-            },
-            {
-              "itemId": "24126",
-              "slot": "Trinket",
-              "rank": "Alt Thrt",
-              "name": "Figurine - Living Ruby Serpent"
-            },
-            {
               "itemId": "23046",
               "slot": "Trinket",
               "rank": "Alt",
               "name": "The Restrained Essence of Sapphiron"
-            },
-            {
-              "itemId": "19431",
-              "slot": "Trinket",
-              "rank": "Alt Mit",
-              "name": "Styleen's Impeding Scarab"
             },
             {
               "itemId": "13503",
@@ -81723,6 +81687,48 @@
               "name": "Mark of the Champion"
             },
             {
+              "itemId": "19950",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Zandalarian Hero Charm"
+            },
+            {
+              "itemId": "23836",
+              "slot": "Trinket",
+              "rank": "BIS Thrt",
+              "name": "Goblin Rocket Launcher"
+            },
+            {
+              "itemId": "27891",
+              "slot": "Trinket",
+              "rank": "BIS Mit",
+              "name": "Adamantine Figurine"
+            },
+            {
+              "itemId": "32534",
+              "slot": "Trinket",
+              "rank": "BIS Mit",
+              "name": "Brooch of the Immortal King"
+            },
+            {
+              "itemId": "30300",
+              "slot": "Trinket",
+              "rank": "Alt Mit",
+              "name": "Dabiri's Enigma"
+            },
+            {
+              "itemId": "24126",
+              "slot": "Trinket",
+              "rank": "Alt Thrt",
+              "name": "Figurine - Living Ruby Serpent"
+            },
+            {
+              "itemId": "19431",
+              "slot": "Trinket",
+              "rank": "Alt Mit",
+              "name": "Styleen's Impeding Scarab"
+            },
+            {
               "itemId": "28042",
               "slot": "Trinket",
               "rank": "Alt Mit",
@@ -81739,12 +81745,6 @@
               "slot": "Trinket",
               "rank": "Alt Mit",
               "name": "Glyph of Deflection"
-            },
-            {
-              "itemId": "19950",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Zandalarian Hero Charm"
             },
             {
               "itemId": "29387",
@@ -81801,12 +81801,6 @@
               "name": "Crest of the Sha'tar"
             },
             {
-              "itemId": "29266",
-              "slot": "Off Hand",
-              "rank": "BIS Mit",
-              "name": "Azure-Shield of Coldarra"
-            },
-            {
               "itemId": "32082",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -81835,6 +81829,12 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Platinum Shield of the Valorous"
+            },
+            {
+              "itemId": "29266",
+              "slot": "Off Hand",
+              "rank": "BIS Mit",
+              "name": "Azure-Shield of Coldarra"
             },
             {
               "itemId": "29388",
@@ -84333,12 +84333,6 @@
               "name": "Moroes' Lucky Pocket Watch"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "30629",
               "slot": "Trinket",
               "rank": "BIS",
@@ -84403,6 +84397,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Ashtongue Talisman of Zeal"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "30910",
@@ -85919,12 +85919,6 @@
               "name": "Capacitus' Cloak of Calibration"
             },
             {
-              "itemId": "28484",
-              "slot": "Chest",
-              "rank": "BIS Mit",
-              "name": "Bulwark of Kings"
-            },
-            {
               "itemId": "23522",
               "slot": "Chest",
               "rank": "BIS",
@@ -85941,6 +85935,12 @@
               "slot": "Chest",
               "rank": "Alt",
               "name": "Vest of Vengeance"
+            },
+            {
+              "itemId": "28484",
+              "slot": "Chest",
+              "rank": "BIS Mit",
+              "name": "Bulwark of Kings"
             },
             {
               "itemId": "23537",
@@ -86207,18 +86207,6 @@
               "name": "Hourglass of the Unraveller"
             },
             {
-              "itemId": "28429",
-              "slot": "Two Hand",
-              "rank": "BIS Mit",
-              "name": "Lionheart Champion"
-            },
-            {
-              "itemId": "28441",
-              "slot": "Two Hand",
-              "rank": "BIS Mit",
-              "name": "Deep Thunder"
-            },
-            {
               "itemId": "24550",
               "slot": "Two Hand",
               "rank": "BIS",
@@ -86247,6 +86235,18 @@
               "slot": "Two Hand",
               "rank": "Alt",
               "name": "Khorium Champion"
+            },
+            {
+              "itemId": "28429",
+              "slot": "Two Hand",
+              "rank": "BIS Mit",
+              "name": "Lionheart Champion"
+            },
+            {
+              "itemId": "28441",
+              "slot": "Two Hand",
+              "rank": "BIS Mit",
+              "name": "Deep Thunder"
             },
             {
               "itemId": "27484",
@@ -95533,12 +95533,6 @@
               "name": "Dark Iron Smoking Pipe"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
@@ -95555,6 +95549,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "The Restrained Essence of Sapphiron"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "32237",
@@ -96135,16 +96135,16 @@
               "name": "The Skull of Gul'dan"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "31856",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Darkmoon Card: Crusade"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "29370",
@@ -99435,6 +99435,12 @@
               "name": "Warglaive of Azzinoth"
             },
             {
+              "itemId": "32471",
+              "slot": "Main Hand",
+              "rank": "BIS",
+              "name": "Shard of Azzinoth"
+            },
+            {
               "itemId": "33762",
               "slot": "Main Hand",
               "rank": "Alt",
@@ -99445,12 +99451,6 @@
               "slot": "Main Hand",
               "rank": "Alt",
               "name": "Blade of Infamy"
-            },
-            {
-              "itemId": "32471",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Shard of Azzinoth"
             },
             {
               "itemId": "30082",
@@ -99483,6 +99483,12 @@
               "name": "Vengeful Gladiator's Shanker"
             },
             {
+              "itemId": "32471",
+              "slot": "Off Hand",
+              "rank": "BIS",
+              "name": "Shard of Azzinoth"
+            },
+            {
               "itemId": "32838",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -99505,12 +99511,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Blade of Infamy"
-            },
-            {
-              "itemId": "32471",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Shard of Azzinoth"
             },
             {
               "itemId": "33734",
@@ -100879,16 +100879,16 @@
               "name": "Icon of the Silver Crescent"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Quagmirran's Eye"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "29179",
@@ -101473,12 +101473,6 @@
               "name": "Band of Dominion"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "28785",
               "slot": "Trinket",
               "rank": "BIS",
@@ -101489,6 +101483,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Icon of the Silver Crescent"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "30626",
@@ -102433,12 +102433,6 @@
               "name": "Dark Iron Smoking Pipe"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "31856",
               "slot": "Trinket",
               "rank": "BIS",
@@ -102479,6 +102473,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Neltharion's Tear"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "32374",
@@ -103435,12 +103435,6 @@
               "name": "Band of Dominion"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "32483",
               "slot": "Trinket",
               "rank": "BIS",
@@ -103457,6 +103451,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Hex Shrunken Head"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "29370",
@@ -106595,6 +106595,12 @@
               "name": "Totem of the Astral Winds"
             },
             {
+              "itemId": "28433",
+              "slot": "Main Hand",
+              "rank": "BIS",
+              "name": "Wicked Edge of the Planes"
+            },
+            {
               "itemId": "29996",
               "slot": "Main Hand",
               "rank": "Alt",
@@ -106611,12 +106617,6 @@
               "slot": "Main Hand",
               "rank": "Alt",
               "name": "Merciless Gladiator's Cleaver"
-            },
-            {
-              "itemId": "28433",
-              "slot": "Main Hand",
-              "rank": "BIS",
-              "name": "Wicked Edge of the Planes"
             },
             {
               "itemId": "28439",
@@ -117601,12 +117601,6 @@
               "name": "Band of Al'ar"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
@@ -117623,6 +117617,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Scryer's Bloodgem"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "30626",
@@ -118917,16 +118917,16 @@
               "name": "Hex Shrunken Head"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Quagmirran's Eye"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "29370",
@@ -122743,12 +122743,6 @@
               "name": "Hex Shrunken Head"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "19337",
               "slot": "Trinket",
               "rank": "BIS",
@@ -122759,6 +122753,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Void Star Talisman"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "27683",
@@ -125275,12 +125275,6 @@
               "name": "Sparking Arcanite Ring"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
@@ -125297,6 +125291,12 @@
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Scryer's Bloodgem"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "30626",
@@ -126673,16 +126673,16 @@
               "name": "Hex Shrunken Head"
             },
             {
-              "itemId": "23207",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Mark of the Champion"
-            },
-            {
               "itemId": "27683",
               "slot": "Trinket",
               "rank": "BIS",
               "name": "Quagmirran's Eye"
+            },
+            {
+              "itemId": "23207",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Mark of the Champion"
             },
             {
               "itemId": "29370",
@@ -133831,12 +133831,6 @@
               "name": "Merciless Gladiator's Slicer"
             },
             {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
               "itemId": "33669",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -133847,6 +133841,12 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Vengeful Gladiator's Slicer"
+            },
+            {
+              "itemId": "32838",
+              "slot": "Off Hand",
+              "rank": "Alt",
+              "name": "Warglaive of Azzinoth"
             },
             {
               "itemId": "30082",
@@ -134617,12 +134617,6 @@
               "name": "Faceguard of Determination"
             },
             {
-              "itemId": "27408",
-              "slot": "Head",
-              "rank": "BIS Thrt",
-              "name": "Hope Bearer Helm"
-            },
-            {
               "itemId": "28180",
               "slot": "Head",
               "rank": "BIS",
@@ -134647,6 +134641,12 @@
               "name": "Horns of the Illidari"
             },
             {
+              "itemId": "27408",
+              "slot": "Head",
+              "rank": "BIS Thrt",
+              "name": "Hope Bearer Helm"
+            },
+            {
               "itemId": "28350",
               "slot": "Head",
               "rank": "Alt Mit",
@@ -134657,12 +134657,6 @@
               "slot": "Shoulder",
               "rank": "BIS",
               "name": "Spaulders of Dementia"
-            },
-            {
-              "itemId": "27803",
-              "slot": "Shoulder",
-              "rank": "Alt Mit",
-              "name": "Shoulderguards of the Bold"
             },
             {
               "itemId": "28855",
@@ -134689,6 +134683,12 @@
               "name": "Savage Plate Shoulders"
             },
             {
+              "itemId": "27803",
+              "slot": "Shoulder",
+              "rank": "Alt Mit",
+              "name": "Shoulderguards of the Bold"
+            },
+            {
               "itemId": "27847",
               "slot": "Shoulder",
               "rank": "Alt Mit",
@@ -134701,18 +134701,6 @@
               "name": "Devilshark Cape"
             },
             {
-              "itemId": "28256",
-              "slot": "Back",
-              "rank": "Alt Mit",
-              "name": "Thoriumweave Cloak"
-            },
-            {
-              "itemId": "27988",
-              "slot": "Back",
-              "rank": "Alt Mit",
-              "name": "Burnoose of Shifting Ages"
-            },
-            {
               "itemId": "27892",
               "slot": "Back",
               "rank": "Alt",
@@ -134723,6 +134711,18 @@
               "slot": "Back",
               "rank": "Alt",
               "name": "Cloak of Eternity"
+            },
+            {
+              "itemId": "28256",
+              "slot": "Back",
+              "rank": "Alt Mit",
+              "name": "Thoriumweave Cloak"
+            },
+            {
+              "itemId": "27988",
+              "slot": "Back",
+              "rank": "Alt Mit",
+              "name": "Burnoose of Shifting Ages"
             },
             {
               "itemId": "27878",
@@ -134809,12 +134809,6 @@
               "name": "Gauntlets of Dissension"
             },
             {
-              "itemId": "30341",
-              "slot": "Hands",
-              "rank": "BIS Thrt",
-              "name": "Flesh Handler's Gauntlets"
-            },
-            {
               "itemId": "30375",
               "slot": "Hands",
               "rank": "Alt",
@@ -134833,22 +134827,16 @@
               "name": "Gauntlets of the Chosen"
             },
             {
+              "itemId": "30341",
+              "slot": "Hands",
+              "rank": "BIS Thrt",
+              "name": "Flesh Handler's Gauntlets"
+            },
+            {
               "itemId": "28995",
               "slot": "Waist",
               "rank": "BIS",
               "name": "Marshal's Plate Belt"
-            },
-            {
-              "itemId": "29238",
-              "slot": "Waist",
-              "rank": "BIS Mit",
-              "name": "Lion's Heart Girdle"
-            },
-            {
-              "itemId": "27672",
-              "slot": "Waist",
-              "rank": "BIS Mit",
-              "name": "Girdle of the Immovable"
             },
             {
               "itemId": "31460",
@@ -134867,6 +134855,18 @@
               "slot": "Waist",
               "rank": "Alt",
               "name": "Deathforge Girdle"
+            },
+            {
+              "itemId": "29238",
+              "slot": "Waist",
+              "rank": "BIS Mit",
+              "name": "Lion's Heart Girdle"
+            },
+            {
+              "itemId": "27672",
+              "slot": "Waist",
+              "rank": "BIS Mit",
+              "name": "Girdle of the Immovable"
             },
             {
               "itemId": "29184",
@@ -134893,16 +134893,16 @@
               "name": "Legguards of the Resolute Defender"
             },
             {
-              "itemId": "30533",
-              "slot": "Legs",
-              "rank": "Alt Thrt",
-              "name": "Vanquisher's Legplates"
-            },
-            {
               "itemId": "27527",
               "slot": "Legs",
               "rank": "Alt",
               "name": "Greaves of the Shatterer"
+            },
+            {
+              "itemId": "30533",
+              "slot": "Legs",
+              "rank": "Alt Thrt",
+              "name": "Vanquisher's Legplates"
             },
             {
               "itemId": "28997",
@@ -134941,12 +134941,6 @@
               "name": "Necklace of the Juggernaut"
             },
             {
-              "itemId": "28244",
-              "slot": "Neck",
-              "rank": "BIS Thrt",
-              "name": "Pendant of Triumph"
-            },
-            {
               "itemId": "27546",
               "slot": "Neck",
               "rank": "Alt",
@@ -134965,16 +134959,10 @@
               "name": "Talon Lord's Collar"
             },
             {
-              "itemId": "30834",
-              "slot": "Ring",
+              "itemId": "28244",
+              "slot": "Neck",
               "rank": "BIS Thrt",
-              "name": "Shapeshifter's Signet"
-            },
-            {
-              "itemId": "29384",
-              "slot": "Ring",
-              "rank": "BIS Mit",
-              "name": "Ring of Unyielding Force"
+              "name": "Pendant of Triumph"
             },
             {
               "itemId": "30006",
@@ -134989,6 +134977,18 @@
               "name": "Protector's Mark of the Redemption"
             },
             {
+              "itemId": "30834",
+              "slot": "Ring",
+              "rank": "BIS Thrt",
+              "name": "Shapeshifter's Signet"
+            },
+            {
+              "itemId": "29384",
+              "slot": "Ring",
+              "rank": "BIS Mit",
+              "name": "Ring of Unyielding Force"
+            },
+            {
               "itemId": "28553",
               "slot": "Ring",
               "rank": "Alt Thrt",
@@ -134999,6 +134999,30 @@
               "slot": "Ring",
               "rank": "Alt Thrt",
               "name": "Crystal Band of Valor"
+            },
+            {
+              "itemId": "27891",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Adamantine Figurine"
+            },
+            {
+              "itemId": "19406",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Drake Fang Talisman"
+            },
+            {
+              "itemId": "30300",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Dabiri's Enigma"
+            },
+            {
+              "itemId": "28042",
+              "slot": "Trinket",
+              "rank": "Alt",
+              "name": "Regal Protectorate"
             },
             {
               "itemId": "23836",
@@ -135031,18 +135055,6 @@
               "name": "Timelapse Shard"
             },
             {
-              "itemId": "27891",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Adamantine Figurine"
-            },
-            {
-              "itemId": "19406",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Drake Fang Talisman"
-            },
-            {
               "itemId": "29387",
               "slot": "Trinket",
               "rank": "Alt Thrt",
@@ -135053,18 +135065,6 @@
               "slot": "Trinket",
               "rank": "Alt Thrt",
               "name": "Mark of the Champion"
-            },
-            {
-              "itemId": "30300",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Dabiri's Enigma"
-            },
-            {
-              "itemId": "28042",
-              "slot": "Trinket",
-              "rank": "Alt",
-              "name": "Regal Protectorate"
             },
             {
               "itemId": "28438",
