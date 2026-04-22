@@ -1762,7 +1762,7 @@ function buildFeralDruidSimRequest(gearSlots, iterations, randomSeed) {
 
     const target = new ProtoWriter();
     target.fieldVarint(TARGET_LEVEL, 73);
-    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);  // neutral — no Mark of the Champion bonus
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
     writeDouble(target, 7, 4000.0);   // armor
     writeDouble(target, 8, 2.0);      // speed
 

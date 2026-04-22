@@ -2315,20 +2315,31 @@
         // Build gem data for inline display
         const gems = phaseData ? (phaseData.gems || []) : [];
         let metaGem = gems.find(g => g.isMeta);
-        const regularGems = gems.filter(g => !g.isMeta);
+        let regularGems = gems.filter(g => !g.isMeta);
 
-        // Fallback: if no meta gem in current phase, search other phases
-        if (!metaGem && specData && state.selectedPhase != null) {
+        // Fallback: if no meta gem or too few regular gems, inherit from nearest phase
+        if (specData && state.selectedPhase != null) {
             const phases = Object.keys(specData.phases).map(Number).sort();
-            // Search nearest lower phase first, then higher phases
             const lower = phases.filter(p => p < state.selectedPhase).reverse();
             const higher = phases.filter(p => p > state.selectedPhase);
-            for (const p of [...lower, ...higher]) {
-                const pg = specData.phases[p]?.gems || [];
-                const found = pg.find(g => g.isMeta);
-                if (found) { metaGem = found; break; }
+            const searchOrder = [...lower, ...higher];
+            if (!metaGem) {
+                for (const p of searchOrder) {
+                    const found = (specData.phases[p]?.gems || []).find(g => g.isMeta);
+                    if (found) { metaGem = found; break; }
+                }
+            }
+            if (regularGems.length < 2) {
+                for (const p of searchOrder) {
+                    const pg = (specData.phases[p]?.gems || []).filter(g => !g.isMeta);
+                    if (pg.length >= 2) { regularGems = pg; break; }
+                }
             }
         }
+
+        // Build complete gem list for sim (includes fallbacks)
+        const gemsForSim = [...regularGems];
+        if (metaGem) gemsForSim.push(metaGem);
 
         // ── Helper: gem color string for a gem ──
         function gemColor(gemId) {
@@ -2801,7 +2812,7 @@
 
         _lastSlotGroups    = slotGroups;
         _lastEnchantLookup = enchantLookup;
-        _lastGems          = gems;
+        _lastGems          = gemsForSim;
 
         clearTimeout(_simStatsDebounce);
         _simStatsDebounce = setTimeout(async () => {
