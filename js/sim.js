@@ -36,6 +36,7 @@ const SPELL_TO_ENCHANT_ID = {
     29186: 29186,
     // Glyph of Power (+22 SP, +14 spell hit) — The Sha'tar exalted
     35455: 29191,
+    35447: 29191,   // Classic variant spellId for Glyph of Power
     29191: 29191,
     // Glyph of Ferocity (+34 AP, +16 hit) — Cenarion Expedition exalted
     35452: 29192,
@@ -55,10 +56,14 @@ const SPELL_TO_ENCHANT_ID = {
     29483: 28888,
     28888: 28888,
     35407: 28888,   // Classic variant spellId for Greater Inscription of Vengeance
+    // Greater Inscription of Discipline (+18 SP, +10 crit) — Aldor exalted
+    35437: 28886,
+    28886: 28886,
     // Greater Inscription of the Blade (+15 agi, +20 hit) — Scryer exalted
     28910: 28910,
     // Greater Inscription of the Orb (+12 SP, +15 spell crit) — Scryer exalted
     29467: 28909,
+    35406: 28909,   // Classic variant spellId for Greater Inscription of the Orb
     28909: 28909,
     // Might of the Scourge (+26 AP, +14 crit) — Naxx shoulder
     29475: 23548,
@@ -72,6 +77,9 @@ const SPELL_TO_ENCHANT_ID = {
     33148: 33148,
     // Enchant Cloak - Greater Agility (+12 agi)
     34004: 34004,
+    // Enchant Cloak - Subtlety (-2% threat)
+    25084: 33150,
+    33150: 33150,
     // Enchant Cloak - Steelweave (+12 def) — Phase 5
     35279: 35756,
     35756: 35756,
@@ -121,6 +129,7 @@ const SPELL_TO_ENCHANT_ID = {
     29534: 29534,
     // Runic Spellthread (+35 SP, +20 stam) — caster
     31368: 24274,
+    31372: 24274,   // Classic variant spellId for Runic Spellthread
     24274: 24274,
 
     // ── Feet ──────────────────────────────────────────────────────────────────
@@ -160,6 +169,14 @@ const SPELL_TO_ENCHANT_ID = {
     // Ring - Striking (+2 weapon damage) — great for feral druids
     27920: 22535,
     22535: 22535,
+    // Ring - Spellpower (+12 SP) — enchanter ring enchant
+    27924: 22536,
+    22536: 22536,
+
+    // ── Shield ────────────────────────────────────────────────────────────────
+    // Shield - Intellect (+12 int)
+    27945: 22539,
+    22539: 22539,
 };
 
 /**
