@@ -1105,6 +1105,129 @@ function buildBalanceDruidSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for Elemental Shaman (Orc, Adaptive) ──────────────
+
+function buildElementalShamanSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── ElementalShaman Rotation — Adaptive with totems ──
+    const totems = new ProtoWriter();
+    totems.fieldVarint(1, 2);  // earth = TremorTotem (2)
+    totems.fieldVarint(2, 4);  // air = WrathOfAirTotem (4)
+    totems.fieldVarint(3, 3);  // fire = TotemOfWrath (3)
+    totems.fieldVarint(4, 1);  // water = ManaSpringTotem (1)
+
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(1, 1);             // type = Adaptive (1)
+    rotation.fieldMessage(3, totems);       // totems
+
+    // ── ShamanTalents — Standard Elemental build ──
+    const talents = new ProtoWriter();
+    // Elemental tree
+    talents.fieldVarint(EST_CONVECTION,            5);
+    talents.fieldVarint(EST_CONCUSSION,            5);
+    talents.fieldVarint(EST_CALL_OF_FLAME,         3);
+    talents.fieldVarint(EST_ELEMENTAL_FOCUS,       1);
+    talents.fieldVarint(EST_CALL_OF_THUNDER,       5);
+    talents.fieldVarint(EST_ELEMENTAL_DEVASTATION, 3);
+    talents.fieldVarint(EST_ELEMENTAL_FURY,        1);
+    talents.fieldVarint(EST_UNRELENTING_STORM,     3);
+    talents.fieldVarint(EST_ELEMENTAL_PRECISION,   3);
+    talents.fieldVarint(EST_LIGHTNING_MASTERY,     5);
+    talents.fieldVarint(EST_ELEMENTAL_MASTERY,     1);
+    talents.fieldVarint(EST_LIGHTNING_OVERLOAD,    5);
+    talents.fieldVarint(EST_TOTEM_OF_WRATH,        1);
+    // Restoration tree
+    talents.fieldVarint(26, 5);  // totemic_focus = 5
+    talents.fieldVarint(27, 3);  // natures_guidance = 3
+    talents.fieldVarint(29, 5);  // tidal_mastery = 5
+
+    // ── ElementalShaman Options ──
+    const options = new ProtoWriter();
+    options.fieldVarint(ESO_WATER_SHIELD, 1);  // water_shield = true
+    options.fieldVarint(ESO_BLOODLUST, 1);     // bloodlust = true
+
+    // ── ElementalShaman spec message ──
+    const eleSpec = new ProtoWriter();
+    eleSpec.fieldMessage(ELE_SHAMAN_ROTATION, rotation);
+    eleSpec.fieldMessage(ELE_SHAMAN_TALENTS, talents);
+    eleSpec.fieldMessage(ELE_SHAMAN_OPTIONS, options);
+
+    // ── Consumes (caster) ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath = 3
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // FoodBlackenedBasilisk = 1
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion = 2
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 5);        // WeaponImbueBrilliantWizardOil = 5
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);      // true
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);     // Improved Blessing of Wisdom
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);  // true
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Ele Shaman'));
+    player.fieldVarint(PLAYER_RACE, RACE_ORC);
+    player.fieldVarint(PLAYER_CLASS, CLASS_SHAMAN);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_ELE_SHAMAN, eleSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    // ── Raid buffs ──
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);  // true
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);       // Improved Divine Spirit
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);   // Improved Gift of the Wild
+
+    // ── Debuffs ──
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1); // Judgement of Wisdom
+    debuffs.fieldVarint(DB_MISERY, 1);              // Misery (5% spell hit)
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);   // Curse of Elements
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    // ── Target (level 73 Unknown mob type) ──
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build RaidSimRequest for Combat Rogue (Human, Swords) ──────────────────
 
 function buildRogueSimRequest(gearSlots, iterations, randomSeed) {
@@ -2382,11 +2505,16 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         eleTalents.fieldVarint(EST_CALL_OF_THUNDER,       5);
         eleTalents.fieldVarint(EST_ELEMENTAL_DEVASTATION, 3);
         eleTalents.fieldVarint(EST_ELEMENTAL_FURY,        1);
+        eleTalents.fieldVarint(EST_UNRELENTING_STORM,     3);
         eleTalents.fieldVarint(EST_ELEMENTAL_PRECISION,   3);
         eleTalents.fieldVarint(EST_LIGHTNING_MASTERY,     5);
         eleTalents.fieldVarint(EST_ELEMENTAL_MASTERY,     1);
         eleTalents.fieldVarint(EST_LIGHTNING_OVERLOAD,    5);
         eleTalents.fieldVarint(EST_TOTEM_OF_WRATH,        1);
+        // Restoration tree
+        eleTalents.fieldVarint(26, 5);  // totemic_focus = 5
+        eleTalents.fieldVarint(27, 3);  // natures_guidance = 3
+        eleTalents.fieldVarint(29, 5);  // tidal_mastery = 5
 
         const eleOptions = new ProtoWriter();
         eleOptions.fieldVarint(ESO_WATER_SHIELD, 1);
@@ -3088,6 +3216,22 @@ class WowSimBridge {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
 
         const request = buildBalanceDruidSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({
+                msg:       'raidSimAsync',
+                id:        id,
+                inputData: request,
+            });
+        });
+    }
+
+    runEleShaman(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+
+        const request = buildElementalShamanSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
 
         return new Promise((resolve, reject) => {

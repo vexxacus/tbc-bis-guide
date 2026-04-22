@@ -597,3 +597,13 @@ async function simulateBalanceDruid(slotGroups, getActiveItemFn, weaponMode, enc
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runBalanceDruid(gearSlots, onProgress, iterations), gearSlots);
 }
+
+/**
+ * Run DPS simulation for Elemental Shaman.
+ * Ele Shaman can use Staff (2h) or MH+Shield — weapon mode follows BiS selection.
+ */
+async function simulateEleShaman(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runEleShaman(gearSlots, onProgress, iterations), gearSlots);
+}
