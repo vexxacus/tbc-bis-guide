@@ -52031,6 +52031,42 @@
           ],
           "enchants": [
             {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
+            },
+            {
               "spellId": "30260",
               "slot": "Ranged/Relic"
             }
@@ -52846,6 +52882,42 @@
             }
           ],
           "enchants": [
+            {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
+            },
+            {
+              "spellId": "30252",
+              "slot": "Ranged/Relic"
+            },
             {
               "spellId": "23800",
               "slot": "Main Hand~Off Hand"
@@ -53962,6 +54034,46 @@
             }
           ],
           "enchants": [
+            {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
+            },
+            {
+              "spellId": "30252",
+              "slot": "Ranged/Relic"
+            },
             {
               "spellId": "42620",
               "slot": "Main Hand~Off Hand"
@@ -57025,12 +57137,44 @@
           ],
           "enchants": [
             {
-              "spellId": "27951",
-              "slot": "Feet"
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
             },
             {
               "spellId": "30260",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
             }
           ]
         },
@@ -57844,6 +57988,42 @@
             }
           ],
           "enchants": [
+            {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
+            },
+            {
+              "spellId": "30252",
+              "slot": "Ranged/Relic"
+            },
             {
               "spellId": "23800",
               "slot": "Main Hand~Off Hand"
@@ -58954,6 +59134,42 @@
             }
           ],
           "enchants": [
+            {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "29483",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
+            },
+            {
+              "spellId": "30252",
+              "slot": "Ranged/Relic"
+            },
             {
               "spellId": "42620",
               "slot": "Main Hand~Off Hand"
@@ -62025,12 +62241,40 @@
           ],
           "enchants": [
             {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
               "spellId": "29483",
               "slot": "Shoulder"
             },
             {
-              "spellId": "27977",
-              "slot": "Two Hand"
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
+            },
+            {
+              "spellId": "23800",
+              "slot": "Main Hand~Off Hand"
             },
             {
               "spellId": "30260",
@@ -63707,8 +63951,44 @@
           ],
           "enchants": [
             {
+              "spellId": "35452",
+              "slot": "Head"
+            },
+            {
+              "spellId": "35417",
+              "slot": "Shoulder"
+            },
+            {
+              "spellId": "34004",
+              "slot": "Back"
+            },
+            {
+              "spellId": "27960",
+              "slot": "Chest"
+            },
+            {
+              "spellId": "34002",
+              "slot": "Wrist"
+            },
+            {
+              "spellId": "25080",
+              "slot": "Hands"
+            },
+            {
+              "spellId": "35490",
+              "slot": "Legs"
+            },
+            {
+              "spellId": "27951",
+              "slot": "Feet"
+            },
+            {
               "spellId": "42620",
               "slot": "Main Hand~Off Hand"
+            },
+            {
+              "spellId": "22779",
+              "slot": "Ranged/Relic"
             }
           ]
         },
