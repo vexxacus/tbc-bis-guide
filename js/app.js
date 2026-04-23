@@ -2781,7 +2781,7 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane', 'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
@@ -2797,6 +2797,9 @@
         'Mage-Fire': 'Simulation uses Fire Mage rotation (Fireball filler + maintain Improved Scorch + Fire Blast weave). Molten Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
         'Mage-Frost': 'Simulation uses Deep Frost Mage rotation (Frostbolt spam + Water Elemental). Mage Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
         'Mage-Arcane': 'Simulation uses Arcane Mage rotation (Arcane Blast ×3 + Frostbolt filler, regen at 20%/50% mana). Mage Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
+        'Hunter-Beast Mastery': 'Simulation uses BM Hunter rotation (Steady Shot + Multi-Shot, Aimed Shot precast, Serpent Sting, lazy rotation). Ravager pet, 90% uptime. Flask of Relentless Assault + FlameCap. 3 000 iterations, 300s fight, Troll vs. boss-level target.',
+        'Hunter-Marksmanship': 'Simulation uses MM Hunter rotation (Steady Shot + Multi-Shot + Arcane Shot, Aimed Shot precast, Serpent Sting). Ravager pet, 90% uptime. Flask of Relentless Assault + FlameCap. 3 000 iterations, 300s fight, Troll vs. boss-level target.',
+        'Hunter-Survival': 'Simulation uses Survival Hunter melee-weave rotation (Steady Shot + Multi-Shot + Arcane Shot, Serpent Sting, raptor strike weave 80%). Wind Serpent pet, 90% uptime. Flask of Relentless Assault + FlameCap. 3 000 iterations, 300s fight, Troll vs. boss-level target.',
     };
 
     const simPanel       = document.getElementById('simPanel');
@@ -2976,6 +2979,9 @@
                         : specKey === 'Mage-Fire' ? simulateFireMage
                         : specKey === 'Mage-Frost' ? simulateFrostMage
                         : specKey === 'Mage-Arcane' ? simulateArcaneMage
+                        : specKey === 'Hunter-Beast Mastery' ? simulateBMHunter
+                        : specKey === 'Hunter-Marksmanship' ? simulateMMHunter
+                        : specKey === 'Hunter-Survival' ? simulateSurvivalHunter
                         : simulateFuryWarrior;
 
             try {

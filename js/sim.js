@@ -727,3 +727,21 @@ async function simulateArcaneMage(slotGroups, getActiveItemFn, weaponMode, encha
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runArcaneMage(gearSlots, onProgress, iterations), gearSlots);
 }
+
+async function simulateBMHunter(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runBMHunter(gearSlots, onProgress, iterations), gearSlots);
+}
+
+async function simulateMMHunter(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runMMHunter(gearSlots, onProgress, iterations), gearSlots);
+}
+
+async function simulateSurvivalHunter(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runSurvivalHunter(gearSlots, onProgress, iterations), gearSlots);
+}

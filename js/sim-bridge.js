@@ -482,10 +482,12 @@ const WLR_DETONATE_SEED = 5;  // bool
 
 // HunterTalents fields — verified against proto/hunter.proto
 const HT_IMPROVED_ASPECT_OF_HAWK = 1;
+const HT_ENDURANCE_TRAINING  = 2;   // 0-5
 const HT_FOCUSED_FIRE        = 3;
 const HT_UNLEASHED_FURY      = 4;   // 0-5
 const HT_FEROCITY            = 5;   // 0-5
 const HT_BESTIAL_DISCIPLINE  = 6;   // 0-2
+const HT_ANIMAL_HANDLER      = 45;  // 0-2
 const HT_FRENZY              = 7;   // 0-5
 const HT_FEROCIOUS_INSPIRATION = 8; // 0-3
 const HT_BESTIAL_WRATH       = 9;   // bool
@@ -495,14 +497,29 @@ const HT_LETHAL_SHOTS        = 12;  // 0-5
 const HT_IMPROVED_HUNTERS_MARK = 13; // 0-5
 const HT_EFFICIENCY          = 14;  // 0-5
 const HT_GO_FOR_THE_THROAT   = 15;  // 0-2
+const HT_IMPROVED_ARCANE_SHOT = 16; // 0-5
 const HT_AIMED_SHOT          = 17;  // bool
+const HT_RAPID_KILLING       = 18;  // 0-2
+const HT_IMPROVED_STINGS     = 19;  // 0-5
 const HT_MORTAL_SHOTS        = 20;  // 0-5
 const HT_SCATTER_SHOT        = 21;  // bool
 const HT_BARRAGE             = 22;  // 0-3
+const HT_COMBAT_EXPERIENCE   = 23;  // 0-2
 const HT_RANGED_WEAPON_SPEC  = 24;  // 0-5
 const HT_CAREFUL_AIM         = 25;  // 0-3
 const HT_TRUESHOT_AURA       = 26;  // bool
+const HT_IMPROVED_BARRAGE    = 27;  // 0-3
 const HT_MASTER_MARKSMAN     = 28;  // 0-5
+const HT_SILENCING_SHOT      = 29;  // bool
+const HT_MONSTER_SLAYING     = 30;  // 0-3
+const HT_HUMANOID_SLAYING    = 31;  // 0-3
+const HT_SAVAGE_STRIKES      = 32;  // 0-2
+const HT_CLEVER_TRAPS        = 33;  // 0-2
+const HT_SURVIVALIST         = 34;  // 0-5
+const HT_SUREFOOTED          = 36;  // 0-3
+const HT_SURVIVAL_INSTINCTS  = 37;  // 0-2
+const HT_KILLER_INSTINCT     = 38;  // 0-3
+const HT_RESOURCEFULNESS     = 39;  // 0-3
 const HT_LIGHTNING_REFLEXES  = 40;  // 0-5
 const HT_THRILL_OF_THE_HUNT  = 41;  // 0-3
 const HT_EXPOSE_WEAKNESS     = 42;  // 0-3
@@ -512,13 +529,21 @@ const HT_READINESS           = 44;  // bool
 const HUNTER_ROTATION = 1;
 const HUNTER_TALENTS  = 2;
 const HUNTER_OPTIONS  = 3;
-const HRO_QUIVER_BONUS = 1;  // 6=Speed15
-const HRO_AMMO         = 2;  // 6=BlackflightArrow
-const HRO_PET_TYPE     = 3;  // 1=Ravager, 2=Cat, 3=Raptor
-const HRO_PET_UPTIME   = 4;
+const HRO_QUIVER_BONUS      = 1;  // 6=Speed15
+const HRO_AMMO               = 2;  // 6=BlackflightArrow
+const HRO_PET_TYPE           = 3;  // 1=Ravager, 2=Cat, 6=WindSerpent
+const HRO_PET_UPTIME         = 4;  // double
+const HRO_PET_SINGLE_ABILITY = 6;  // bool
+const HRO_LATENCY_MS         = 5;  // int32
 const HR_USE_MULTI_SHOT  = 1;
 const HR_USE_ARCANE_SHOT = 2;
+const HR_PRECAST_AIMED   = 3;  // bool
+const HR_LAZY_ROTATION   = 12; // bool
 const HR_STING           = 5;  // 2=SerpentSting
+const HR_VIPER_START     = 6;  // double
+const HR_VIPER_STOP      = 7;  // double
+const HR_TIME_TO_WEAVE_MS = 9; // int32
+const HR_PERCENT_WEAVED  = 10; // double
 const HR_WEAVE           = 11; // 3=WeaveFull
 
 // ElementalShamanTalents fields — verified against proto/shaman.proto
@@ -612,6 +637,8 @@ const CONS_FOOD           = 41;  // enum: 4 = FoodRoastedClefthoof
 const CONS_DEFAULT_POTION = 15;  // enum: 3 = HastePotion
 const CONS_MH_IMBUE       = 32;  // enum: 1 = AdamantiteSharpeningStone
 const CONS_OH_IMBUE       = 33;
+const CONS_DEFAULT_CONJURED = 27; // enum: FlameCap = 2
+const CONS_PET_FOOD       = 37;   // enum: KiblersBits = 1
 
 // IndividualBuffs fields
 const IB_BLESSING_OF_KINGS = 1;
@@ -2539,6 +2566,380 @@ function buildFeralDruidSimRequest(gearSlots, iterations, randomSeed) {
     return rsr.finish();
 }
 
+// ─── Build RaidSimRequest for BM Hunter (Troll, 41/20/0) ────────────────────
+
+function buildBMHunterSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── HunterTalents — BM 41/20/0 from presets.go ──
+    const talents = new ProtoWriter();
+    talents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+    talents.fieldVarint(HT_FOCUSED_FIRE,         2);
+    talents.fieldVarint(HT_UNLEASHED_FURY,       5);
+    talents.fieldVarint(HT_FEROCITY,             5);
+    talents.fieldVarint(HT_BESTIAL_DISCIPLINE,   2);
+    talents.fieldVarint(HT_ANIMAL_HANDLER,       1);
+    talents.fieldVarint(HT_FRENZY,               5);
+    talents.fieldVarint(HT_FEROCIOUS_INSPIRATION, 3);
+    talents.fieldVarint(HT_BESTIAL_WRATH,        1);
+    talents.fieldVarint(HT_SERPENTS_SWIFTNESS,   5);
+    talents.fieldVarint(HT_THE_BEAST_WITHIN,     1);
+    // MM dip (20 points)
+    talents.fieldVarint(HT_LETHAL_SHOTS,         5);
+    talents.fieldVarint(HT_EFFICIENCY,           5);
+    talents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+    talents.fieldVarint(HT_AIMED_SHOT,           1);
+    talents.fieldVarint(HT_RAPID_KILLING,        2);
+    talents.fieldVarint(HT_MORTAL_SHOTS,         5);
+
+    // ── Rotation — basicRotation (lazy) from presets.go ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(HR_USE_MULTI_SHOT, 1);    // true
+    // use_arcane_shot = false (omit)
+    rotation.fieldVarint(HR_PRECAST_AIMED, 1);     // true
+    rotation.fieldVarint(HR_STING, 2);             // SerpentSting
+    rotation.fieldVarint(HR_LAZY_ROTATION, 1);     // true
+    writeDouble(rotation, HR_VIPER_START, 0.2);
+    writeDouble(rotation, HR_VIPER_STOP, 0.3);
+
+    // ── Options — basicOptions: Ravager pet ──
+    const options = new ProtoWriter();
+    options.fieldVarint(HRO_QUIVER_BONUS, 6);      // Speed15
+    options.fieldVarint(HRO_AMMO, 3);              // AdamantiteStinger
+    options.fieldVarint(HRO_PET_TYPE, 1);          // Ravager
+    writeDouble(options, HRO_PET_UPTIME, 0.9);
+    options.fieldVarint(HRO_LATENCY_MS, 15);
+
+    const hunterSpec = new ProtoWriter();
+    hunterSpec.fieldMessage(HUNTER_ROTATION, rotation);
+    hunterSpec.fieldMessage(HUNTER_TALENTS, talents);
+    hunterSpec.fieldMessage(HUNTER_OPTIONS, options);
+
+    // ── Consumes — Flask of Relentless Assault, Grilled Mudfish (agi), Haste Potion, FlameCap, Kiblers ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);              // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 2);               // GrilledMudfish (agi)
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);     // HastePotion
+    consumes.fieldVarint(CONS_DEFAULT_CONJURED, 2);   // FlameCap
+    consumes.fieldVarint(CONS_PET_FOOD, 1);           // KiblersBits
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);     // Improved
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('BM Hunter'));
+    player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+    player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    // ── Raid buffs ──
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);   // Improved
+
+    // ── Debuffs ──
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);           // Improved
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+    debuffs.fieldVarint(15, 2);  // hunters_mark = Improved
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for MM Hunter (Troll, 5/45/11 or 2/45/14) ─────────
+
+function buildMMHunterSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── HunterTalents — MM 5/45/11: standard raid MM build ──
+    const talents = new ProtoWriter();
+    // Beast Mastery dip (5 pts)
+    talents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+    // Marksmanship (45 pts)
+    talents.fieldVarint(HT_LETHAL_SHOTS,         5);
+    talents.fieldVarint(HT_IMPROVED_HUNTERS_MARK, 5);
+    talents.fieldVarint(HT_EFFICIENCY,           5);
+    talents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+    talents.fieldVarint(HT_AIMED_SHOT,           1);
+    talents.fieldVarint(HT_RAPID_KILLING,        2);
+    talents.fieldVarint(HT_MORTAL_SHOTS,         5);
+    talents.fieldVarint(HT_BARRAGE,              3);
+    talents.fieldVarint(HT_COMBAT_EXPERIENCE,    2);
+    talents.fieldVarint(HT_RANGED_WEAPON_SPEC,   5);
+    talents.fieldVarint(HT_CAREFUL_AIM,          3);
+    talents.fieldVarint(HT_TRUESHOT_AURA,        1);
+    talents.fieldVarint(HT_MASTER_MARKSMAN,      5);
+    talents.fieldVarint(HT_SILENCING_SHOT,       1);
+    // Survival dip (11 pts)
+    talents.fieldVarint(HT_MONSTER_SLAYING,      3);
+    talents.fieldVarint(HT_HUMANOID_SLAYING,     3);
+    talents.fieldVarint(HT_SAVAGE_STRIKES,       2);
+    talents.fieldVarint(HT_SUREFOOTED,           3);
+
+    // ── Rotation — frenchRotation: Multi+Arcane, higher viper thresholds ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
+    rotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+    rotation.fieldVarint(HR_PRECAST_AIMED, 1);
+    rotation.fieldVarint(HR_STING, 2);             // SerpentSting
+    writeDouble(rotation, HR_VIPER_START, 0.3);
+    writeDouble(rotation, HR_VIPER_STOP, 0.5);
+
+    // ── Options — basicOptions: Ravager pet ──
+    const options = new ProtoWriter();
+    options.fieldVarint(HRO_QUIVER_BONUS, 6);
+    options.fieldVarint(HRO_AMMO, 3);              // AdamantiteStinger
+    options.fieldVarint(HRO_PET_TYPE, 1);          // Ravager
+    writeDouble(options, HRO_PET_UPTIME, 0.9);
+    options.fieldVarint(HRO_LATENCY_MS, 15);
+
+    const hunterSpec = new ProtoWriter();
+    hunterSpec.fieldMessage(HUNTER_ROTATION, rotation);
+    hunterSpec.fieldMessage(HUNTER_TALENTS, talents);
+    hunterSpec.fieldMessage(HUNTER_OPTIONS, options);
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);              // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 2);               // GrilledMudfish (agi)
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);     // HastePotion
+    consumes.fieldVarint(CONS_DEFAULT_CONJURED, 2);   // FlameCap
+    consumes.fieldVarint(CONS_PET_FOOD, 1);           // KiblersBits
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('MM Hunter'));
+    player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+    player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+    debuffs.fieldVarint(15, 2);  // hunters_mark = Improved
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Survival Hunter (Troll, 5/15/41) ───────────────
+
+function buildSurvivalHunterSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── HunterTalents — SV 5/15/41 from presets.go ──
+    const talents = new ProtoWriter();
+    // Beast Mastery dip (5 pts)
+    talents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
+    // Marksmanship dip (15 pts)
+    talents.fieldVarint(HT_LETHAL_SHOTS,         5);
+    talents.fieldVarint(HT_IMPROVED_HUNTERS_MARK, 5);
+    talents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+    talents.fieldVarint(HT_FOCUSED_FIRE,         2);
+    talents.fieldVarint(HT_RAPID_KILLING,        1);
+    // Survival tree (41 pts)
+    talents.fieldVarint(HT_MONSTER_SLAYING,      3);
+    talents.fieldVarint(HT_HUMANOID_SLAYING,     3);
+    talents.fieldVarint(HT_SAVAGE_STRIKES,       2);
+    talents.fieldVarint(HT_CLEVER_TRAPS,         2);
+    talents.fieldVarint(HT_SURVIVALIST,          2);
+    talents.fieldVarint(HT_SUREFOOTED,           3);
+    talents.fieldVarint(HT_SURVIVAL_INSTINCTS,   2);
+    talents.fieldVarint(HT_KILLER_INSTINCT,      3);
+    talents.fieldVarint(HT_LIGHTNING_REFLEXES,   5);
+    talents.fieldVarint(HT_THRILL_OF_THE_HUNT,   2);
+    talents.fieldVarint(HT_EXPOSE_WEAKNESS,      3);
+    talents.fieldVarint(HT_MASTER_TACTICIAN,     5);
+    talents.fieldVarint(HT_READINESS,            1);
+
+    // ── Rotation — meleeWeaveRotation from presets.go ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
+    rotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+    rotation.fieldVarint(HR_STING, 2);             // SerpentSting
+    rotation.fieldVarint(HR_WEAVE, 3);             // WeaveFull
+    rotation.fieldVarint(HR_TIME_TO_WEAVE_MS, 500);
+    writeDouble(rotation, HR_PERCENT_WEAVED, 0.8);
+    writeDouble(rotation, HR_VIPER_START, 0.3);
+    writeDouble(rotation, HR_VIPER_STOP, 0.5);
+
+    // ── Options — windSerpentOptions from presets.go ──
+    const options = new ProtoWriter();
+    options.fieldVarint(HRO_QUIVER_BONUS, 6);
+    options.fieldVarint(HRO_AMMO, 3);              // AdamantiteStinger
+    options.fieldVarint(HRO_PET_TYPE, 6);          // WindSerpent
+    writeDouble(options, HRO_PET_UPTIME, 0.9);
+    options.fieldVarint(HRO_PET_SINGLE_ABILITY, 1); // true
+    options.fieldVarint(HRO_LATENCY_MS, 15);
+
+    const hunterSpec = new ProtoWriter();
+    hunterSpec.fieldMessage(HUNTER_ROTATION, rotation);
+    hunterSpec.fieldMessage(HUNTER_TALENTS, talents);
+    hunterSpec.fieldMessage(HUNTER_OPTIONS, options);
+
+    // ── Consumes ──
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_FLASK, 4);              // FlaskOfRelentlessAssault
+    consumes.fieldVarint(CONS_FOOD, 2);               // GrilledMudfish (agi)
+    consumes.fieldVarint(CONS_DEFAULT_POTION, 3);     // HastePotion
+    consumes.fieldVarint(CONS_DEFAULT_CONJURED, 2);   // FlameCap
+    consumes.fieldVarint(CONS_PET_FOOD, 1);           // KiblersBits
+
+    // ── Individual buffs ──
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_MIGHT, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    // ── Player ──
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Surv Hunter'));
+    player.fieldVarint(PLAYER_RACE, RACE_TROLL);
+    player.fieldVarint(PLAYER_CLASS, CLASS_HUNTER);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_HUNTER, hunterSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_SUNDER_ARMOR, 1);
+    debuffs.fieldVarint(DB_FAERIE_FIRE, 2);
+    debuffs.fieldVarint(DB_CURSE_OF_RECKLESSNESS, 1);
+    debuffs.fieldVarint(15, 2);  // hunters_mark = Improved
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
 // ─── Build ComputeStatsRequest ───────────────────────────────────────────────
 // ComputeStatsRequest { raid = 1 }
 // Reuses the same Raid message as buildRaidSimRequest but without Encounter/SimOptions
@@ -3151,32 +3552,40 @@ function buildComputeStatsRequest(gearSlots, specKey) {
     } else if (specKey === 'Hunter-Marksmanship') {
         const hunterTalents = new ProtoWriter();
         hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
-        hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);
-        hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
-        hunterTalents.fieldVarint(HT_FEROCITY,             5);
         hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
         hunterTalents.fieldVarint(HT_IMPROVED_HUNTERS_MARK, 5);
         hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
         hunterTalents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
         hunterTalents.fieldVarint(HT_AIMED_SHOT,           1);
+        hunterTalents.fieldVarint(HT_RAPID_KILLING,        2);
         hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         5);
         hunterTalents.fieldVarint(HT_BARRAGE,              3);
+        hunterTalents.fieldVarint(HT_COMBAT_EXPERIENCE,    2);
         hunterTalents.fieldVarint(HT_RANGED_WEAPON_SPEC,   5);
         hunterTalents.fieldVarint(HT_CAREFUL_AIM,          3);
         hunterTalents.fieldVarint(HT_TRUESHOT_AURA,        1);
         hunterTalents.fieldVarint(HT_MASTER_MARKSMAN,      5);
+        hunterTalents.fieldVarint(HT_SILENCING_SHOT,       1);
+        // SV dip
+        hunterTalents.fieldVarint(HT_MONSTER_SLAYING,      3);
+        hunterTalents.fieldVarint(HT_HUMANOID_SLAYING,     3);
+        hunterTalents.fieldVarint(HT_SAVAGE_STRIKES,       2);
+        hunterTalents.fieldVarint(HT_SUREFOOTED,           3);
 
         const hunterOptions = new ProtoWriter();
         hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
-        hunterOptions.fieldVarint(HRO_AMMO, 6);
-        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
-        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+        hunterOptions.fieldVarint(HRO_AMMO, 3);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 1);
+        writeDouble(hunterOptions, HRO_PET_UPTIME, 0.9);
+        hunterOptions.fieldVarint(HRO_LATENCY_MS, 15);
 
         const hunterRotation = new ProtoWriter();
         hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
         hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+        hunterRotation.fieldVarint(HR_PRECAST_AIMED, 1);
         hunterRotation.fieldVarint(HR_STING, 2);
-        hunterRotation.fieldVarint(HR_WEAVE, 3);
+        writeDouble(hunterRotation, HR_VIPER_START, 0.3);
+        writeDouble(hunterRotation, HR_VIPER_STOP, 0.5);
 
         const hunterSpec = new ProtoWriter();
         hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
@@ -3185,7 +3594,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
         const consumes = new ProtoWriter();
         consumes.fieldVarint(CONS_FLASK, 4);
-        consumes.fieldVarint(CONS_FOOD, 4);
+        consumes.fieldVarint(CONS_FOOD, 2);            // GrilledMudfish (agi)
 
         player = new ProtoWriter();
         player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('MM Hunter'));
@@ -3202,6 +3611,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
         hunterTalents.fieldVarint(HT_FEROCITY,             5);
         hunterTalents.fieldVarint(HT_BESTIAL_DISCIPLINE,   2);
+        hunterTalents.fieldVarint(HT_ANIMAL_HANDLER,       1);
         hunterTalents.fieldVarint(HT_FRENZY,               5);
         hunterTalents.fieldVarint(HT_FEROCIOUS_INSPIRATION, 3);
         hunterTalents.fieldVarint(HT_BESTIAL_WRATH,        1);
@@ -3209,19 +3619,25 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         hunterTalents.fieldVarint(HT_THE_BEAST_WITHIN,     1);
         hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
         hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
-        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         3);
+        hunterTalents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+        hunterTalents.fieldVarint(HT_AIMED_SHOT,           1);
+        hunterTalents.fieldVarint(HT_RAPID_KILLING,        2);
+        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         5);
 
         const hunterOptions = new ProtoWriter();
         hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
-        hunterOptions.fieldVarint(HRO_AMMO, 6);
-        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
-        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+        hunterOptions.fieldVarint(HRO_AMMO, 3);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 1);
+        writeDouble(hunterOptions, HRO_PET_UPTIME, 0.9);
+        hunterOptions.fieldVarint(HRO_LATENCY_MS, 15);
 
         const hunterRotation = new ProtoWriter();
         hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
-        hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
+        hunterRotation.fieldVarint(HR_PRECAST_AIMED, 1);
         hunterRotation.fieldVarint(HR_STING, 2);
-        hunterRotation.fieldVarint(HR_WEAVE, 3);
+        hunterRotation.fieldVarint(HR_LAZY_ROTATION, 1);
+        writeDouble(hunterRotation, HR_VIPER_START, 0.2);
+        writeDouble(hunterRotation, HR_VIPER_STOP, 0.3);
 
         const hunterSpec = new ProtoWriter();
         hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
@@ -3230,7 +3646,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
         const consumes = new ProtoWriter();
         consumes.fieldVarint(CONS_FLASK, 4);
-        consumes.fieldVarint(CONS_FOOD, 4);
+        consumes.fieldVarint(CONS_FOOD, 2);            // GrilledMudfish (agi)
 
         player = new ProtoWriter();
         player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('BM Hunter'));
@@ -3243,30 +3659,42 @@ function buildComputeStatsRequest(gearSlots, specKey) {
     } else if (specKey === 'Hunter-Survival') {
         const hunterTalents = new ProtoWriter();
         hunterTalents.fieldVarint(HT_IMPROVED_ASPECT_OF_HAWK, 5);
-        hunterTalents.fieldVarint(HT_UNLEASHED_FURY,       5);
-        hunterTalents.fieldVarint(HT_FEROCITY,             5);
+        hunterTalents.fieldVarint(HT_FOCUSED_FIRE,         2);
         hunterTalents.fieldVarint(HT_LETHAL_SHOTS,         5);
-        hunterTalents.fieldVarint(HT_EFFICIENCY,           5);
-        hunterTalents.fieldVarint(HT_MORTAL_SHOTS,         5);
-        hunterTalents.fieldVarint(HT_RANGED_WEAPON_SPEC,   5);
-        hunterTalents.fieldVarint(HT_CAREFUL_AIM,          3);
+        hunterTalents.fieldVarint(HT_IMPROVED_HUNTERS_MARK, 5);
+        hunterTalents.fieldVarint(HT_GO_FOR_THE_THROAT,    2);
+        hunterTalents.fieldVarint(HT_RAPID_KILLING,        1);
+        hunterTalents.fieldVarint(HT_MONSTER_SLAYING,      3);
+        hunterTalents.fieldVarint(HT_HUMANOID_SLAYING,     3);
+        hunterTalents.fieldVarint(HT_SAVAGE_STRIKES,       2);
+        hunterTalents.fieldVarint(HT_CLEVER_TRAPS,         2);
+        hunterTalents.fieldVarint(HT_SURVIVALIST,          2);
+        hunterTalents.fieldVarint(HT_SUREFOOTED,           3);
+        hunterTalents.fieldVarint(HT_SURVIVAL_INSTINCTS,   2);
+        hunterTalents.fieldVarint(HT_KILLER_INSTINCT,      3);
         hunterTalents.fieldVarint(HT_LIGHTNING_REFLEXES,   5);
-        hunterTalents.fieldVarint(HT_THRILL_OF_THE_HUNT,   3);
+        hunterTalents.fieldVarint(HT_THRILL_OF_THE_HUNT,   2);
         hunterTalents.fieldVarint(HT_EXPOSE_WEAKNESS,      3);
         hunterTalents.fieldVarint(HT_MASTER_TACTICIAN,     5);
         hunterTalents.fieldVarint(HT_READINESS,            1);
 
         const hunterOptions = new ProtoWriter();
         hunterOptions.fieldVarint(HRO_QUIVER_BONUS, 6);
-        hunterOptions.fieldVarint(HRO_AMMO, 6);
-        hunterOptions.fieldVarint(HRO_PET_TYPE, 2);
-        hunterOptions.fieldVarint(HRO_PET_UPTIME, 1);
+        hunterOptions.fieldVarint(HRO_AMMO, 3);
+        hunterOptions.fieldVarint(HRO_PET_TYPE, 6);
+        writeDouble(hunterOptions, HRO_PET_UPTIME, 0.9);
+        hunterOptions.fieldVarint(HRO_PET_SINGLE_ABILITY, 1);
+        hunterOptions.fieldVarint(HRO_LATENCY_MS, 15);
 
         const hunterRotation = new ProtoWriter();
         hunterRotation.fieldVarint(HR_USE_MULTI_SHOT, 1);
         hunterRotation.fieldVarint(HR_USE_ARCANE_SHOT, 1);
         hunterRotation.fieldVarint(HR_STING, 2);
         hunterRotation.fieldVarint(HR_WEAVE, 3);
+        hunterRotation.fieldVarint(HR_TIME_TO_WEAVE_MS, 500);
+        writeDouble(hunterRotation, HR_PERCENT_WEAVED, 0.8);
+        writeDouble(hunterRotation, HR_VIPER_START, 0.3);
+        writeDouble(hunterRotation, HR_VIPER_STOP, 0.5);
 
         const hunterSpec = new ProtoWriter();
         hunterSpec.fieldMessage(HUNTER_ROTATION, hunterRotation);
@@ -3275,7 +3703,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
         const consumes = new ProtoWriter();
         consumes.fieldVarint(CONS_FLASK, 4);
-        consumes.fieldVarint(CONS_FOOD, 4);
+        consumes.fieldVarint(CONS_FOOD, 2);            // GrilledMudfish (agi)
 
         player = new ProtoWriter();
         player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Surv Hunter'));
@@ -4092,6 +4520,36 @@ class WowSimBridge {
     runArcaneMage(gearSlots, onProgress, iterations = 3000) {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
         const request = buildArcaneMageSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runBMHunter(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildBMHunterSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runMMHunter(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildMMHunterSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runSurvivalHunter(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildSurvivalHunterSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
         return new Promise((resolve, reject) => {
             this._pending[id] = { resolve, reject, onProgress };
