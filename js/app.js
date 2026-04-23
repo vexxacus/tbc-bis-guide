@@ -2115,11 +2115,17 @@
 
             // "Main Hand~Off Hand" means weapon usable in either hand
             if (slot === 'Main Hand~Off Hand') {
-                // Add to both MH and OH
+                // Add to both MH and OH, inserting by rank order
+                const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2, 'PvP BIS': 3, 'PvP Alt': 4 };
                 for (const s of ['Main Hand', 'Off Hand']) {
                     if (!slotGroups[s]) slotGroups[s] = [];
                     if (!slotGroups[s].find(i => i.itemId === item.itemId)) {
-                        slotGroups[s].push({ ...item, slot: s });
+                        const entry = { ...item, slot: s };
+                        const entryRank = rankOrder[entry.rank] ?? 99;
+                        // Find insertion index to keep rank-sorted
+                        let idx = slotGroups[s].findIndex(i => (rankOrder[i.rank] ?? 99) > entryRank);
+                        if (idx === -1) idx = slotGroups[s].length;
+                        slotGroups[s].splice(idx, 0, entry);
                     }
                 }
                 continue;
