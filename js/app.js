@@ -1212,8 +1212,9 @@
                 const r2h = rankOrder[top2H.rank] ?? 99;
                 const rmh = rankOrder[topMH.rank] ?? 99;
                 if (r2h < rmh) return '2h';
-                // If the top Main Hand item is actually the same 2H weapon, prefer 2h
-                if (r2h === rmh && top2H.itemId === topMH.itemId) return '2h';
+                // If the top Main Hand item also appears in the Two Hand list,
+                // it's a 2H weapon mis-listed as MH — prefer 2h mode
+                if (topMH && twoHanders.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
                 return 'dw';
             }
         }
@@ -2876,7 +2877,7 @@
                      :            SIM_STAT_LABELS_MELEE;
         // Bear uses a different stat order: no block/parry, has crit-immune badge via SotF
         const order  = isHealer ? SIM_STAT_ORDER_HEALER
-                     : isCaster ? SIM_STAT_ORDER_CASTER
+                     : isCaster ? getCasterStatOrder(specKey)
                      : isHunter ? SIM_STAT_ORDER_HUNTER
                      : isBear   ? SIM_STAT_ORDER_TANK_BEAR
                      : isTank   ? SIM_STAT_ORDER_TANK

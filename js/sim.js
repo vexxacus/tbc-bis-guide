@@ -336,12 +336,41 @@ const SIM_STAT_LABELS_CASTER = {
      3: { label: 'Intellect',     fmt: v => Math.round(v) },
      4: { label: 'Spirit',        fmt: v => Math.round(v) },
      5: { label: 'Spell Power',   fmt: v => Math.round(v) },
+     7: { label: 'Arcane Power',  fmt: v => Math.round(v) },
+     8: { label: 'Fire Power',    fmt: v => Math.round(v) },
+     9: { label: 'Frost Power',   fmt: v => Math.round(v) },
+    11: { label: 'Nature Power',  fmt: v => Math.round(v) },
     12: { label: 'Shadow Power',  fmt: v => Math.round(v) },
     14: { label: 'Spell Hit',     fmt: v => `${Math.round(v)} (${(v / SPELL_HIT_RATING_PER_PCT).toFixed(2)}%)` },
     15: { label: 'Spell Crit',    fmt: v => `${Math.round(v)} (${(v / SPELL_CRIT_RATING_PER_PCT).toFixed(2)}%)` },
     16: { label: 'Spell Haste',   fmt: v => `${Math.round(v)} (${(v / SPELL_HASTE_RATING_PER_PCT).toFixed(2)}%)` },
     13: { label: 'MP5',           fmt: v => Math.round(v) },
 };
+// Base order (school-specific power slot filled per spec)
+const SIM_STAT_ORDER_CASTER_BASE = [35, 2, 3, 4, 5];
+const SIM_STAT_ORDER_CASTER_TAIL = [14, 15, 16, 13];
+
+// Per-spec school power stat index
+const CASTER_SCHOOL_POWER = {
+    'Mage-Fire':                8,   // FireSpellPower
+    'Mage-Frost':               9,   // FrostSpellPower
+    'Mage-Arcane':              7,   // ArcaneSpellPower
+    'Warlock-Destruction':     8,    // FireSpellPower
+    'Warlock-Affliction':      12,   // ShadowSpellPower
+    'Warlock-Demonology':      12,   // ShadowSpellPower
+    'Priest-Shadow':           12,   // ShadowSpellPower
+    'Shaman-Elemental':        11,   // NatureSpellPower
+    'Druid-Balance':           7,    // ArcaneSpellPower (+ NatureSpellPower, but Starfire is arcane)
+};
+
+function getCasterStatOrder(specKey) {
+    const schoolIdx = CASTER_SCHOOL_POWER[specKey];
+    if (schoolIdx) {
+        return [...SIM_STAT_ORDER_CASTER_BASE, schoolIdx, ...SIM_STAT_ORDER_CASTER_TAIL];
+    }
+    return [...SIM_STAT_ORDER_CASTER_BASE, ...SIM_STAT_ORDER_CASTER_TAIL];
+}
+// Legacy alias
 const SIM_STAT_ORDER_CASTER = [35, 2, 3, 4, 5, 12, 14, 15, 16, 13];
 
 /**
