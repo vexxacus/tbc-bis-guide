@@ -72683,10 +72683,10 @@
               "name": "Ring of Ancient Knowledge"
             },
             {
-              "itemId": "33497",
+              "itemId": "29305",
               "slot": "Ring",
               "rank": "BIS",
-              "name": "Mana Attuned Band"
+              "name": "Band of the Eternal Sage"
             },
             {
               "itemId": "32247",
@@ -72695,10 +72695,10 @@
               "name": "Ring of Captured Storms"
             },
             {
-              "itemId": "29305",
+              "itemId": "33497",
               "slot": "Ring",
               "rank": "BIS",
-              "name": "Band of the Eternal Sage"
+              "name": "Mana Attuned Band"
             },
             {
               "itemId": "32483",
