@@ -1205,10 +1205,15 @@
             const mainHanders = slotGroups['Main Hand'];
             const offHanders = slotGroups['Off Hand'];
             const weapons = slotGroups['Weapon'];
-            // If top MH and top OH are the same item, it's a 2H weapon → force 2h
+            // If top MH and top OH are the same item, check if it's a 2H weapon or dual-wielded
             const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
             const topOH = offHanders && offHanders.length ? offHanders[0] : null;
-            if (topMH && topOH && String(topMH.itemId) === String(topOH.itemId)) return '2h';
+            if (topMH && topOH && String(topMH.itemId) === String(topOH.itemId)) {
+                // Only treat as 2H if the item is also in the Two Hand list
+                if (twoHanders && twoHanders.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
+                // Otherwise it's a "Main Hand~Off Hand" weapon dual-wielded → DW
+                return 'dw';
+            }
             // If top MH matches a Weapon/Two Hand entry, it's a 2H
             if (topMH && weapons && weapons.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
             if (twoHanders && twoHanders.length) {
