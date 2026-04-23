@@ -1200,21 +1200,24 @@
         // Specs with a fixed default bypass auto-detect
         const specKey = `${state.selectedClass}-${state.selectedSpec}`;
         if (WEAPON_MODE_DEFAULT[specKey]) return WEAPON_MODE_DEFAULT[specKey];
-        // Auto-detect: if there's a Two Hand item ranked #1 (first entry), use '2h'
         if (slotGroups) {
             const twoHanders = slotGroups['Two Hand'];
             const mainHanders = slotGroups['Main Hand'];
+            const offHanders = slotGroups['Off Hand'];
+            const weapons = slotGroups['Weapon'];
+            // If top MH and top OH are the same item, it's a 2H weapon → force 2h
+            const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
+            const topOH = offHanders && offHanders.length ? offHanders[0] : null;
+            if (topMH && topOH && String(topMH.itemId) === String(topOH.itemId)) return '2h';
+            // If top MH matches a Weapon/Two Hand entry, it's a 2H
+            if (topMH && weapons && weapons.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
             if (twoHanders && twoHanders.length) {
-                const top2H = twoHanders[0];
-                const topMH = mainHanders && mainHanders.length ? mainHanders[0] : null;
                 if (!topMH) return '2h';
                 const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
-                const r2h = rankOrder[top2H.rank] ?? 99;
+                const r2h = rankOrder[twoHanders[0].rank] ?? 99;
                 const rmh = rankOrder[topMH.rank] ?? 99;
                 if (r2h < rmh) return '2h';
-                // If the top Main Hand item also appears in the Two Hand list,
-                // it's a 2H weapon mis-listed as MH — prefer 2h mode
-                if (topMH && twoHanders.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
+                if (twoHanders.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
                 return 'dw';
             }
         }

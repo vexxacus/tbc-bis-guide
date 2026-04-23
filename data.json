@@ -72269,12 +72269,6 @@
               "name": "The Skull of Gul'dan"
             },
             {
-              "itemId": "33829",
-              "slot": "Trinket",
-              "rank": "BIS",
-              "name": "Hex Shrunken Head"
-            },
-            {
               "itemId": "30720",
               "slot": "Trinket",
               "rank": "BIS",
@@ -72841,7 +72835,7 @@
             {
               "itemId": "32374",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Zhar'doom, Greatstaff of the Devourer"
             }
           ],
