@@ -1301,6 +1301,13 @@ body {
     border-top: 1px solid rgba(255,255,255,0.05);
     padding-top: 8px;
 }
+.sim-tip {
+    margin-top: 6px;
+    border-top: none;
+    padding-top: 0;
+    font-style: italic;
+    color: rgba(255,255,255,0.35);
+}
 
 /* Item notes / gearing tips */
 .item-note {
