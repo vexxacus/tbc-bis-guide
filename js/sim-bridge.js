@@ -360,21 +360,27 @@ const PT_SPIRIT_OF_REDEMPTION     = 33;  // bool → +5% spirit
 
 // MageTalents fields — verified against proto/mage.proto
 const MT_ARCANE_SUBTLETY      = 1;
+const MT_ARCANE_FOCUS         = 2;   // 0-5
 const MT_ARCANE_CONCENTRATION = 4;   // 0-5
+const MT_ARCANE_IMPACT        = 5;   // 0-3
 const MT_ARCANE_MEDITATION    = 6;   // 0-3
 const MT_PRESENCE_OF_MIND     = 7;   // bool
 const MT_ARCANE_MIND          = 8;   // 0-5
 const MT_ARCANE_INSTABILITY   = 9;   // 0-3
-const MT_ARCANE_POTENCY       = 10;  // 0-2
+const MT_ARCANE_POTENCY       = 10;  // 0-3
 const MT_ARCANE_POWER         = 12;  // bool
 const MT_SPELL_POWER          = 13;  // 0-5
 const MT_MIND_MASTERY         = 14;  // 0-5
 const MT_IMPROVED_FIREBALL    = 15;  // 0-5
 const MT_IGNITE               = 16;  // 0-5
+const MT_IMPROVED_FIRE_BLAST  = 17;  // 0-3
+const MT_INCINERATION         = 18;  // 0-2
+const MT_PYROBLAST            = 20;  // bool
 const MT_IMPROVED_SCORCH      = 21;  // 0-3
 const MT_MASTER_OF_ELEMENTS   = 22;  // 0-3
 const MT_PLAYING_WITH_FIRE    = 23;  // 0-3
 const MT_CRITICAL_MASS        = 24;  // 0-3
+const MT_BLAST_WAVE           = 25;  // bool
 const MT_FIRE_POWER           = 26;  // 0-5
 const MT_PYROMANIAC           = 27;  // 0-3
 const MT_COMBUSTION           = 28;  // bool
@@ -387,6 +393,7 @@ const MT_PIERCING_ICE         = 36;  // 0-3
 const MT_ICY_VEINS            = 37;  // bool
 const MT_FROST_CHANNELING     = 38;  // 0-3
 const MT_SHATTER              = 39;  // 0-5
+const MT_COLD_SNAP            = 40;  // bool
 const MT_WINTERS_CHILL        = 43;  // 0-5
 const MT_ARCTIC_WINDS         = 44;  // 0-5
 const MT_EMPOWERED_FROSTBOLT  = 45;  // 0-5
@@ -398,10 +405,10 @@ const MAGE_OPTIONS  = 3;
 const MO_ARMOR      = 1;  // 0=NoArmor, 1=MageArmor, 2=MoltenArmor
 
 // Mage.Rotation field numbers
-const MR_TYPE        = 1;  // enum: 0=Unknown, 1=Arcane, 2=Fire, 3=Frost
-const MR_ARCANE      = 5;  // ArcaneRotation sub-message
-const MR_FIRE        = 6;  // FireRotation sub-message
-const MR_FROST       = 7;  // FrostRotation sub-message
+const MR_TYPE        = 1;  // enum: 0=Arcane, 1=Fire, 2=Frost
+const MR_ARCANE      = 2;  // ArcaneRotation sub-message
+const MR_FIRE        = 3;  // FireRotation sub-message
+const MR_FROST       = 4;  // FrostRotation sub-message
 // ArcaneRotation fields
 const MRA_FILLER                      = 1;  // enum: 0=Frostbolt,1=AM,4=AM+FB
 const MRA_ARCANE_BLASTS_BETWEEN       = 2;  // int32
@@ -412,7 +419,7 @@ const MRF_PRIMARY_SPELL               = 1;  // enum: 0=Fireball, 1=Scorch
 const MRF_MAINTAIN_IMPROVED_SCORCH    = 2;  // bool
 const MRF_WEAVE_FIRE_BLAST            = 3;  // bool
 // FrostRotation fields
-const MRFR_WATER_ELEMENTAL_DISOBEY    = 1;  // float
+const MRFR_WATER_ELEMENTAL_DISOBEY    = 3;  // double
 
 // WarlockTalents fields — verified against proto/warlock.proto
 const WLT_SUPPRESSION         = 1;
@@ -1649,7 +1656,7 @@ function buildFireMageSimRequest(gearSlots, iterations, randomSeed) {
     fireRot.fieldVarint(MRF_WEAVE_FIRE_BLAST, 1);        // true
 
     const rotation = new ProtoWriter();
-    rotation.fieldVarint(MR_TYPE, 2);  // Fire
+    rotation.fieldVarint(MR_TYPE, 1);  // Fire
     rotation.fieldMessage(MR_FIRE, fireRot);
 
     // Talents: 2-505202012303331053125-043500001
@@ -1657,10 +1664,14 @@ function buildFireMageSimRequest(gearSlots, iterations, randomSeed) {
     talents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
     talents.fieldVarint(MT_IMPROVED_FIREBALL,    5);
     talents.fieldVarint(MT_IGNITE,               5);
+    talents.fieldVarint(MT_IMPROVED_FIRE_BLAST,  3);
+    talents.fieldVarint(MT_INCINERATION,         2);
+    talents.fieldVarint(MT_PYROBLAST,            1);
     talents.fieldVarint(MT_IMPROVED_SCORCH,      3);
     talents.fieldVarint(MT_MASTER_OF_ELEMENTS,   3);
     talents.fieldVarint(MT_PLAYING_WITH_FIRE,    3);
     talents.fieldVarint(MT_CRITICAL_MASS,        3);
+    talents.fieldVarint(MT_BLAST_WAVE,           1);
     talents.fieldVarint(MT_FIRE_POWER,           5);
     talents.fieldVarint(MT_PYROMANIAC,           3);
     talents.fieldVarint(MT_COMBUSTION,           1);
@@ -1761,7 +1772,7 @@ function buildFrostMageSimRequest(gearSlots, iterations, randomSeed) {
     // Actually the proto field is double in wowsims wire format for simplicity. Let's keep 0.
 
     const rotation = new ProtoWriter();
-    rotation.fieldVarint(MR_TYPE, 3);  // Frost
+    rotation.fieldVarint(MR_TYPE, 2);  // Frost
     rotation.fieldMessage(MR_FROST, frostRot);
 
     // Talents: Deep Frost 230015031003--0535000310230012241551
@@ -1875,14 +1886,16 @@ function buildArcaneMageSimRequest(gearSlots, iterations, randomSeed) {
     writeDouble(arcaneRot, MRA_STOP_REGEN_PERCENT, 0.5);
 
     const rotation = new ProtoWriter();
-    rotation.fieldVarint(MR_TYPE, 1);  // Arcane
+    rotation.fieldVarint(MR_TYPE, 0);  // Arcane
     rotation.fieldMessage(MR_ARCANE, arcaneRot);
 
     // Talents: Arcane 40/0/21 — "2500250300030150330125--053500031003001"
     const talents = new ProtoWriter();
     // Arcane tree (40 pts)
     talents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
+    talents.fieldVarint(MT_ARCANE_FOCUS,         5);
     talents.fieldVarint(MT_ARCANE_CONCENTRATION, 5);
+    talents.fieldVarint(MT_ARCANE_IMPACT,        3);
     talents.fieldVarint(MT_ARCANE_MEDITATION,    3);
     talents.fieldVarint(MT_PRESENCE_OF_MIND,     1);
     talents.fieldVarint(MT_ARCANE_MIND,          5);
@@ -1898,6 +1911,7 @@ function buildArcaneMageSimRequest(gearSlots, iterations, randomSeed) {
     talents.fieldVarint(MT_ICY_VEINS,            1);
     talents.fieldVarint(MT_PIERCING_ICE,         5);
     talents.fieldVarint(MT_FROST_CHANNELING,     3);
+    talents.fieldVarint(MT_COLD_SNAP,            1);
 
     const options = new ProtoWriter();
     options.fieldVarint(MO_ARMOR, 1);  // MageArmor
