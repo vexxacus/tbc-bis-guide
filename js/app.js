@@ -1211,7 +1211,10 @@
                 const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
                 const r2h = rankOrder[top2H.rank] ?? 99;
                 const rmh = rankOrder[topMH.rank] ?? 99;
-                return r2h < rmh ? '2h' : 'dw';
+                if (r2h < rmh) return '2h';
+                // If the top Main Hand item is actually the same 2H weapon, prefer 2h
+                if (r2h === rmh && top2H.itemId === topMH.itemId) return '2h';
+                return 'dw';
             }
         }
         return 'dw';

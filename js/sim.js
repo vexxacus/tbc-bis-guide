@@ -201,6 +201,12 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
     const metaGem     = (gems || []).find(g => g.isMeta);
     const metaGemId   = metaGem ? parseInt(metaGem.itemId) : 0;
 
+    // Collect Two Hand item IDs to filter them out of Off Hand
+    const twoHandIds = new Set();
+    if (slotGroups['Two Hand']) {
+        for (const i of slotGroups['Two Hand']) twoHandIds.add(String(i.itemId));
+    }
+
     for (const [bisSlot, items] of Object.entries(slotGroups)) {
         if (!items || !items.length) continue;
 
@@ -221,6 +227,31 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
 
         const id = parseInt(item.itemId);
         if (!id) continue;
+
+        // In DW mode, skip Off Hand items that are actually 2H weapons
+        if (weaponMode === 'dw' && bisSlot === 'Off Hand' && twoHandIds.has(String(item.itemId))) {
+            // Try next non-2H item in the slot
+            const altItem = items.find(i => i.itemId && !twoHandIds.has(String(i.itemId)));
+            if (!altItem) continue;  // No valid off-hand available
+            const altId = parseInt(altItem.itemId);
+            if (!altId) continue;
+            usedWsSlots.add(wsSlot);
+            const slotDisplayName2 = bisSlot.replace(/ [12]$/, '');
+            const enchantEntry2 = enchantLookup
+                ? (enchantLookup[bisSlot] || enchantLookup[slotDisplayName2] || enchantLookup['Main Hand~Off Hand'])
+                : null;
+            const enchantId2 = enchantEntry2 ? (SPELL_TO_ENCHANT_ID[enchantEntry2.spellId] || 0) : 0;
+            let itemGems2 = [];
+            const sockets2 = (typeof ITEM_SOCKETS !== 'undefined' && ITEM_SOCKETS[String(altId)]) || null;
+            if (sockets2 && sockets2.length) {
+                for (const socketColor of sockets2) {
+                    if (socketColor === 'm') { if (metaGemId) itemGems2.push(metaGemId); }
+                    else { if (regularGems.length) itemGems2.push(regularGems[0]); }
+                }
+            }
+            gearSlots.push({ slot: wsSlot, id: altId, enchant: enchantId2, gems: itemGems2 });
+            continue;
+        }
 
         usedWsSlots.add(wsSlot);
 
