@@ -2774,7 +2774,7 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
@@ -2785,6 +2785,8 @@
         'Druid-Balance': 'Simulation uses Adaptive Balance Druid rotation (Starfire + Moonfire, Faerie Fire maintained, auto-adjusts for mana). Self-Innervate, Force of Nature on cooldown. 3 000 iterations, 300s fight, Tauren vs. boss-level target.',
         'Shaman-Elemental': 'Simulation uses Adaptive Elemental Shaman rotation (Lightning Bolt + Chain Lightning, Totem of Wrath, Water Shield). Bloodlust included. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Warlock-Affliction': 'Simulation uses Affliction Warlock rotation (Shadow Bolt filler + Corruption, UA, Siphon Life, CoE, Immolate). Succubus sacrifice for 15% shadow dmg. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
+        'Warlock-Destruction': 'Simulation uses Destruction Warlock rotation (Shadow Bolt filler + Immolate, Curse of Doom). Succubus sacrifice for 15% shadow dmg. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
+        'Warlock-Demonology': 'Simulation uses Demonology Warlock rotation (Shadow Bolt filler + Corruption, Immolate, Curse of Elements) with Felguard pet. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
     };
 
     const simPanel       = document.getElementById('simPanel');
@@ -2959,6 +2961,8 @@
                         : specKey === 'Druid-Balance'   ? simulateBalanceDruid
                         : specKey === 'Shaman-Elemental' ? simulateEleShaman
                         : specKey === 'Warlock-Affliction' ? simulateAfflictionWarlock
+                        : specKey === 'Warlock-Destruction' ? simulateDestructionWarlock
+                        : specKey === 'Warlock-Demonology' ? simulateDemonologyWarlock
                         : simulateFuryWarrior;
 
             try {

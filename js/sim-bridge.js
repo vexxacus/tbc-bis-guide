@@ -415,9 +415,16 @@ const WLT_UNSTABLE_AFFLICTION = 14;  // bool
 const WLT_DEMONIC_EMBRACE     = 16;  // 0-5
 const WLT_IMPROVED_VOIDWALKER = 17;  // 0-3
 const WLT_FEL_INTELLECT       = 18;  // 0-3
+const WLT_IMPROVED_SAYAAD     = 19;  // 0-3
 const WLT_FEL_STAMINA         = 20;  // 0-3
 const WLT_DEMONIC_AEGIS       = 21;  // 0-3
+const WLT_UNHOLY_POWER        = 22;  // 0-5
 const WLT_DEMONIC_SACRIFICE   = 24;  // bool
+const WLT_MASTER_CONJUROR     = 25;  // 0-3
+const WLT_MANA_FEED           = 26;  // 0-3
+const WLT_MASTER_DEMONOLOGIST = 27;  // 0-5
+const WLT_SOUL_LINK           = 28;  // bool
+const WLT_DEMONIC_KNOWLEDGE   = 29;  // 0-3
 const WLT_DEMONIC_TACTICS     = 30;  // 0-5
 const WLT_SUMMON_FELGUARD     = 31;  // bool
 const WLT_IMPROVED_SHADOW_BOLT = 32; // 0-5
@@ -1350,6 +1357,238 @@ function buildAfflictionWarlockSimRequest(gearSlots, iterations, randomSeed) {
     raid.fieldMessage(RAID_DEBUFFS, debuffs);
 
     // ── Target (level 73 Unknown mob type) ──
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Destruction Warlock (Undead, Fire/Shadow) ──────
+
+function buildDestructionWarlockSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── Warlock.Rotation — Destro: SB filler + Immolate + CoD ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(WLR_PRIMARY_SPELL, 1);  // Shadowbolt
+    rotation.fieldVarint(WLR_CURSE, 3);           // Curse of Doom
+    rotation.fieldVarint(WLR_IMMOLATE, 1);        // true
+    rotation.fieldVarint(WLR_DETONATE_SEED, 1);   // true
+
+    // ── WarlockTalents — Destruction 0/21/40: "-20501301332001-50500051220051053105" ──
+    const talents = new ProtoWriter();
+    // Demonology dip (21 points)
+    talents.fieldVarint(WLT_DEMONIC_EMBRACE,       5);
+    talents.fieldVarint(WLT_IMPROVED_VOIDWALKER,   1);
+    talents.fieldVarint(WLT_FEL_INTELLECT,         3);
+    talents.fieldVarint(WLT_FEL_STAMINA,           3);
+    talents.fieldVarint(WLT_DEMONIC_AEGIS,         3);
+    talents.fieldVarint(WLT_DEMONIC_SACRIFICE,     1);
+    // Destruction tree (40 points)
+    talents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,  5);
+    talents.fieldVarint(WLT_BANE,                  5);
+    talents.fieldVarint(WLT_DEVASTATION,           5);
+    talents.fieldVarint(WLT_SHADOWBURN,            1);
+    talents.fieldVarint(WLT_DESTRUCTIVE_REACH,     2);
+    talents.fieldVarint(WLT_IMPROVED_IMMOLATE,     5);
+    talents.fieldVarint(WLT_RUIN,                  1);
+    talents.fieldVarint(WLT_EMBERSTORM,            5);
+    talents.fieldVarint(WLT_BACKLASH,              3);
+    talents.fieldVarint(WLT_CONFLAGRATE,           1);
+    talents.fieldVarint(WLT_SHADOW_AND_FLAME,      5);
+
+    // ── Warlock Options — FelArmor, Succubus sacrifice (fire dmg +15%) ──
+    const options = new ProtoWriter();
+    options.fieldVarint(WLO_ARMOR, 1);       // FelArmor
+    options.fieldVarint(WLO_SUMMON, 3);      // Succubus
+    options.fieldVarint(WLO_SACRIFICE, 1);   // Sacrifice = true
+
+    const warlockSpec = new ProtoWriter();
+    warlockSpec.fieldMessage(WARLOCK_ROTATION, rotation);
+    warlockSpec.fieldMessage(WARLOCK_TALENTS, talents);
+    warlockSpec.fieldMessage(WARLOCK_OPTIONS, options);
+
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Destro Warlock'));
+    player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+    player.fieldVarint(PLAYER_CLASS, CLASS_WARLOCK);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_WARLOCK, warlockSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+    debuffs.fieldVarint(DB_MISERY, 1);
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);
+    debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Demonology Warlock (Undead, Felguard) ─────────
+
+function buildDemonologyWarlockSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // ── Warlock.Rotation — Demo: SB filler + Corruption + CoE + Immolate ──
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(WLR_PRIMARY_SPELL, 1);  // Shadowbolt
+    rotation.fieldVarint(WLR_CURSE, 1);           // Curse of Elements
+    rotation.fieldVarint(WLR_IMMOLATE, 1);        // true
+    rotation.fieldVarint(WLR_CORRUPTION, 1);      // true
+    rotation.fieldVarint(WLR_DETONATE_SEED, 1);   // true
+
+    // ── WarlockTalents — Demonology 1/41/19: "01-2050030133250101501351-5050005112" ──
+    const talents = new ProtoWriter();
+    // Affliction (1 point)
+    talents.fieldVarint(WLT_IMPROVED_CORRUPTION,   1);  // just 1 point
+    // Demonology tree (41 points)
+    talents.fieldVarint(WLT_DEMONIC_EMBRACE,       5);
+    talents.fieldVarint(WLT_FEL_INTELLECT,         3);
+    talents.fieldVarint(WLT_IMPROVED_SAYAAD,       3);
+    talents.fieldVarint(WLT_FEL_STAMINA,           3);
+    talents.fieldVarint(WLT_DEMONIC_AEGIS,         3);
+    talents.fieldVarint(WLT_UNHOLY_POWER,          5);
+    talents.fieldVarint(WLT_DEMONIC_SACRIFICE,     1);
+    talents.fieldVarint(WLT_MANA_FEED,             1);
+    talents.fieldVarint(WLT_MASTER_DEMONOLOGIST,   5);
+    talents.fieldVarint(WLT_SOUL_LINK,             1);
+    talents.fieldVarint(WLT_DEMONIC_KNOWLEDGE,     3);
+    talents.fieldVarint(WLT_DEMONIC_TACTICS,       5);
+    talents.fieldVarint(WLT_SUMMON_FELGUARD,       1);
+    // Destruction dip (19 points)
+    talents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,  5);
+    talents.fieldVarint(WLT_BANE,                  5);
+    talents.fieldVarint(WLT_DEVASTATION,           5);
+    talents.fieldVarint(WLT_IMPROVED_IMMOLATE,     1);
+    talents.fieldVarint(WLT_RUIN,                  1);
+
+    // ── Warlock Options — FelArmor, Felguard (no sacrifice) ──
+    const options = new ProtoWriter();
+    options.fieldVarint(WLO_ARMOR, 1);       // FelArmor
+    options.fieldVarint(WLO_SUMMON, 5);      // Felguard
+
+    const warlockSpec = new ProtoWriter();
+    warlockSpec.fieldMessage(WARLOCK_ROTATION, rotation);
+    warlockSpec.fieldMessage(WARLOCK_TALENTS, talents);
+    warlockSpec.fieldMessage(WARLOCK_OPTIONS, options);
+
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Demo Warlock'));
+    player.fieldVarint(PLAYER_RACE, RACE_UNDEAD);
+    player.fieldVarint(PLAYER_CLASS, CLASS_WARLOCK);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_WARLOCK, warlockSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+    debuffs.fieldVarint(DB_MISERY, 1);
+    debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
     const target = new ProtoWriter();
     target.fieldVarint(TARGET_LEVEL, 73);
     target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
@@ -2494,12 +2733,27 @@ function buildComputeStatsRequest(gearSlots, specKey) {
 
     } else if (specKey === 'Warlock-Demonology') {
         const wlTalents = new ProtoWriter();
+        // Affliction (1 point)
+        wlTalents.fieldVarint(WLT_IMPROVED_CORRUPTION,   1);
+        // Demonology (41 points)
         wlTalents.fieldVarint(WLT_DEMONIC_EMBRACE,       5);
+        wlTalents.fieldVarint(WLT_FEL_INTELLECT,         3);
+        wlTalents.fieldVarint(WLT_IMPROVED_SAYAAD,       3);
+        wlTalents.fieldVarint(WLT_FEL_STAMINA,           3);
+        wlTalents.fieldVarint(WLT_DEMONIC_AEGIS,         3);
+        wlTalents.fieldVarint(WLT_UNHOLY_POWER,          5);
+        wlTalents.fieldVarint(WLT_DEMONIC_SACRIFICE,     1);
+        wlTalents.fieldVarint(WLT_MANA_FEED,             1);
+        wlTalents.fieldVarint(WLT_MASTER_DEMONOLOGIST,   5);
+        wlTalents.fieldVarint(WLT_SOUL_LINK,             1);
+        wlTalents.fieldVarint(WLT_DEMONIC_KNOWLEDGE,     3);
         wlTalents.fieldVarint(WLT_DEMONIC_TACTICS,       5);
         wlTalents.fieldVarint(WLT_SUMMON_FELGUARD,       1);
+        // Destruction dip (19 points)
         wlTalents.fieldVarint(WLT_IMPROVED_SHADOW_BOLT,  5);
-        wlTalents.fieldVarint(WLT_CATACLYSM,             5);
         wlTalents.fieldVarint(WLT_BANE,                  5);
+        wlTalents.fieldVarint(WLT_DEVASTATION,           5);
+        wlTalents.fieldVarint(WLT_IMPROVED_IMMOLATE,     1);
         wlTalents.fieldVarint(WLT_RUIN,                  1);
 
         const wlOptions = new ProtoWriter();
@@ -3422,6 +3676,26 @@ class WowSimBridge {
                 id:        id,
                 inputData: request,
             });
+        });
+    }
+
+    runDestructionWarlock(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildDestructionWarlockSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runDemonologyWarlock(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildDemonologyWarlockSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
         });
     }
 
