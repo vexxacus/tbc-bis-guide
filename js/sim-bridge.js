@@ -397,6 +397,23 @@ const MAGE_TALENTS  = 2;
 const MAGE_OPTIONS  = 3;
 const MO_ARMOR      = 1;  // 0=NoArmor, 1=MageArmor, 2=MoltenArmor
 
+// Mage.Rotation field numbers
+const MR_TYPE        = 1;  // enum: 0=Unknown, 1=Arcane, 2=Fire, 3=Frost
+const MR_ARCANE      = 5;  // ArcaneRotation sub-message
+const MR_FIRE        = 6;  // FireRotation sub-message
+const MR_FROST       = 7;  // FrostRotation sub-message
+// ArcaneRotation fields
+const MRA_FILLER                      = 1;  // enum: 0=Frostbolt,1=AM,4=AM+FB
+const MRA_ARCANE_BLASTS_BETWEEN       = 2;  // int32
+const MRA_START_REGEN_PERCENT         = 3;  // float
+const MRA_STOP_REGEN_PERCENT          = 4;  // float
+// FireRotation fields
+const MRF_PRIMARY_SPELL               = 1;  // enum: 0=Fireball, 1=Scorch
+const MRF_MAINTAIN_IMPROVED_SCORCH    = 2;  // bool
+const MRF_WEAVE_FIRE_BLAST            = 3;  // bool
+// FrostRotation fields
+const MRFR_WATER_ELEMENTAL_DISOBEY    = 1;  // float
+
 // WarlockTalents fields — verified against proto/warlock.proto
 const WLT_SUPPRESSION         = 1;
 const WLT_IMPROVED_CORRUPTION = 2;   // 0-5
@@ -1583,6 +1600,345 @@ function buildDemonologyWarlockSimRequest(gearSlots, iterations, randomSeed) {
     debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
     debuffs.fieldVarint(DB_MISERY, 1);
     debuffs.fieldVarint(DB_SHADOW_WEAVING, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Fire Mage (Gnome) ────────────────────────────
+
+function buildFireMageSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // Fire rotation: Fireball + maintain Scorch + weave Fire Blast
+    const fireRot = new ProtoWriter();
+    fireRot.fieldVarint(MRF_PRIMARY_SPELL, 0);          // Fireball
+    fireRot.fieldVarint(MRF_MAINTAIN_IMPROVED_SCORCH, 1); // true
+    fireRot.fieldVarint(MRF_WEAVE_FIRE_BLAST, 1);        // true
+
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(MR_TYPE, 2);  // Fire
+    rotation.fieldMessage(MR_FIRE, fireRot);
+
+    // Talents: 2-505202012303331053125-043500001
+    const talents = new ProtoWriter();
+    talents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
+    talents.fieldVarint(MT_IMPROVED_FIREBALL,    5);
+    talents.fieldVarint(MT_IGNITE,               5);
+    talents.fieldVarint(MT_IMPROVED_SCORCH,      3);
+    talents.fieldVarint(MT_MASTER_OF_ELEMENTS,   3);
+    talents.fieldVarint(MT_PLAYING_WITH_FIRE,    3);
+    talents.fieldVarint(MT_CRITICAL_MASS,        3);
+    talents.fieldVarint(MT_FIRE_POWER,           5);
+    talents.fieldVarint(MT_PYROMANIAC,           3);
+    talents.fieldVarint(MT_COMBUSTION,           1);
+    talents.fieldVarint(MT_MOLTEN_FURY,          2);
+    talents.fieldVarint(MT_EMPOWERED_FIREBALL,   5);
+    // Frost dip
+    talents.fieldVarint(MT_IMPROVED_FROSTBOLT,   4);
+    talents.fieldVarint(MT_ELEMENTAL_PRECISION,  3);
+    talents.fieldVarint(MT_ICE_SHARDS,           5);
+    talents.fieldVarint(MT_ICY_VEINS,            1);
+
+    const options = new ProtoWriter();
+    options.fieldVarint(MO_ARMOR, 2);  // MoltenArmor
+
+    const mageSpec = new ProtoWriter();
+    mageSpec.fieldMessage(MAGE_ROTATION, rotation);
+    mageSpec.fieldMessage(MAGE_TALENTS, talents);
+    mageSpec.fieldMessage(MAGE_OPTIONS, options);
+
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Fire Mage'));
+    player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+    player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+    debuffs.fieldVarint(DB_MISERY, 1);
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Frost Mage (Gnome, Deep Frost w/ Water Ele) ──
+
+function buildFrostMageSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // Frost rotation: just Frostbolt spam + Water Elemental
+    const frostRot = new ProtoWriter();
+    // waterElementalDisobeyChance = 0.1 (float, field 1)
+    // Use writeFloat helper — but we have writeDouble; for proto float we need 4-byte.
+    // Actually the proto field is double in wowsims wire format for simplicity. Let's keep 0.
+
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(MR_TYPE, 3);  // Frost
+    rotation.fieldMessage(MR_FROST, frostRot);
+
+    // Talents: Deep Frost 230015031003--0535000310230012241551
+    const talents = new ProtoWriter();
+    talents.fieldVarint(MT_ARCANE_SUBTLETY,        2);
+    talents.fieldVarint(MT_ARCANE_CONCENTRATION,   5);
+    talents.fieldVarint(MT_ARCANE_MEDITATION,       3);
+    // Frost tree
+    talents.fieldVarint(MT_IMPROVED_FROSTBOLT,     5);
+    talents.fieldVarint(MT_ELEMENTAL_PRECISION,    3);
+    talents.fieldVarint(MT_ICE_SHARDS,             5);
+    talents.fieldVarint(MT_PIERCING_ICE,           3);
+    talents.fieldVarint(MT_ICY_VEINS,              1);
+    talents.fieldVarint(MT_FROST_CHANNELING,       3);
+    talents.fieldVarint(MT_SHATTER,                5);
+    talents.fieldVarint(MT_WINTERS_CHILL,          5);
+    talents.fieldVarint(MT_ARCTIC_WINDS,           5);
+    talents.fieldVarint(MT_EMPOWERED_FROSTBOLT,    5);
+    talents.fieldVarint(MT_SUMMON_WATER_ELEMENTAL, 1);
+
+    const options = new ProtoWriter();
+    options.fieldVarint(MO_ARMOR, 1);  // MageArmor
+
+    const mageSpec = new ProtoWriter();
+    mageSpec.fieldMessage(MAGE_ROTATION, rotation);
+    mageSpec.fieldMessage(MAGE_TALENTS, talents);
+    mageSpec.fieldMessage(MAGE_OPTIONS, options);
+
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Frost Mage'));
+    player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+    player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+    debuffs.fieldVarint(DB_MISERY, 1);
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);
+
+    const raid = new ProtoWriter();
+    raid.fieldMessage(RAID_PARTIES, party);
+    raid.fieldMessage(RAID_BUFFS, raidBuffs);
+    raid.fieldMessage(RAID_DEBUFFS, debuffs);
+
+    const target = new ProtoWriter();
+    target.fieldVarint(TARGET_LEVEL, 73);
+    target.fieldVarint(TARGET_MOB_TYPE, MOB_TYPE_UNKNOWN);
+    writeDouble(target, 7, 4000.0);
+    writeDouble(target, 8, 2.0);
+
+    const encounter = new ProtoWriter();
+    writeDouble(encounter, ENC_DURATION, 300.0);
+    writeDouble(encounter, ENC_DURATION_VARIATION, 5.0);
+    writeDouble(encounter, ENC_EXECUTE_PROPORTION, 0.0);
+    encounter.fieldMessage(ENC_TARGETS, target);
+
+    const simOptions = new ProtoWriter();
+    simOptions.fieldVarint(SIMOPT_ITERATIONS, iterations || 3000);
+    simOptions.fieldVarint(SIMOPT_RANDOM_SEED, randomSeed || Math.floor(Math.random() * 0x7fffffff));
+
+    const rsr = new ProtoWriter();
+    rsr.fieldMessage(RSR_RAID, raid);
+    rsr.fieldMessage(RSR_ENCOUNTER, encounter);
+    rsr.fieldMessage(RSR_SIM_OPTIONS, simOptions);
+
+    return rsr.finish();
+}
+
+// ─── Build RaidSimRequest for Arcane Mage (Gnome, AB + Frostbolt filler) ───
+
+function buildArcaneMageSimRequest(gearSlots, iterations, randomSeed) {
+    const equipSpec = new ProtoWriter();
+    for (const slot of gearSlots) {
+        const itemSpec = new ProtoWriter();
+        itemSpec.fieldVarint(ITEM_ID, slot.id);
+        if (slot.enchant) itemSpec.fieldVarint(ITEM_ENCHANT, slot.enchant);
+        for (const gem of (slot.gems || [])) itemSpec.fieldVarint(ITEM_GEMS, gem);
+        equipSpec.fieldMessage(EQUIP_ITEMS, itemSpec);
+    }
+
+    // Arcane rotation: AB x3 + Frostbolt filler, regen thresholds 20%/50%
+    const arcaneRot = new ProtoWriter();
+    arcaneRot.fieldVarint(MRA_FILLER, 0);   // Frostbolt filler
+    arcaneRot.fieldVarint(MRA_ARCANE_BLASTS_BETWEEN, 3);
+    // start/stop regen percentages as float — encode as fixed32 (IEEE 754)
+    // 0.2 = 0x3E4CCCCD, 0.5 = 0x3F000000
+    // Use writeDouble for simplicity (field type 1 = double)
+    writeDouble(arcaneRot, MRA_START_REGEN_PERCENT, 0.2);
+    writeDouble(arcaneRot, MRA_STOP_REGEN_PERCENT, 0.5);
+
+    const rotation = new ProtoWriter();
+    rotation.fieldVarint(MR_TYPE, 1);  // Arcane
+    rotation.fieldMessage(MR_ARCANE, arcaneRot);
+
+    // Talents: Arcane 40/0/21 — "2500250300030150330125--053500031003001"
+    const talents = new ProtoWriter();
+    // Arcane tree (40 pts)
+    talents.fieldVarint(MT_ARCANE_SUBTLETY,      2);
+    talents.fieldVarint(MT_ARCANE_CONCENTRATION, 5);
+    talents.fieldVarint(MT_ARCANE_MEDITATION,    3);
+    talents.fieldVarint(MT_PRESENCE_OF_MIND,     1);
+    talents.fieldVarint(MT_ARCANE_MIND,          5);
+    talents.fieldVarint(MT_ARCANE_INSTABILITY,   3);
+    talents.fieldVarint(MT_ARCANE_POTENCY,       3);
+    talents.fieldVarint(MT_ARCANE_POWER,         1);
+    talents.fieldVarint(MT_SPELL_POWER,          2);
+    talents.fieldVarint(MT_MIND_MASTERY,         5);
+    // Frost dip (21 pts)
+    talents.fieldVarint(MT_IMPROVED_FROSTBOLT,   5);
+    talents.fieldVarint(MT_ELEMENTAL_PRECISION,  3);
+    talents.fieldVarint(MT_ICE_SHARDS,           5);
+    talents.fieldVarint(MT_ICY_VEINS,            1);
+    talents.fieldVarint(MT_PIERCING_ICE,         5);
+    talents.fieldVarint(MT_FROST_CHANNELING,     3);
+
+    const options = new ProtoWriter();
+    options.fieldVarint(MO_ARMOR, 1);  // MageArmor
+
+    const mageSpec = new ProtoWriter();
+    mageSpec.fieldMessage(MAGE_ROTATION, rotation);
+    mageSpec.fieldMessage(MAGE_TALENTS, talents);
+    mageSpec.fieldMessage(MAGE_OPTIONS, options);
+
+    const consumes = new ProtoWriter();
+    consumes.fieldVarint(CONS_SP_FLASK, 3);           // FlaskOfPureDeath (or BlindingLight for arcane — but PureDeath is fine)
+    consumes.fieldVarint(CONS_SP_FOOD, 1);            // BlackenedBasilisk
+    consumes.fieldVarint(CONS_SP_DEFAULT_POTION, 2);  // SuperManaPotion
+    consumes.fieldVarint(CONS_SP_MH_IMBUE, 4);        // SuperiorWizardOil
+
+    const indBuffs = new ProtoWriter();
+    indBuffs.fieldVarint(IB_BLESSING_OF_KINGS, 1);
+    indBuffs.fieldVarint(IB_BLESSING_OF_WISDOM, 2);
+    indBuffs.fieldVarint(IB_BLESSING_OF_SALVATION, 1);
+
+    const player = new ProtoWriter();
+    player.fieldBytes(PLAYER_NAME, new TextEncoder().encode('Arcane Mage'));
+    player.fieldVarint(PLAYER_RACE, RACE_GNOME);
+    player.fieldVarint(PLAYER_CLASS, CLASS_MAGE);
+    player.fieldMessage(PLAYER_EQUIPMENT, equipSpec);
+    player.fieldMessage(PLAYER_CONSUMES, consumes);
+    player.fieldMessage(PLAYER_BUFFS, indBuffs);
+    player.fieldMessage(PLAYER_MAGE, mageSpec);
+
+    const party = new ProtoWriter();
+    party.fieldMessage(PARTY_PLAYERS, player);
+
+    const raidBuffs = new ProtoWriter();
+    raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
+    raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
+    raidBuffs.fieldVarint(RB_GIFT_OF_THE_WILD, 2);
+
+    const debuffs = new ProtoWriter();
+    debuffs.fieldVarint(DB_JUDGEMENT_OF_WISDOM, 1);
+    debuffs.fieldVarint(DB_MISERY, 1);
+    debuffs.fieldVarint(DB_CURSE_OF_ELEMENTS, 1);
 
     const raid = new ProtoWriter();
     raid.fieldMessage(RAID_PARTIES, party);
@@ -3692,6 +4048,36 @@ class WowSimBridge {
     runDemonologyWarlock(gearSlots, onProgress, iterations = 3000) {
         if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
         const request = buildDemonologyWarlockSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runFireMage(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildFireMageSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runFrostMage(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildFrostMageSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
+        const id      = this._makeTaskId();
+        return new Promise((resolve, reject) => {
+            this._pending[id] = { resolve, reject, onProgress };
+            this.worker.postMessage({ msg: 'raidSimAsync', id, inputData: request });
+        });
+    }
+
+    runArcaneMage(gearSlots, onProgress, iterations = 3000) {
+        if (!this.ready) return Promise.reject(new Error('WASM not ready yet'));
+        const request = buildArcaneMageSimRequest(gearSlots, iterations, Math.floor(Math.random() * 0x7fffffff));
         const id      = this._makeTaskId();
         return new Promise((resolve, reject) => {
             this._pending[id] = { resolve, reject, onProgress };

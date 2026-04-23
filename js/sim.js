@@ -649,3 +649,21 @@ async function simulateDemonologyWarlock(slotGroups, getActiveItemFn, weaponMode
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runDemonologyWarlock(gearSlots, onProgress, iterations), gearSlots);
 }
+
+async function simulateFireMage(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runFireMage(gearSlots, onProgress, iterations), gearSlots);
+}
+
+async function simulateFrostMage(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runFrostMage(gearSlots, onProgress, iterations), gearSlots);
+}
+
+async function simulateArcaneMage(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runArcaneMage(gearSlots, onProgress, iterations), gearSlots);
+}

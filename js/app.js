@@ -2774,7 +2774,7 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
@@ -2787,6 +2787,9 @@
         'Warlock-Affliction': 'Simulation uses Affliction Warlock rotation (Shadow Bolt filler + Corruption, UA, Siphon Life, CoE, Immolate). Succubus sacrifice for 15% shadow dmg. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
         'Warlock-Destruction': 'Simulation uses Destruction Warlock rotation (Shadow Bolt filler + Immolate, Curse of Doom). Succubus sacrifice for 15% shadow dmg. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
         'Warlock-Demonology': 'Simulation uses Demonology Warlock rotation (Shadow Bolt filler + Corruption, Immolate, Curse of Elements) with Felguard pet. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
+        'Mage-Fire': 'Simulation uses Fire Mage rotation (Fireball filler + maintain Improved Scorch + Fire Blast weave). Molten Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
+        'Mage-Frost': 'Simulation uses Deep Frost Mage rotation (Frostbolt spam + Water Elemental). Mage Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
+        'Mage-Arcane': 'Simulation uses Arcane Mage rotation (Arcane Blast ×3 + Frostbolt filler, regen at 20%/50% mana). Mage Armor. 3 000 iterations, 300s fight, Gnome vs. boss-level target.',
     };
 
     const simPanel       = document.getElementById('simPanel');
@@ -2963,6 +2966,9 @@
                         : specKey === 'Warlock-Affliction' ? simulateAfflictionWarlock
                         : specKey === 'Warlock-Destruction' ? simulateDestructionWarlock
                         : specKey === 'Warlock-Demonology' ? simulateDemonologyWarlock
+                        : specKey === 'Mage-Fire' ? simulateFireMage
+                        : specKey === 'Mage-Frost' ? simulateFrostMage
+                        : specKey === 'Mage-Arcane' ? simulateArcaneMage
                         : simulateFuryWarrior;
 
             try {
