@@ -161,6 +161,9 @@ const SPELL_TO_ENCHANT_ID = {
     // Sunfire — caster fire/arcane
     27981: 22560,
     22560: 22560,
+    // Major Intellect — +30 int weapon
+    27982: 22555,
+    22555: 22555,
 
     // ── Ring ──────────────────────────────────────────────────────────────────
     // Ring - Stats (+4 all stats)
@@ -623,4 +626,14 @@ async function simulateEleShaman(slotGroups, getActiveItemFn, weaponMode, enchan
     const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
     if (!gearSlots.length) throw new Error('No gear selected');
     return _retrySimDps(() => _simBridge.runEleShaman(gearSlots, onProgress, iterations), gearSlots);
+}
+
+/**
+ * Run DPS simulation for Affliction Warlock.
+ * Affliction uses Succubus sacrifice, SB filler + DoTs.
+ */
+async function simulateAfflictionWarlock(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems, onProgress, iterations = 3000) {
+    const gearSlots = _cleanGearSlots(buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantLookup, gems));
+    if (!gearSlots.length) throw new Error('No gear selected');
+    return _retrySimDps(() => _simBridge.runAfflictionWarlock(gearSlots, onProgress, iterations), gearSlots);
 }
