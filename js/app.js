@@ -1211,8 +1211,8 @@
             if (topMH && topOH && String(topMH.itemId) === String(topOH.itemId)) {
                 // Only treat as 2H if the item is also in the Two Hand list
                 if (twoHanders && twoHanders.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
-                // Otherwise it's a "Main Hand~Off Hand" weapon dual-wielded → DW
-                return 'dw';
+                // Otherwise it's a "Main Hand~Off Hand" weapon dual-wielded
+                // But still compare rank with Two Hand BIS before deciding
             }
             // If top MH matches a Weapon/Two Hand entry, it's a 2H
             if (topMH && weapons && weapons.some(i => String(i.itemId) === String(topMH.itemId))) return '2h';
