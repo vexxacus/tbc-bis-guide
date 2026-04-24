@@ -2102,7 +2102,7 @@
 
         // Group by slot, dedup
         // Ring and Trinket are split into slot 1 and slot 2 (you wear two of each)
-        const _ringBuf = [], _trinketBuf = [];
+        const _ringBuf = [], _trinketBuf = [], _mhohBuf = [];
         const slotGroups = {};
         for (const item of items) {
             let slot = item.slot;
@@ -2113,27 +2113,32 @@
             if (slot === 'Ring')    { if (!_ringBuf.find(i => i.itemId === item.itemId))    _ringBuf.push(item);    continue; }
             if (slot === 'Trinket') { if (!_trinketBuf.find(i => i.itemId === item.itemId)) _trinketBuf.push(item); continue; }
 
-            // "Main Hand~Off Hand" means weapon usable in either hand
+            // "Main Hand~Off Hand" — defer until after regular items are placed
             if (slot === 'Main Hand~Off Hand') {
-                // Add to both MH and OH, inserting by rank order
-                const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2, 'PvP BIS': 3, 'PvP Alt': 4 };
-                for (const s of ['Main Hand', 'Off Hand']) {
-                    if (!slotGroups[s]) slotGroups[s] = [];
-                    if (!slotGroups[s].find(i => i.itemId === item.itemId)) {
-                        const entry = { ...item, slot: s };
-                        const entryRank = rankOrder[entry.rank] ?? 99;
-                        // Find insertion index to keep rank-sorted
-                        let idx = slotGroups[s].findIndex(i => (rankOrder[i.rank] ?? 99) > entryRank);
-                        if (idx === -1) idx = slotGroups[s].length;
-                        slotGroups[s].splice(idx, 0, entry);
-                    }
-                }
+                _mhohBuf.push(item);
                 continue;
             }
 
             if (!slotGroups[slot]) slotGroups[slot] = [];
             if (!slotGroups[slot].find(i => i.itemId === item.itemId)) {
                 slotGroups[slot].push(item);
+            }
+        }
+
+        // Now merge deferred MH~OH items into MH and OH by rank order
+        if (_mhohBuf.length) {
+            const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2, 'PvP BIS': 3, 'PvP Alt': 4 };
+            for (const item of _mhohBuf) {
+                for (const s of ['Main Hand', 'Off Hand']) {
+                    if (!slotGroups[s]) slotGroups[s] = [];
+                    if (!slotGroups[s].find(i => i.itemId === item.itemId)) {
+                        const entry = { ...item, slot: s };
+                        const entryRank = rankOrder[entry.rank] ?? 99;
+                        let idx = slotGroups[s].findIndex(i => (rankOrder[i.rank] ?? 99) > entryRank);
+                        if (idx === -1) idx = slotGroups[s].length;
+                        slotGroups[s].splice(idx, 0, entry);
+                    }
+                }
             }
         }
 

@@ -56,6 +56,7 @@ const SPELL_TO_ENCHANT_ID = {
     29483: 28888,
     28888: 28888,
     35407: 28888,   // Classic variant spellId for Greater Inscription of Vengeance
+    35417: 28888,   // Another variant spellId for Greater Inscription of Vengeance
     // Greater Inscription of Discipline (+18 SP, +10 crit) — Aldor exalted
     35437: 28886,
     28886: 28886,

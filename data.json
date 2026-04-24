@@ -62035,7 +62035,7 @@
             {
               "itemId": "29121",
               "slot": "Main Hand~Off Hand",
-              "rank": "BIS",
+              "rank": "Alt",
               "name": "Guile of Khoraazi"
             },
             {
@@ -62179,7 +62179,7 @@
             {
               "itemId": "28587",
               "slot": "Two Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Legacy"
             },
             {
@@ -62279,6 +62279,10 @@
             {
               "spellId": "30260",
               "slot": "Ranged/Relic"
+            },
+            {
+              "spellId": "27977",
+              "slot": "Two Hand"
             }
           ]
         },
