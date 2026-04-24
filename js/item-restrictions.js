@@ -6,13 +6,32 @@
 // Add item IDs here when needed — used by app.js to prevent invalid dual-wield suggestions.
 
 const ITEM_UNIQUE = new Set([
-    // Weapons — Unique (cannot dual-wield two of the same)
+    // Weapons — Unique or Unique-Equipped (confirmed via Wowhead tooltip)
+    28429,  // Lionheart Champion
+    28430,  // Lionheart Executioner
     28438,  // Dragonmaw
     28439,  // Dragonstrike
-    32837,  // Warglaive of Azzinoth (MH)
-    32838,  // Warglaive of Azzinoth (OH) — pair is fine, but two MH not possible
-    32471,  // Shard of Azzinoth
+    28441,  // Deep Thunder
+    28442,  // Stormherald
+    28524,  // Emerald Ripper
+    28572,  // Blade of the Unrequited
+    28658,  // Terestian's Stranglestaff
+    28768,  // Malchazeen
+    29121,  // Guile of Khoraazi
+    29124,  // Vindicator's Brand
+    29171,  // Earthwarden
+    29359,  // Feral Staff of Lashing
+    29962,  // Heartrazor
+    29996,  // Rod of the Sun King
+    30021,  // Wildfury Greatstaff
     30082,  // Talon of Azshara
+    30103,  // Fang of Vashj
+    30865,  // Tracker's Blade
+    30901,  // Boundless Agony
+    32236,  // Rising Tide
+    32471,  // Shard of Azzinoth
+    32837,  // Warglaive of Azzinoth (MH)
+    32838,  // Warglaive of Azzinoth (OH)
     32944,  // Talon of the Phoenix
     32946,  // Claw of Molten Fury
     33495,  // Rage

@@ -38917,28 +38917,10 @@
               "name": "Feral Staff of Lashing"
             },
             {
-              "itemId": "28658",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Terestian's Stranglestaff"
-            },
-            {
               "itemId": "28476",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Gladiator's Maul"
-            },
-            {
-              "itemId": "29171",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Earthwarden"
-            },
-            {
-              "itemId": "29359",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Feral Staff of Lashing"
             },
             {
               "itemId": "28658",
@@ -39591,22 +39573,10 @@
               "name": "Gladiator's Maul"
             },
             {
-              "itemId": "30021",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Wildfury Greatstaff"
-            },
-            {
               "itemId": "32014",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Merciless Gladiator's Maul"
-            },
-            {
-              "itemId": "28658",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Terestian's Stranglestaff"
             },
             {
               "itemId": "28476",
@@ -41203,12 +41173,6 @@
               "name": "Vengeful Gladiator's Staff"
             },
             {
-              "itemId": "30021",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Wildfury Greatstaff"
-            },
-            {
               "itemId": "33465",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -41741,12 +41705,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Stanchion of Primal Instinct"
-            },
-            {
-              "itemId": "30021",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Wildfury Greatstaff"
             },
             {
               "itemId": "35103",
@@ -42813,22 +42771,10 @@
               "name": "Staff of Natural Fury"
             },
             {
-              "itemId": "28658",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Terestian's Stranglestaff"
-            },
-            {
               "itemId": "28476",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Gladiator's Maul"
-            },
-            {
-              "itemId": "29359",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Feral Staff of Lashing"
             },
             {
               "itemId": "31334",
@@ -43443,22 +43389,10 @@
               "name": "Merciless Gladiator's Maul"
             },
             {
-              "itemId": "28658",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Terestian's Stranglestaff"
-            },
-            {
               "itemId": "28476",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Gladiator's Maul"
-            },
-            {
-              "itemId": "30021",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Wildfury Greatstaff"
             },
             {
               "itemId": "32014",
@@ -52105,12 +52039,6 @@
               "name": "Void-Talon"
             },
             {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
               "itemId": "23242",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -52925,24 +52853,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -54019,12 +53929,6 @@
               "name": "Dagger of Bad Mojo"
             },
             {
-              "itemId": "30901",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Boundless Agony"
-            },
-            {
               "itemId": "30881",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -54035,12 +53939,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Vengeful Gladiator's Left Ripper"
-            },
-            {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
             },
             {
               "itemId": "32269",
@@ -54059,24 +53957,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -55235,12 +55115,6 @@
               "name": "Vengeful Gladiator's Left Ripper"
             },
             {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
-            },
-            {
               "itemId": "32269",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -55257,24 +55131,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -55995,12 +55851,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Vengeful Gladiator's Left Ripper"
-            },
-            {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
             },
             {
               "itemId": "32269",
@@ -57193,21 +57043,9 @@
               "name": "Ripfang Paw"
             },
             {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Blade of the Unrequited"
-            },
-            {
               "itemId": "28315",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Stormreaver Warblades"
             },
             {
@@ -58031,24 +57869,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -59125,12 +58945,6 @@
               "name": "Dagger of Bad Mojo"
             },
             {
-              "itemId": "30901",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Boundless Agony"
-            },
-            {
               "itemId": "30881",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -59141,12 +58955,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Vengeful Gladiator's Left Ripper"
-            },
-            {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
             },
             {
               "itemId": "32269",
@@ -59165,24 +58973,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -60337,12 +60127,6 @@
               "name": "Vengeful Gladiator's Left Ripper"
             },
             {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
-            },
-            {
               "itemId": "32269",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -60359,24 +60143,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "28315",
@@ -61087,12 +60853,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Vengeful Gladiator's Left Ripper"
-            },
-            {
-              "itemId": "30865",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Tracker's Blade"
             },
             {
               "itemId": "32269",
@@ -62299,20 +62059,8 @@
             {
               "itemId": "28263",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Stellaris"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "29372",
@@ -63087,28 +62835,10 @@
               "name": "Netherbane"
             },
             {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
               "itemId": "28263",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Stellaris"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "29372",
@@ -63999,34 +63729,16 @@
               "name": "Claw of the Phoenix"
             },
             {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
               "itemId": "29924",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
             },
             {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
               "itemId": "28263",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Stellaris"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "29372",
@@ -64937,7 +64649,7 @@
             {
               "itemId": "33389",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Dagger of Bad Mojo"
             },
             {
@@ -64959,28 +64671,10 @@
               "name": "Netherbane"
             },
             {
-              "itemId": "29121",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Guile of Khoraazi"
-            },
-            {
               "itemId": "28263",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Stellaris"
-            },
-            {
-              "itemId": "28524",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Emerald Ripper"
-            },
-            {
-              "itemId": "28572",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Blade of the Unrequited"
             },
             {
               "itemId": "29372",
@@ -65659,12 +65353,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Shiv of Exsanguination"
-            },
-            {
-              "itemId": "30901",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Boundless Agony"
             },
             {
               "itemId": "34203",
@@ -87651,18 +87339,6 @@
               "name": "Hammer of the Naaru"
             },
             {
-              "itemId": "28429",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Lionheart Champion"
-            },
-            {
-              "itemId": "28441",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Deep Thunder"
-            },
-            {
               "itemId": "30722",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -88263,22 +87939,10 @@
               "name": "Merciless Gladiator's Greatsword"
             },
             {
-              "itemId": "28430",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Lionheart Executioner"
-            },
-            {
               "itemId": "29993",
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Twinblade of the Phoenix"
-            },
-            {
-              "itemId": "28442",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Stormherald"
             },
             {
               "itemId": "31984",
@@ -89599,12 +89263,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Vengeful Gladiator's Greatsword"
-            },
-            {
-              "itemId": "28430",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Lionheart Executioner"
             },
             {
               "itemId": "32332",
@@ -98371,12 +98029,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "The Night Blade"
-            },
-            {
-              "itemId": "29124",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Vindicator's Brand"
             }
           ],
           "gems": [
@@ -98799,12 +98451,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Gladiator's Shanker"
-            },
-            {
-              "itemId": "28768",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Malchazeen"
             },
             {
               "itemId": "28307",
@@ -99265,40 +98911,16 @@
               "name": "Heartrazor"
             },
             {
-              "itemId": "30082",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Talon of Azshara"
-            },
-            {
               "itemId": "32052",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Slicer"
-            },
-            {
-              "itemId": "29996",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Rod of the Sun King"
             },
             {
               "itemId": "28295",
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Gladiator's Slicer"
-            },
-            {
-              "itemId": "30103",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Fang of Vashj"
-            },
-            {
-              "itemId": "29962",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Heartrazor"
             },
             {
               "itemId": "32027",
@@ -100355,15 +99977,9 @@
               "name": "Vengeful Gladiator's Shanker"
             },
             {
-              "itemId": "32471",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Shard of Azzinoth"
-            },
-            {
               "itemId": "32838",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Warglaive of Azzinoth"
             },
             {
@@ -100389,12 +100005,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Vengeful Gladiator's Quickblade"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
             },
             {
               "itemId": "32052",
@@ -107563,15 +107173,9 @@
               "name": "Fist of Reckoning"
             },
             {
-              "itemId": "29996",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Rod of the Sun King"
-            },
-            {
               "itemId": "31965",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Merciless Gladiator's Cleaver"
             },
             {
@@ -108819,18 +108423,6 @@
               "name": "High Warlord's Cleaver"
             },
             {
-              "itemId": "29996",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Rod of the Sun King"
-            },
-            {
-              "itemId": "32236",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Rising Tide"
-            },
-            {
               "itemId": "31965",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -109845,18 +109437,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Syphon of the Nathrezim"
-            },
-            {
-              "itemId": "29996",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Rod of the Sun King"
-            },
-            {
-              "itemId": "32236",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Rising Tide"
             },
             {
               "itemId": "31965",
@@ -111047,7 +110627,7 @@
             {
               "itemId": "34996",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Brutal Gladiator's Cleaver"
             },
             {
@@ -111061,12 +110641,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Syphon of the Nathrezim"
-            },
-            {
-              "itemId": "32236",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Rising Tide"
             },
             {
               "itemId": "31965",
@@ -130659,12 +130233,6 @@
               "name": "Merciless Gladiator's Slicer"
             },
             {
-              "itemId": "32838",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Warglaive of Azzinoth"
-            },
-            {
               "itemId": "33669",
               "slot": "Off Hand",
               "rank": "BIS",
@@ -130693,12 +130261,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Netherbane"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
             },
             {
               "itemId": "32052",
@@ -132507,12 +132069,6 @@
               "name": "Latro's Shifting Sword"
             },
             {
-              "itemId": "29124",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Vindicator's Brand"
-            },
-            {
               "itemId": "28210",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -133009,12 +132565,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Spiteblade"
-            },
-            {
-              "itemId": "29124",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Vindicator's Brand"
             },
             {
               "itemId": "28307",
@@ -133537,12 +133087,6 @@
               "slot": "Off Hand",
               "rank": "BIS",
               "name": "Talon of Azshara"
-            },
-            {
-              "itemId": "29996",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Rod of the Sun King"
             },
             {
               "itemId": "32052",
@@ -134721,12 +134265,6 @@
               "name": "Warglaive of Azzinoth"
             },
             {
-              "itemId": "30082",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
-            },
-            {
               "itemId": "30881",
               "slot": "Off Hand",
               "rank": "Alt",
@@ -135371,7 +134909,7 @@
             {
               "itemId": "32838",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Warglaive of Azzinoth"
             },
             {
@@ -135391,12 +134929,6 @@
               "slot": "Off Hand",
               "rank": "Alt",
               "name": "Muramasa"
-            },
-            {
-              "itemId": "30082",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Talon of Azshara"
             },
             {
               "itemId": "34346",
@@ -136607,21 +136139,9 @@
               "name": "Warbringer"
             },
             {
-              "itemId": "28749",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "King's Defender"
-            },
-            {
-              "itemId": "28295",
-              "slot": "Off Hand",
-              "rank": "Alt",
-              "name": "Gladiator's Slicer"
-            },
-            {
               "itemId": "28825",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Aldori Legacy Defender"
             },
             {
@@ -137169,15 +136689,9 @@
               "name": "Warbringer"
             },
             {
-              "itemId": "30103",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "Fang of Vashj"
-            },
-            {
               "itemId": "28825",
               "slot": "Off Hand",
-              "rank": "Alt",
+              "rank": "BIS",
               "name": "Aldori Legacy Defender"
             },
             {
@@ -137709,12 +137223,6 @@
               "slot": "Main Hand",
               "rank": "Alt",
               "name": "Swiftsteel Bludgeon"
-            },
-            {
-              "itemId": "32254",
-              "slot": "Off Hand",
-              "rank": "BIS",
-              "name": "The Brutalizer"
             },
             {
               "itemId": "32375",

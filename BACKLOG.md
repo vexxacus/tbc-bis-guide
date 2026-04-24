@@ -16,12 +16,22 @@ Prioritet: 🔴 Hög | 🟡 Medium | 🟢 Låg
 | 12 | "My Farm List" | 🟡 | 📋 Todo |
 | 16 | ~~Item-kommentarer / Gearing-tips~~ | 🟡 | ✅ Klart |
 | 17 | Meta gem fallback (saknade meta gems) | 🟡 | 📋 Todo |
+| 18 | 🛡️ Prot Warrior OH = sköldar, inte dual-wield (P1-P3) | 🔴 | ✅ Klart |
+| 19 | Resto Shaman OH = sköld (ej offhand) — enchant funkar inte | 🔴 | 📋 Todo |
+| 20 | ~~Unika 1H-vapen i både MH och OH (borde ej vara möjligt)~~ | 🔴 | ✅ Klart |
+| 21 | Holy Paladin saknas som PvP-spec | 🟡 | 📋 Todo |
+| 22 | Scrapa enchants från ironforge.pro | 🟡 | 📋 Todo |
+| 23 | Scrapa 1500 bästa PvP-spelare (bättre data) | 🟡 | 📋 Todo |
+| 24 | Warlocks P1 — blandar shadow/fire + fel sockets | 🔴 | 📋 Todo |
+| 25 | Thalassian Cloak — säger Kael men notes säger Mag | 🟡 | 📋 Todo |
+| 26 | Visa ranged hit för Hunters istället för melee hit | 🟡 | 📋 Todo |
+| 27 | Desktop layout — smalare/kortare sidor | 🟢 | 📋 Todo |
 | 7 | Kebab Warrior | 🟢 | ❓ Behöver spec |
 | 9 | AdSense + disclaimer | 🟢 | 📋 Todo |
 
 ---
 
-*Senast uppdaterad: 2026-04-05*---|---------|-----------|--------|
+*Senast uppdaterad: 2026-04-25*---|---------|-----------|--------|
 | 1 | ~~MH/2H build-separation~~ | 🔴 | ✅ Klart |
 | 2 | ~~OH för dual-wielders~~ | 🔴 | ✅ Klart |
 | 3 | ~~Fix blå/lila item-färger~~ | 🔴 | ✅ Klart |
@@ -220,9 +230,19 @@ Prioritet: 🔴 Hög | 🟡 Medium | 🟢 Låg
 | 12 | "My Farm List" | 🟡 | 📋 Todo |
 | 16 | ~~Item-kommentarer / Gearing-tips~~ | 🟡 | ✅ Klart |
 | 17 | Meta gem fallback (saknade meta gems) | 🟡 | 📋 Todo |
+| 18 | 🛡️ Prot Warrior OH = sköldar, inte dual-wield (P1-P3) | 🔴 | ✅ Klart |
+| 19 | Resto Shaman OH = sköld (ej offhand) — enchant funkar inte | 🔴 | 📋 Todo |
+| 20 | ~~Unika 1H-vapen i både MH och OH (borde ej vara möjligt)~~ | 🔴 | ✅ Klart |
+| 21 | Holy Paladin saknas som PvP-spec | 🟡 | 📋 Todo |
+| 22 | Scrapa enchants från ironforge.pro | 🟡 | 📋 Todo |
+| 23 | Scrapa 1500 bästa PvP-spelare (bättre data) | 🟡 | 📋 Todo |
+| 24 | Warlocks P1 — blandar shadow/fire + fel sockets | 🔴 | 📋 Todo |
+| 25 | Thalassian Cloak — säger Kael men notes säger Mag | 🟡 | 📋 Todo |
+| 26 | Visa ranged hit för Hunters istället för melee hit | 🟡 | 📋 Todo |
+| 27 | Desktop layout — smalare/kortare sidor | 🟢 | 📋 Todo |
 | 7 | Kebab Warrior | 🟢 | ❓ Behöver spec |
 | 9 | AdSense + disclaimer | 🟢 | 📋 Todo |
 
 ---
 
-*Senast uppdaterad: 2026-04-05*
+*Senast uppdaterad: 2026-04-25*
