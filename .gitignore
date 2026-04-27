@@ -1,4 +1,6 @@
 node_modules/
+.env
+scraper/.env
 .icon-cache.json
 .quality-cache.json
 .socket-cache.json
@@ -12,3 +14,5 @@ sim-prototype/
 audit_fury.py
 data.backup-*.json
 community feedback.md
+scraper/output/wcl-cache/
+scraper/output/wcl-test-rankings.json
