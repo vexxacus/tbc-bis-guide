@@ -1742,6 +1742,9 @@
         // PvP popularity meta
         const bisPvpHtml = pvpMetaHtml(bis);
 
+        // WCL popularity meta
+        const bisWclHtml = wclMetaHtml(bis);
+
         let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}">
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
@@ -1753,6 +1756,7 @@
                     ${enchantHtml}
                     ${srcText ? `<div class="slot-source">${srcText}</div>` : ''}
                     ${bisPvpHtml}
+                    ${bisWclHtml}
                     ${clonedNote}
                 </div>
                 <div class="slot-meta">
@@ -1783,6 +1787,7 @@
                 const altQuality = pvpQualityClass(alt);
                 const altIconHtml = itemIcon(alt.itemId, 'small', 'alt-icon ' + altQuality);
                 const altPvpHtml = pvpMetaHtml(alt);
+                const altWclHtml = wclMetaHtml(alt);
                 const bisLabel = isBisFallback ? ' <span class="alt-bis-label">BiS</span>' : '';
                 const selectBtn = showSelectUI
                     ? `<button class="alt-select-btn${isActive ? ' active' : ''}" data-slot="${slot}" data-item-id="${alt.itemId}" title="${isActive ? 'Selected' : 'Use this item'}">${isActive ? '✓' : 'Use'}</button>`
@@ -1793,6 +1798,7 @@
                         <span class="alt-name ${altQuality}">${whItem(alt.itemId, alt.name || 'Item #'+alt.itemId, altQuality)}${bisLabel}</span>
                         ${altSrcText ? `<div class="slot-source">${altSrcText}</div>` : ''}
                         ${altPvpHtml}
+                        ${altWclHtml}
                         ${getNote(alt.itemId)}
                     </div>
                     ${showSelectUI ? selectBtn : `<span class="slot-badge ${ac}"${as}>${alt.rank}</span>`}
@@ -1812,6 +1818,15 @@
             if (q === 'epic') return 'q-epic';
             if (q === 'rare') return 'q-rare';
             if (q === 'uncommon') return 'q-uncommon';
+            return 'q-epic';
+        }
+        if (item._wclMeta) {
+            const q = (item._wclMeta.quality || '').toLowerCase();
+            if (q === 'legendary') return 'q-legendary';
+            if (q === 'epic') return 'q-epic';
+            if (q === 'rare') return 'q-rare';
+            if (q === 'uncommon') return 'q-uncommon';
+            if (q === 'common') return 'q-common';
             return 'q-epic';
         }
         return qualityClass(item.itemId);
@@ -1847,6 +1862,71 @@
     }
 
     // ─── Build PvP items list from scraped data ────────────────────
+
+    // ─── WCL slot name mapping ───────────────────────────────────────
+    const WCL_SLOT_MAP = {
+        'Shoulders': 'Shoulder',
+        'Wrists':    'Wrist',
+        'Ranged':    'Ranged/Relic',
+    };
+
+    // ─── WCL popularity tier thresholds ──────────────────────────────
+    const WCL_TIER_META = {
+        'gold':   { badge: '🥇', label: 'Meta',    cls: 'wcl-tier-gold' },
+        'strong': { badge: '🥈', label: 'Strong',  cls: 'wcl-tier-strong' },
+        'viable': { badge: '🥉', label: 'Viable',  cls: 'wcl-tier-viable' },
+        'niche':  { badge: '',    label: 'Niche',   cls: 'wcl-tier-niche' },
+    };
+    function wclTier(pop) {
+        if (pop >= 70) return 'gold';
+        if (pop >= 40) return 'strong';
+        if (pop >= 15) return 'viable';
+        return 'niche';
+    }
+
+    // ─── Build WCL items list from scraped data ──────────────────────
+    function buildWclItemsList(wclSpecData) {
+        const items = [];
+        for (const [wclSlot, slotItems] of Object.entries(wclSpecData.slots)) {
+            const appSlot = WCL_SLOT_MAP[wclSlot] || wclSlot;
+            for (let i = 0; i < slotItems.length; i++) {
+                const wi = slotItems[i];
+                const tier = wclTier(wi.popularity);
+                const rank = i === 0 ? 'BIS' : 'Alt';
+                items.push({
+                    itemId: String(wi.id),
+                    slot: appSlot,
+                    rank,
+                    name: wi.name,
+                    _wclMeta: {
+                        popularity: wi.popularity,
+                        tier,
+                        quality: wi.quality,
+                    }
+                });
+            }
+        }
+        return items;
+    }
+
+    // ─── WCL popularity badge HTML ───────────────────────────────────
+    function wclMetaHtml(item) {
+        if (!item._wclMeta) return '';
+        const m = item._wclMeta;
+        const tierMeta = WCL_TIER_META[m.tier] || {};
+        return `<div class="wcl-meta-row"><span class="wcl-pop-badge ${tierMeta.cls || ''}">${tierMeta.badge || ''} ${m.popularity}% used</span></div>`;
+    }
+
+    // ─── Get WCL data for current spec + phase ──────────────────────
+    function getWclSpecData() {
+        if (typeof WCL_DATA === 'undefined' || !WCL_DATA.phases) return null;
+        if (state.isPvP) return null;
+        const phase = state.selectedPhase;
+        if (!phase || !WCL_DATA.phases[phase]) return null;
+        const wclKey = `${state.selectedClass}|${state.selectedSpec}`;
+        return WCL_DATA.phases[phase][wclKey] || null;
+    }
+
     function buildPvpItemsList(pvpSpecData) {
         // With very few players, rating gate is just noise — suppress it
         const suppressRatingGate = (pvpSpecData.playerCount || 0) < 10;
@@ -2078,6 +2158,15 @@
             : null;
 
         let items = phaseData ? [...phaseData.items] : [];
+
+        // ── WCL: Use top-parser data as primary source if available ──
+        let wclSpecData = null;
+        if (!state.isPvP) {
+            wclSpecData = getWclSpecData();
+            if (wclSpecData) {
+                items = buildWclItemsList(wclSpecData);
+            }
+        }
 
         // ── PvP: Use scraped data if available, else fall back to old PVP_ITEMS ──
         let pvpSpecData = null;
@@ -2610,12 +2699,33 @@
                 </div>`;
             }
         } else {
-            // PvE hint
-            html += hintHtml('pve-bis', '📖',
-                `These are <strong>curated BiS recommendations</strong> based on theorycrafting and community guides. ` +
-                `Tap any item to see alternatives, source info, and a Wowhead link. ` +
-                `Items with <strong>gem sockets</strong> show recommended gems below the icon.`
-            );
+            if (wclSpecData) {
+                // WCL data banner
+                const meta = (typeof WCL_DATA !== 'undefined' && WCL_DATA.meta) || {};
+                const dateStr = meta.scrapedAt
+                    ? new Date(meta.scrapedAt).toLocaleDateString('sv-SE')
+                    : '';
+                html += `<div class="wcl-info-banner">
+                    <div class="wcl-banner-title">📊 <strong>WarcraftLogs Meta — Top Parsers</strong></div>
+                    <div class="wcl-banner-meta">
+                        What the top ${wclSpecData.totalPlayers} ${state.selectedSpec} ${state.selectedClass} parsers are wearing in Phase ${state.selectedPhase}.
+                        ${dateStr ? '<br>📅 Data snapshot: ' + dateStr : ''}
+                    </div>
+                    <div class="wcl-banner-legend">
+                        <span class="wcl-legend-item"><span class="wcl-pop-badge wcl-tier-gold">🥇 70%+</span> Meta</span>
+                        <span class="wcl-legend-item"><span class="wcl-pop-badge wcl-tier-strong">🥈 40%+</span> Strong</span>
+                        <span class="wcl-legend-item"><span class="wcl-pop-badge wcl-tier-viable">🥉 15%+</span> Viable</span>
+                        <span class="wcl-legend-item"><span class="wcl-pop-badge wcl-tier-niche">Niche</span></span>
+                    </div>
+                </div>`;
+            } else {
+                // PvE hint (manual data fallback)
+                html += hintHtml('pve-bis', '📖',
+                    `These are <strong>curated BiS recommendations</strong> based on theorycrafting and community guides. ` +
+                    `Tap any item to see alternatives, source info, and a Wowhead link. ` +
+                    `Items with <strong>gem sockets</strong> show recommended gems below the icon.`
+                );
+            }
         }
 
         // ── Category-based rendering ──
