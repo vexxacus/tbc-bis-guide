@@ -2301,6 +2301,26 @@
         splitDualSlot(_ringBuf,    'Ring 1',    'Ring 2');
         splitDualSlot(_trinketBuf, 'Trinket 1', 'Trinket 2');
 
+        // ── WCL dedup: Ring/Trinket come pre-split but may share the same #1 item ──
+        // If the primary item in slot 1 and slot 2 is identical (Unique-Equipped),
+        // bump slot 2's primary to the next different item.
+        function dedupeWclDualSlot(slot1, slot2) {
+            const s1 = slotGroups[slot1], s2 = slotGroups[slot2];
+            if (!s1?.length || !s2?.length) return;
+            if (String(s1[0].itemId) !== String(s2[0].itemId)) return;
+            // Find next different item in slot 2
+            const altIdx = s2.findIndex(i => String(i.itemId) !== String(s1[0].itemId));
+            if (altIdx > 0) {
+                // Promote that item to primary, keep rest as alts
+                const promoted = s2.splice(altIdx, 1)[0];
+                s2.unshift(promoted);
+            }
+        }
+        if (wclSpecData) {
+            dedupeWclDualSlot('Ring 1', 'Ring 2');
+            dedupeWclDualSlot('Trinket 1', 'Trinket 2');
+        }
+
         // ── Remove 2H weapons from Main Hand slot ──
         // Some items (Zhar'doom, Earthwarden, etc.) are tagged in the source data as
         // BOTH 'Main Hand' AND 'Two Hand'. They are 2H weapons — remove them from MH
