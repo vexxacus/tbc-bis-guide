@@ -949,6 +949,7 @@
         'Hunter-Survival':       'ability_hunter_swiftstrike',
         // Rogue
         'Rogue-Dps':             'ability_backstab',
+        'Rogue-Assassination':   'ability_rogue_eviscerate',
         'Rogue-Subtlety':        'ability_stealth',
         'Rogue-Combat':          'ability_backstab',
         // Priest
@@ -1024,8 +1025,8 @@
         Warrior:  { color: '#C79C6E', specs: ['Arms', 'Fury', 'Protection'] },
         Paladin:  { color: '#F58CBA', specs: ['Holy', 'Protection', 'Retribution'] },
         Hunter:   { color: '#ABD473', specs: ['Beast Mastery', 'Marksmanship', 'Survival'] },
-        Rogue:    { color: '#FFF569', specs: ['Dps'] },
-        Priest:   { color: '#FFFFFF', specs: ['Holy', 'Shadow'] },
+        Rogue:    { color: '#FFF569', specs: ['Combat', 'Assassination', 'Subtlety'] },
+        Priest:   { color: '#FFFFFF', specs: ['Discipline', 'Holy', 'Shadow'] },
         Shaman:   { color: '#0070DE', specs: ['Elemental', 'Enhancement', 'Restoration'] },
         Mage:     { color: '#69CCF0', specs: ['Arcane', 'Fire', 'Frost'] },
         Warlock:  { color: '#9482C9', specs: ['Affliction', 'Demonology', 'Destruction'] },
@@ -1040,7 +1041,7 @@
         Warrior:  { pveSpec: 'Arms',          label: 'Arms PvP' },
         Paladin:  { pveSpec: 'Retribution',   label: 'Ret / Holy PvP' },
         Hunter:   { pveSpec: 'Marksmanship',  label: 'MM / Survival PvP' },
-        Rogue:    { pveSpec: 'Dps',           label: 'Subtlety PvP' },
+        Rogue:    { pveSpec: 'Combat',        label: 'Subtlety PvP' },
         Priest:   { pveSpec: 'Shadow',        label: 'Shadow / Disc PvP' },
         Shaman:   { pveSpec: 'Elemental',     label: 'Ele / Resto PvP' },
         Mage:     { pveSpec: 'Frost',         label: 'Frost PvP' },
@@ -1106,17 +1107,15 @@
     // ─── PvP→PvE spec name mapping ──────────────────────────────────
     // Maps scraped PvP spec names to PvE DATA spec names for phase data
     const PVP_TO_PVE_SPEC = {
-        'Rogue|Subtlety':       'Dps',
-        'Rogue|Combat':         'Dps',
-        'Priest|Discipline':    'Holy',
         'Druid|Feral Combat':   'Cat',
         // All others match directly (Arms→Arms, Frost→Frost, etc.)
     };
 
     const SPEC_ROLES = {
         Arms: 'Melee DPS', Fury: 'Melee DPS', Protection: 'Tank',
-        Holy: 'Healer', Retribution: 'Melee DPS',
+        Holy: 'Healer', Retribution: 'Melee DPS', Discipline: 'Healer',
         'Beast Mastery': 'Ranged DPS', Marksmanship: 'Ranged DPS', Survival: 'Ranged DPS',
+        Combat: 'Melee DPS', Assassination: 'Melee DPS', Subtlety: 'Melee DPS',
         Dps: 'Melee DPS', Shadow: 'Ranged DPS',
         Elemental: 'Ranged DPS', Enhancement: 'Melee DPS', Restoration: 'Healer',
         Arcane: 'Ranged DPS', Fire: 'Ranged DPS', Frost: 'Ranged DPS',
@@ -1148,7 +1147,9 @@
     const WEAPON_STYLE = {
         'Warrior-Fury':         'both',   // DW is BiS but user can toggle to 2H
         'Warrior-Protection':   'dw',
-        'Rogue-Dps':            'dw',
+        'Rogue-Combat':            'dw',
+        'Rogue-Assassination':    'dw',
+        'Rogue-Subtlety':         'dw',
         'Shaman-Enhancement':   'dw',
         'Paladin-Holy':         'dw',
         'Paladin-Protection':   'dw',
@@ -1166,6 +1167,7 @@
         'Druid-Balance':        'both',
         'Shaman-Elemental':     'both',
         'Priest-Holy':          'both',   // Staff or MH+OH
+        'Priest-Discipline':    'both',   // Staff or MH+OH
         'Shaman-Restoration':   'both',   // MH+Shield or Staff
         'Druid-Restoration':    'both',   // Staff or MH+OH
         'Hunter-Beast Mastery':  'both',   // DW or 2H
@@ -1179,7 +1181,7 @@
         'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
         'Druid-Balance', 'Shaman-Elemental',
-        'Priest-Holy', 'Shaman-Restoration', 'Druid-Restoration',
+        'Priest-Holy', 'Priest-Discipline', 'Shaman-Restoration', 'Druid-Restoration',
         'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival',
     ]);
 
@@ -1317,7 +1319,16 @@
 
     // ─── Data helpers ────────────────────────────────────────────────
     function findSpec(cls, spec) {
-        return DATA.specs.find(s => s.className === cls && s.specName === spec);
+        let result = DATA.specs.find(s => s.className === cls && s.specName === spec);
+        if (!result) {
+            // Fallback: new spec names → old manual data spec names
+            const fb = MANUAL_SPEC_FALLBACK[`${cls}|${spec}`];
+            if (fb) {
+                const [fbCls, fbSpec] = fb.split('|');
+                result = DATA.specs.find(s => s.className === fbCls && s.specName === fbSpec);
+            }
+        }
+        return result;
     }
     function getItemSource(id) { return DATA.itemSources[id] || null; }
     function getGemSource(id)  { return DATA.gemSources[id] || null; }
@@ -1884,17 +1895,39 @@
     }
 
     // ─── Build WCL items list from scraped data ──────────────────────
+    // Specs where OH should only show shields
+    const WCL_SHIELD_ONLY_SPECS = new Set(['Warrior|Protection', 'Paladin|Protection']);
+
     function buildWclItemsList(wclSpecData) {
+        const specKey = `${state.selectedClass}|${state.selectedSpec}`;
+        const appKey = APP_TO_WCL_SPEC[specKey] || specKey;
+        const shieldOnly = WCL_SHIELD_ONLY_SPECS.has(appKey);
+        const has2HSet = typeof ITEM_TWO_HAND_WEAPON !== 'undefined';
+        const hasShieldSet = typeof ITEM_SHIELD !== 'undefined';
+
         const items = [];
         for (const [wclSlot, slotItems] of Object.entries(wclSpecData.slots)) {
-            const appSlot = WCL_SLOT_MAP[wclSlot] || wclSlot;
+            let appSlot = WCL_SLOT_MAP[wclSlot] || wclSlot;
+
             for (let i = 0; i < slotItems.length; i++) {
                 const wi = slotItems[i];
+                let finalSlot = appSlot;
+
+                // Reclassify 2H weapons from "Main Hand" to "Two Hand"
+                if (finalSlot === 'Main Hand' && has2HSet && ITEM_TWO_HAND_WEAPON.has(wi.id)) {
+                    finalSlot = 'Two Hand';
+                }
+
+                // Filter Prot specs OH to shields only
+                if (shieldOnly && finalSlot === 'Off Hand' && hasShieldSet && !ITEM_SHIELD.has(wi.id)) {
+                    continue;
+                }
+
                 const tier = wclTier(wi.popularity);
                 const rank = i === 0 ? 'BIS' : 'Alt';
                 items.push({
                     itemId: String(wi.id),
-                    slot: appSlot,
+                    slot: finalSlot,
                     rank,
                     name: wi.name,
                     _wclMeta: {
@@ -1917,12 +1950,26 @@
     }
 
     // ─── Get WCL data for current spec + phase ──────────────────────
+    // App spec names → WCL spec names mapping
+    const APP_TO_WCL_SPEC = {
+        'Druid|Cat':    'Druid|Feral',         // App "Cat" = WCL "Feral"
+        'Druid|Bear':   'Druid|Guardian',      // App "Bear" = WCL "Guardian"
+    };
+
+    // Manual BiS data fallback: maps new spec names → old data spec names for P0
+    const MANUAL_SPEC_FALLBACK = {
+        'Rogue|Combat':        'Rogue|Dps',
+        'Rogue|Assassination': 'Rogue|Dps',
+        'Rogue|Subtlety':     'Rogue|Dps',
+        'Priest|Discipline':   'Priest|Holy',
+    };
     function getWclSpecData() {
         if (typeof WCL_DATA === 'undefined' || !WCL_DATA.phases) return null;
         if (state.isPvP) return null;
         const phase = state.selectedPhase;
         if (!phase) return null; // P0 (Pre-BiS) has no WCL data
-        const wclKey = `${state.selectedClass}|${state.selectedSpec}`;
+        const appKey = `${state.selectedClass}|${state.selectedSpec}`;
+        const wclKey = APP_TO_WCL_SPEC[appKey] || appKey;
         const phaseData = WCL_DATA.phases[phase];
         if (!phaseData) return null;
         return phaseData[wclKey] || null;
@@ -2338,6 +2385,7 @@
         // Only for true dual-wield melee specs (same weapon in both hands)
         const DUAL_WIELD_SPECS = {
             'Warrior-Arms': true, 'Warrior-Fury': true,
+            'Rogue-Combat': true, 'Rogue-Assassination': true, 'Rogue-Subtlety': true,
             'Rogue-Dps': true,
             'Shaman-Enhancement': true,
         };
@@ -2928,8 +2976,8 @@
     // Specs som har sim-stöd (matchas mot specKey = "Class-Spec")
     const SIM_SUPPORTED_SPECS = new Set([
         'Warrior-Fury', 'Warrior-Arms', 'Warrior-Protection',
-        'Priest-Shadow', 'Priest-Holy',
-        'Rogue-Dps',
+        'Priest-Shadow', 'Priest-Holy', 'Priest-Discipline',
+        'Rogue-Combat',
         'Paladin-Retribution', 'Paladin-Protection', 'Paladin-Holy',
         'Shaman-Enhancement', 'Shaman-Elemental', 'Shaman-Restoration',
         'Druid-Cat', 'Druid-Bear', 'Druid-Balance', 'Druid-Restoration',
@@ -2939,12 +2987,13 @@
     ]);
 
     // Specs där DPS-simulering är aktiv
-    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Dps', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane', 'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival']);
+    const SIM_DPS_SPECS = new Set(['Warrior-Fury', 'Warrior-Arms', 'Rogue-Combat', 'Priest-Shadow', 'Shaman-Enhancement', 'Shaman-Elemental', 'Paladin-Retribution', 'Druid-Cat', 'Druid-Balance', 'Warlock-Affliction', 'Warlock-Destruction', 'Warlock-Demonology', 'Mage-Fire', 'Mage-Frost', 'Mage-Arcane', 'Hunter-Beast Mastery', 'Hunter-Marksmanship', 'Hunter-Survival']);
 
     const SIM_DISCLAIMER = {
         'Warrior-Fury':  'Simulation uses standard Fury Warrior rotation (Bloodthirst → Whirlwind → Execute priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Warrior-Arms':  'Simulation uses standard Arms Warrior rotation (Mortal Strike → Overpower priority). On-use trinkets activated on cooldown. 3 000 iterations, 300s fight, Orc vs. boss-level target.',
         'Rogue-Dps':     'Simulation uses Combat Swords rotation (Sinister Strike → Slice and Dice / Rupture / Eviscerate). Expose Armor maintained, Blade Flurry + Adrenaline Rush on cooldown. 3 000 iterations, 300s fight, Human vs. boss-level target.',
+        'Rogue-Combat':  'Simulation uses Combat Swords rotation (Sinister Strike → Slice and Dice / Rupture / Eviscerate). Expose Armor maintained, Blade Flurry + Adrenaline Rush on cooldown. 3 000 iterations, 300s fight, Human vs. boss-level target.',
         'Priest-Shadow': 'Simulation uses Ideal Shadow Priest rotation (VT → MB → SW:D → MF, Devouring Plague on CD). Shadowfiend used on cooldown. 3 000 iterations, 300s fight, Undead vs. boss-level target.',
         'Druid-Cat':     'Simulation uses Feral Cat rotation (Mangle → Shred → Rip/Bite weave, Rake maintained). Omen of Clarity procs, Faerie Fire maintained. 3 000 iterations, 300s fight, Tauren vs. boss-level target.',
         'Druid-Balance': 'Simulation uses Adaptive Balance Druid rotation (Starfire + Moonfire, Faerie Fire maintained, auto-adjusts for mana). Self-Innervate, Force of Nature on cooldown. 3 000 iterations, 300s fight, Tauren vs. boss-level target.',
@@ -3126,6 +3175,7 @@
             const simFn = specKey === 'Warrior-Arms'   ? simulateArmsWarrior
                         : specKey === 'Priest-Shadow'   ? simulateShadowPriest
                         : specKey === 'Rogue-Dps'       ? simulateRogue
+                        : specKey === 'Rogue-Combat'    ? simulateRogue
                         : specKey === 'Shaman-Enhancement' ? simulateEnhShaman
                         : specKey === 'Paladin-Retribution' ? simulateRetPaladin
                         : specKey === 'Druid-Cat'       ? simulateFeralDruid

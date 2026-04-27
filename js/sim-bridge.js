@@ -3010,7 +3010,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_BUFFS, indBuffs);
         player.fieldMessage(PLAYER_SHADOW_PRIEST, spSpec);
 
-    } else if (specKey === 'Rogue-Dps') {
+    } else if (specKey === 'Rogue-Dps' || specKey === 'Rogue-Combat' || specKey === 'Rogue-Assassination' || specKey === 'Rogue-Subtlety') {
         // ── Rogue (Combat Swords) — BiS P1 talents ──
         const rogueTalents = new ProtoWriter();
         rogueTalents.fieldVarint(RT_MALICE,                   5);  // +5% crit
@@ -3798,7 +3798,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
         player.fieldMessage(PLAYER_CONSUMES, consumes);
         player.fieldMessage(PLAYER_BALANCE_DRUID, balanceSpec);
 
-    } else if (specKey === 'Priest-Holy') {
+    } else if (specKey === 'Priest-Holy' || specKey === 'Priest-Discipline') {
         // ── Holy Priest — uses SmitePriest proto with Holy/Disc talents ──
         const holyTalents = new ProtoWriter();
         // Discipline tree
@@ -4022,7 +4022,7 @@ function buildComputeStatsRequest(gearSlots, specKey) {
     const isCasterSpec = ['Priest-Shadow','Mage-Fire','Mage-Frost','Mage-Arcane',
         'Warlock-Destruction','Warlock-Affliction','Warlock-Demonology',
         'Shaman-Elemental','Druid-Balance',
-        'Priest-Holy','Paladin-Holy','Shaman-Restoration','Druid-Restoration'].includes(specKey);
+        'Priest-Holy','Priest-Discipline','Paladin-Holy','Shaman-Restoration','Druid-Restoration'].includes(specKey);
     if (isCasterSpec) {
         raidBuffs.fieldVarint(RB_ARCANE_BRILLIANCE, 1);
         raidBuffs.fieldVarint(RB_DIVINE_SPIRIT, 2);
