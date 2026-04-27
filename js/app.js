@@ -1177,7 +1177,7 @@
 
     // Specs där user kan toggla mellan DW och 2H
     const WEAPON_TOGGLE_SPECS = new Set([
-        'Warrior-Fury', 'Priest-Shadow',
+        'Warrior-Fury', 'Warrior-Arms', 'Priest-Shadow',
         'Mage-Fire', 'Mage-Frost', 'Mage-Arcane',
         'Warlock-Destruction', 'Warlock-Affliction', 'Warlock-Demonology',
         'Druid-Balance', 'Shaman-Elemental',
@@ -1191,6 +1191,7 @@
     // User can override per spec+phase; override is persisted in localStorage.
     const WEAPON_MODE_DEFAULT = {
         'Paladin-Retribution': '2h',
+        'Warrior-Arms':        '2h',
     };
     const weaponModeState = {};
 
