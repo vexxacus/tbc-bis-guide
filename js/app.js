@@ -1051,10 +1051,14 @@
     // ─── Build PvP spec list from scraped data ──────────────────────
     // Groups scraped specs by WoW class, producing per-class arrays
     // e.g. { Warrior: [{key:'Warrior|Arms', spec:'Arms', ...}], ... }
+    // Tank specs make no sense in arena PvP — hide them
+    const PVP_SKIP_SPECS = new Set(['Warrior|Protection', 'Paladin|Protection']);
+
     function buildPvpSpecs() {
         if (typeof PVP_DATA === 'undefined' || !PVP_DATA.specs) return {};
         const map = {};
         for (const [key, data] of Object.entries(PVP_DATA.specs)) {
+            if (PVP_SKIP_SPECS.has(key)) continue;
             const cls = data.class;
             if (!map[cls]) map[cls] = [];
             map[cls].push({
@@ -1830,6 +1834,15 @@
         // Rating gate indicator
         if (m.ratingGate) {
             parts.push(`<span class="pvp-rating-gate" title="More popular at higher ratings">🔒 ${m.ratingGate}+</span>`);
+        }
+
+        // Top enchant
+        if (m.topEnchants && m.topEnchants.length) {
+            const e = m.topEnchants[0];
+            const enchLabel = e.id
+                ? `<a href="https://tbc.wowhead.com/spell=${e.id}" target="_blank" rel="noopener">${e.name}</a>`
+                : e.name;
+            parts.push(`<span class="pvp-enchant-badge" title="Most popular enchant (${e.usage}% of players)">🔮 ${enchLabel} ${e.usage}%</span>`);
         }
 
         return `<div class="pvp-meta-row">${parts.join('')}</div>`;

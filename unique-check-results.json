@@ -1,0 +1,383 @@
+{
+  "uniqueItems": [
+    {
+      "itemId": "28658",
+      "name": "Terestian's Stranglestaff"
+    },
+    {
+      "itemId": "29171",
+      "name": "Earthwarden"
+    },
+    {
+      "itemId": "29359",
+      "name": "Feral Staff of Lashing"
+    },
+    {
+      "itemId": "30021",
+      "name": "Wildfury Greatstaff"
+    },
+    {
+      "itemId": "29121",
+      "name": "Guile of Khoraazi"
+    },
+    {
+      "itemId": "28524",
+      "name": "Emerald Ripper"
+    },
+    {
+      "itemId": "28572",
+      "name": "Blade of the Unrequited"
+    },
+    {
+      "itemId": "30901",
+      "name": "Boundless Agony"
+    },
+    {
+      "itemId": "30865",
+      "name": "Tracker's Blade"
+    },
+    {
+      "itemId": "28429",
+      "name": "Lionheart Champion"
+    },
+    {
+      "itemId": "28441",
+      "name": "Deep Thunder"
+    },
+    {
+      "itemId": "28430",
+      "name": "Lionheart Executioner"
+    },
+    {
+      "itemId": "28442",
+      "name": "Stormherald"
+    },
+    {
+      "itemId": "29124",
+      "name": "Vindicator's Brand"
+    },
+    {
+      "itemId": "28768",
+      "name": "Malchazeen"
+    },
+    {
+      "itemId": "30082",
+      "name": "Talon of Azshara"
+    },
+    {
+      "itemId": "29996",
+      "name": "Rod of the Sun King"
+    },
+    {
+      "itemId": "30103",
+      "name": "Fang of Vashj"
+    },
+    {
+      "itemId": "29962",
+      "name": "Heartrazor"
+    },
+    {
+      "itemId": "32471",
+      "name": "Shard of Azzinoth"
+    },
+    {
+      "itemId": "32236",
+      "name": "Rising Tide"
+    },
+    {
+      "itemId": "32838",
+      "name": "Warglaive of Azzinoth"
+    }
+  ],
+  "nonUniqueItems": [
+    {
+      "itemId": "28476",
+      "name": "Gladiator's Maul"
+    },
+    {
+      "itemId": "32014",
+      "name": "Merciless Gladiator's Maul"
+    },
+    {
+      "itemId": "30883",
+      "name": "Pillar of Ferocity"
+    },
+    {
+      "itemId": "33716",
+      "name": "Vengeful Gladiator's Staff"
+    },
+    {
+      "itemId": "33465",
+      "name": "Staff of Primal Fury"
+    },
+    {
+      "itemId": "34198",
+      "name": "Stanchion of Primal Instinct"
+    },
+    {
+      "itemId": "35103",
+      "name": "Brutal Gladiator's Staff"
+    },
+    {
+      "itemId": "31334",
+      "name": "Staff of Natural Fury"
+    },
+    {
+      "itemId": "34898",
+      "name": "Staff of the Forest Lord"
+    },
+    {
+      "itemId": "28263",
+      "name": "Stellaris"
+    },
+    {
+      "itemId": "28315",
+      "name": "Stormreaver Warblades"
+    },
+    {
+      "itemId": "23242",
+      "name": "Claw of the Frost Wyrm"
+    },
+    {
+      "itemId": "29948",
+      "name": "Claw of the Phoenix"
+    },
+    {
+      "itemId": "29924",
+      "name": "Netherbane"
+    },
+    {
+      "itemId": "29372",
+      "name": "Void-Talon"
+    },
+    {
+      "itemId": "33389",
+      "name": "Dagger of Bad Mojo"
+    },
+    {
+      "itemId": "30881",
+      "name": "Blade of Infamy"
+    },
+    {
+      "itemId": "33705",
+      "name": "Vengeful Gladiator's Left Ripper"
+    },
+    {
+      "itemId": "32269",
+      "name": "Messenger of Fate"
+    },
+    {
+      "itemId": "34329",
+      "name": "Crux of the Apocalypse"
+    },
+    {
+      "itemId": "34197",
+      "name": "Shiv of Exsanguination"
+    },
+    {
+      "itemId": "34951",
+      "name": "Vanir's Left Fist of Brutality"
+    },
+    {
+      "itemId": "29988",
+      "name": "The Nexus Key"
+    },
+    {
+      "itemId": "32374",
+      "name": "Zhar'doom, Greatstaff of the Devourer"
+    },
+    {
+      "itemId": "34182",
+      "name": "Grand Magister's Staff of Torrents"
+    },
+    {
+      "itemId": "30722",
+      "name": "Ethereum Nexus-Reaver"
+    },
+    {
+      "itemId": "28800",
+      "name": "Hammer of the Naaru"
+    },
+    {
+      "itemId": "29993",
+      "name": "Twinblade of the Phoenix"
+    },
+    {
+      "itemId": "31984",
+      "name": "Merciless Gladiator's Greatsword"
+    },
+    {
+      "itemId": "32332",
+      "name": "Torch of the Damned"
+    },
+    {
+      "itemId": "30902",
+      "name": "Cataclysm's Edge"
+    },
+    {
+      "itemId": "33688",
+      "name": "Vengeful Gladiator's Greatsword"
+    },
+    {
+      "itemId": "34247",
+      "name": "Apolyon, the Soul-Render"
+    },
+    {
+      "itemId": "34183",
+      "name": "Shivering Felspine"
+    },
+    {
+      "itemId": "34891",
+      "name": "The Blade of Harbingers"
+    },
+    {
+      "itemId": "29981",
+      "name": "Ethereum Life-Staff"
+    },
+    {
+      "itemId": "34337",
+      "name": "Golden Staff of the Sin'dorei"
+    },
+    {
+      "itemId": "31332",
+      "name": "Blinkstrike"
+    },
+    {
+      "itemId": "31331",
+      "name": "The Night Blade"
+    },
+    {
+      "itemId": "28295",
+      "name": "Gladiator's Slicer"
+    },
+    {
+      "itemId": "28729",
+      "name": "Spiteblade"
+    },
+    {
+      "itemId": "30733",
+      "name": "Hope Ender"
+    },
+    {
+      "itemId": "28312",
+      "name": "Gladiator's Shanker"
+    },
+    {
+      "itemId": "32052",
+      "name": "Merciless Gladiator's Slicer"
+    },
+    {
+      "itemId": "33762",
+      "name": "Vengeful Gladiator's Slicer"
+    },
+    {
+      "itemId": "33388",
+      "name": "Heartless"
+    },
+    {
+      "itemId": "33754",
+      "name": "Vengeful Gladiator's Shanker"
+    },
+    {
+      "itemId": "34214",
+      "name": "Muramasa"
+    },
+    {
+      "itemId": "35101",
+      "name": "Brutal Gladiator's Slicer"
+    },
+    {
+      "itemId": "35093",
+      "name": "Brutal Gladiator's Shanker"
+    },
+    {
+      "itemId": "28308",
+      "name": "Gladiator's Cleaver"
+    },
+    {
+      "itemId": "27872",
+      "name": "The Harvester of Souls"
+    },
+    {
+      "itemId": "18828",
+      "name": "High Warlord's Cleaver"
+    },
+    {
+      "itemId": "30364",
+      "name": "Resonating Axe"
+    },
+    {
+      "itemId": "25538",
+      "name": "Sporeling Claw"
+    },
+    {
+      "itemId": "31139",
+      "name": "Fist of Reckoning"
+    },
+    {
+      "itemId": "28944",
+      "name": "Grand Marshal's Cleaver"
+    },
+    {
+      "itemId": "31965",
+      "name": "Merciless Gladiator's Cleaver"
+    },
+    {
+      "itemId": "28920",
+      "name": "High Warlord's Cleaver"
+    },
+    {
+      "itemId": "33669",
+      "name": "Vengeful Gladiator's Cleaver"
+    },
+    {
+      "itemId": "32262",
+      "name": "Syphon of the Nathrezim"
+    },
+    {
+      "itemId": "33640",
+      "name": "Fury"
+    },
+    {
+      "itemId": "34996",
+      "name": "Brutal Gladiator's Cleaver"
+    },
+    {
+      "itemId": "22630",
+      "name": "Atiesh, Greatstaff of the Guardian"
+    },
+    {
+      "itemId": "32369",
+      "name": "Blade of Savagery"
+    },
+    {
+      "itemId": "32348",
+      "name": "Soul Cleaver"
+    },
+    {
+      "itemId": "23542",
+      "name": "Fel Edged Battleaxe"
+    },
+    {
+      "itemId": "27490",
+      "name": "Firebrand Battleaxe"
+    },
+    {
+      "itemId": "28189",
+      "name": "Latro's Shifting Sword"
+    },
+    {
+      "itemId": "28210",
+      "name": "Bloodskull Destroyer"
+    },
+    {
+      "itemId": "28267",
+      "name": "Edge of the Cosmos"
+    },
+    {
+      "itemId": "28956",
+      "name": "Grand Marshal's Slicer"
+    }
+  ],
+  "errors": []
+}
