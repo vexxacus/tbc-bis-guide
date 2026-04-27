@@ -73,7 +73,7 @@ const TBC_PHASES = [
     },
     {
         phase: 3,
-        label: 'Phase 3 — BT / Hyjal / ZA',
+        label: 'Phase 3 — BT / Hyjal',
         zones: [
             {
                 zoneId: 1011, name: 'BT / Hyjal', partition: 4, // P3 = partition 4
@@ -83,8 +83,22 @@ const TBC_PHASES = [
                     { id: 605, name: 'Gurtogg Bloodboil' },
                 ],
             },
+        ],
+    },
+    {
+        phase: 4,
+        label: 'Phase 4 — BT / Hyjal / ZA',
+        zones: [
             {
-                zoneId: 1012, name: "Zul'Aman", partition: 4, // P3 = partition 4
+                zoneId: 1011, name: 'BT / Hyjal', partition: 5, // P3.5/P4 = partition 5
+                encounters: [
+                    { id: 609, name: 'Illidan Stormrage' },
+                    { id: 622, name: 'Archimonde' },
+                    { id: 605, name: 'Gurtogg Bloodboil' },
+                ],
+            },
+            {
+                zoneId: 1012, name: "Zul'Aman", partition: 5, // P3.5/P4 = partition 5
                 encounters: [
                     { id: 1194, name: 'Daakara' },
                 ],

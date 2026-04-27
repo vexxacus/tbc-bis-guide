@@ -1492,8 +1492,7 @@
 
         // Context hint
         html += hintHtml('spec-pick', '💡',
-            `Choose a <strong>PvE spec</strong> to see curated Best in Slot lists for each content phase. ` +
-            `These are classic, evergreen recommendations based on theorycrafting and community consensus.`
+            `Choose a <strong>PvE spec</strong> to see gear ranked by what the <strong>top WarcraftLogs parsers</strong> actually wear — per spec and phase.`
         );
 
         // PvE specs
@@ -1922,9 +1921,11 @@
         if (typeof WCL_DATA === 'undefined' || !WCL_DATA.phases) return null;
         if (state.isPvP) return null;
         const phase = state.selectedPhase;
-        if (!phase || !WCL_DATA.phases[phase]) return null;
+        if (!phase) return null; // P0 (Pre-BiS) has no WCL data
         const wclKey = `${state.selectedClass}|${state.selectedSpec}`;
-        return WCL_DATA.phases[phase][wclKey] || null;
+        const phaseData = WCL_DATA.phases[phase];
+        if (!phaseData) return null;
+        return phaseData[wclKey] || null;
     }
 
     function buildPvpItemsList(pvpSpecData) {
@@ -3397,17 +3398,32 @@
 
                 <h2>What we offer</h2>
                 <ul>
-                    <li>📋 <strong>Complete BiS lists</strong> for all 9 classes and every viable spec</li>
+                    <li>� <strong>WarcraftLogs meta gear</strong> — items ranked by what top parsers actually wear, per spec &amp; phase</li>
+                    <li>�📋 <strong>Complete BiS lists</strong> for all 9 classes and every viable spec</li>
                     <li>💎 <strong>Gems &amp; enchants</strong> recommendations per phase</li>
-                    <li>📊 <strong>Character stats</strong> computed via wowsims WASM engine — see your stats with buffs &amp; consumables</li>
+                    <li>� <strong>Character stats</strong> computed via wowsims WASM engine — see your stats with buffs &amp; consumables</li>
                     <li>⚔️ <strong>DPS simulation</strong> for select specs</li>
-                    <li>🏟️ <strong>PvP gear snapshots</strong> based on real arena data</li>
+                    <li>🏟️ <strong>PvP gear snapshots</strong> based on real arena data from Ironforge.pro</li>
                     <li>🔄 <strong>Phase-by-phase progression</strong> from P0 Pre-BiS to P5 Sunwell</li>
                 </ul>
+
+                <h2>How it works</h2>
+                <p>Our PvE gear recommendations are powered by <strong>WarcraftLogs data</strong>. We analyze the gear worn by the top-performing players (by DPS or HPS parse) for each spec and content phase. Items are ranked by <strong>usage popularity</strong> — how many of the top parsers actually equip that item:</p>
+                <ul>
+                    <li>🥇 <strong>70%+</strong> — Meta pick. Almost everyone uses it.</li>
+                    <li>🥈 <strong>40–69%</strong> — Strong pick. Widely used among top players.</li>
+                    <li>🥉 <strong>15–39%</strong> — Viable pick. Used by a significant minority.</li>
+                    <li>📊 <strong>&lt;15%</strong> — Niche pick. Situational or used by specific builds.</li>
+                </ul>
+                <p>This means you see what <em>actually works in practice</em>, not just theoretical best-in-slot. Some items may surprise you — real top players sometimes prefer unexpected gear due to set bonuses, hit caps, or fight-specific needs.</p>
 
                 <h2>Credits &amp; Acknowledgements</h2>
                 <p>This project wouldn't be possible without the amazing WoW community and open-source tools:</p>
                 <ul class="credits-list">
+                    <li>
+                        <span class="credit-name"><a href="https://classic.warcraftlogs.com" target="_blank" rel="noopener">WarcraftLogs</a></span>
+                        <span class="credit-desc">Top-parser gear data that powers our PvE recommendations. We analyze what the best players actually wear.</span>
+                    </li>
                     <li>
                         <span class="credit-name"><a href="https://www.wowhead.com/tbc" target="_blank" rel="noopener">Wowhead</a></span>
                         <span class="credit-desc">Item data, icons, and tooltips. The backbone of WoW theorycrafting.</span>
