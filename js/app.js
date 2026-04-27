@@ -1206,7 +1206,17 @@
         if (key in weaponModeState) return weaponModeState[key];
         // Specs with a fixed default bypass auto-detect
         const specKey = `${state.selectedClass}-${state.selectedSpec}`;
-        if (WEAPON_MODE_DEFAULT[specKey]) return WEAPON_MODE_DEFAULT[specKey];
+        if (WEAPON_MODE_DEFAULT[specKey]) {
+            // Only use default if the preferred mode has items available
+            const pref = WEAPON_MODE_DEFAULT[specKey];
+            if (slotGroups) {
+                const has2HItems = slotGroups['Two Hand']?.length > 0;
+                const hasDWItems = (slotGroups['Main Hand']?.length > 0) || (slotGroups['Off Hand']?.length > 0);
+                if (pref === '2h' && !has2HItems && hasDWItems) return 'dw';
+                if (pref === 'dw' && !hasDWItems && has2HItems) return '2h';
+            }
+            return pref;
+        }
         if (slotGroups) {
             const twoHanders = slotGroups['Two Hand'];
             const mainHanders = slotGroups['Main Hand'];
