@@ -1376,9 +1376,29 @@
         return sourceStr.replace(/\s*\(\d+\)\s*/g, '').trim();
     }
 
-    // Returns the profession name if this item requires a profession to craft/use, else null.
-    // Uses DATA.itemSources directly — any item with sourceType 'Profession' is filtered.
+    // BoP crafted items that REQUIRE the profession to equip.
+    // BoE crafts (Wolfshead Helm, Spellstrike, Belt of Blasting, etc.) are NOT filtered.
+    const PROFESSION_REQUIRED_ITEMS = new Set([
+        // Alchemy — stones are BoP
+        13503, 35750,
+        // Blacksmithing — all 375 BS weapons & shields are BoP
+        28429, 28430, 28432, 28433, 28435, 28438, 28439, 28441, 28442, 28484, 28485,
+        // Tailoring sets — Spellfire, Frozen Shadoweave, Primal Mooncloth (all BoP)
+        21846, 21847, 21848, 21869, 21870, 21871, 21873, 21874, 21875,
+        // Leatherworking sets — Ebon Netherscale, Netherstrike, Windhawk, Primalstrike (all BoP)
+        29515, 29516, 29517, 29519, 29520, 29521, 29522, 29523, 29524, 29525, 29526, 29527,
+        // Engineering — all goggles + Gyro-Balanced Khorium Destroyer + Goblin Rocket Launcher
+        32461, 32472, 32473, 32474, 32475, 32476, 32478, 32479, 32480, 32494, 32495,
+        34353, 34354, 34356, 34357, 34847, 35181, 35182, 35185, 32756, 23836,
+        // Jewelcrafting — figurines (BoP trinkets)
+        24128, 35700, 35702,
+    ]);
+
+    // Returns the profession name if this item requires that profession to EQUIP, else null.
+    // Only BoP crafted items are filtered — BoE crafts (usable by anyone) are not.
     function itemProfession(itemId) {
+        const id = Number(itemId);
+        if (!PROFESSION_REQUIRED_ITEMS.has(id)) return null;
         const src = getItemSource(itemId);
         if (!src || src.sourceType !== 'Profession') return null;
         return extractProfession(src.source);
