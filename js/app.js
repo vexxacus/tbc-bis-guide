@@ -72,6 +72,7 @@
         'Head':'H','Neck':'N','Shoulder':'Sh','Back':'B','Chest':'C',
         'Wrist':'Wr','Hands':'G','Waist':'W','Legs':'L','Feet':'F',
         'Ring 1':'R1','Ring 2':'R2','Trinket 1':'T1','Trinket 2':'T2',
+        'Rings':'Ri','Trinkets':'Tr',
         'Main Hand':'MH','Off Hand':'OH','Two-Hand':'2H','Ranged':'Ra',
         'Relic':'Re','Totem':'To','Libram':'Li','Idol':'Id','Sigil':'Si',
         'Wand':'Wa'
@@ -1159,7 +1160,7 @@
     const SLOT_ORDER = [
         'Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist',
         'Hands', 'Waist', 'Legs', 'Feet',
-        'Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2',
+        'Rings', 'Trinkets',
         'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
     ];
 
@@ -1769,8 +1770,8 @@
         const si = slotGroups[slot];
         if (!si || !si.length) return '';
 
-        // Display name: "Ring 1" → "Ring", "Trinket 2" → "Trinket" etc.
-        const slotDisplayName = slot.replace(/ [12]$/, '');
+        // Display name: "Rings" → "Ring", "Trinkets" → "Trinket", "Ring 1" → "Ring" etc.
+        const slotDisplayName = slot === 'Rings' ? 'Ring' : slot === 'Trinkets' ? 'Trinket' : slot.replace(/ [12]$/, '');
 
         // ── Active item: user selection or BiS (index 0) ──
         const bis = getActiveItem(slot, si);
@@ -2424,6 +2425,58 @@
             dedupeWclDualSlot('Trinket 1', 'Trinket 2');
         }
 
+        // ── Merge dual slots (Ring 1+2 → Rings, Trinket 1+2 → Trinkets) ──
+        // Dedup by itemId, keep highest popularity, top 2 = BIS, rest = ALT.
+        function mergeDualSlots(slot1, slot2, mergedName) {
+            const s1 = slotGroups[slot1] || [];
+            const s2 = slotGroups[slot2] || [];
+            if (!s1.length && !s2.length) return;
+
+            // Merge all items, dedup by itemId keeping highest popularity
+            const byId = {};
+            for (const item of [...s1, ...s2]) {
+                const id = String(item.itemId);
+                const pop = item._wclMeta?.popularity || item._pvpMeta?.popularity || 0;
+                const existing = byId[id];
+                const existingPop = existing?._wclMeta?.popularity || existing?._pvpMeta?.popularity || 0;
+                if (!existing || pop > existingPop) {
+                    byId[id] = { ...item, slot: mergedName };
+                }
+            }
+
+            // Sort by popularity descending (for WCL/PvP), or keep rank order (for manual)
+            const hasPop = Object.values(byId).some(i => i._wclMeta || i._pvpMeta);
+            const merged = Object.values(byId).sort((a, b) => {
+                if (hasPop) {
+                    return (b._wclMeta?.popularity || b._pvpMeta?.popularity || 0)
+                         - (a._wclMeta?.popularity || a._pvpMeta?.popularity || 0);
+                }
+                // Manual data: BIS first, then Alt
+                const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2 };
+                return (rankOrder[a.rank] ?? 99) - (rankOrder[b.rank] ?? 99);
+            });
+
+            // Top 2 = BIS, rest = ALT (preserve PvP prefix if applicable)
+            const isPvP = merged.some(i => i._pvpMeta);
+            for (let i = 0; i < merged.length; i++) {
+                merged[i].rank = i < 2 ? (isPvP ? 'PvP BIS' : 'BIS') : (isPvP ? 'PvP Alt' : 'Alt');
+            }
+
+            slotGroups[mergedName] = merged;
+            delete slotGroups[slot1];
+            delete slotGroups[slot2];
+        }
+
+        if (wclSpecData) {
+            mergeDualSlots('Ring 1', 'Ring 2', 'Rings');
+            mergeDualSlots('Trinket 1', 'Trinket 2', 'Trinkets');
+        }
+        // For manual/PvP data, also merge after splitDualSlot
+        if (!wclSpecData) {
+            mergeDualSlots('Ring 1', 'Ring 2', 'Rings');
+            mergeDualSlots('Trinket 1', 'Trinket 2', 'Trinkets');
+        }
+
         // ── Remove 2H weapons from Main Hand slot ──
         // Some items (Zhar'doom, Earthwarden, etc.) are tagged in the source data as
         // BOTH 'Main Hand' AND 'Two Hand'. They are 2H weapons — remove them from MH
@@ -2697,8 +2750,16 @@
         for (const slot of SLOT_ORDER) {
             const si = slotGroups[slot];
             if (si && si.length) {
-                const il = GearScore.estimateItemLevel(si[0].itemId, gsPhase);
-                bisItems.push({ itemLevel: il, rarity: 4, slot });
+                // Merged slots (Rings, Trinkets) count as 2 items — push top 2
+                if (slot === 'Rings' || slot === 'Trinkets') {
+                    for (let i = 0; i < Math.min(2, si.length); i++) {
+                        const il = GearScore.estimateItemLevel(si[i].itemId, gsPhase);
+                        bisItems.push({ itemLevel: il, rarity: 4, slot: slot + ' ' + (i+1) });
+                    }
+                } else {
+                    const il = GearScore.estimateItemLevel(si[0].itemId, gsPhase);
+                    bisItems.push({ itemLevel: il, rarity: 4, slot });
+                }
             }
         }
         const gs = GearScore.calcTotalScore(bisItems);
@@ -2723,13 +2784,13 @@
         const paperdoll = $('paperdoll');
         const PD_ORDER = [
             'Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist',
-            'Legs', 'Feet', 'Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2',
+            'Legs', 'Feet', 'Rings', 'Trinkets',
             'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
         ];
         const PD_LABELS = {
             Head:'Head', Neck:'Neck', Shoulder:'Shld', Back:'Back', Chest:'Chest', Wrist:'Wrist',
             Hands:'Hands', Waist:'Waist', Legs:'Legs', Feet:'Feet',
-            'Ring 1':'Ring1', 'Ring 2':'Ring2', 'Trinket 1':'Trkt1', 'Trinket 2':'Trkt2',
+            'Rings':'Ring', 'Trinkets':'Trkt',
             'Main Hand':'MH', 'Off Hand':'OH', 'Two Hand':'2H', 'Ranged/Relic':'Rng'
         };
 
@@ -2746,7 +2807,7 @@
 
             const bis = getActiveItem(slot, si);
             const isOverridden = String(bis.itemId) !== String(si[0].itemId);
-            const hasEnchant = !!enchantLookup[slot];
+            const hasEnchant = !!enchantLookup[slot] || !!enchantLookup[slot === 'Rings' ? 'Ring' : slot === 'Trinkets' ? 'Trinket' : slot];
             const pdTitle = (bis.name || slot).replace(/"/g, '&quot;');
 
             // Weapon mode: dim inactive weapon slots (toggle specs only)
@@ -2755,13 +2816,27 @@
                 (weaponMode === 'dw' && is2H)
             );
 
-            pdHtml += `<div class="pd-slot${isOverridden ? ' pd-slot-overridden' : ''}${isWeaponDimmed ? ' pd-slot-dimmed' : ''}" data-pd-slot="${slot}" title="${pdTitle}">
-                ${itemIcon(bis.itemId, 'medium', 'pd-slot-icon ' + qualityClass(bis.itemId))}
-                <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
-                ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
-                ${isOverridden ? '<span class="pd-custom-dot"></span>' : ''}
-                ${isWeaponDimmed ? '<span class="pd-dimmed-x">✕</span>' : ''}
-            </div>`;
+            // Merged slots (Rings, Trinkets): show 2 icons side by side
+            if ((slot === 'Rings' || slot === 'Trinkets') && si.length >= 2) {
+                const bis2 = si[1];
+                const title2 = (bis2.name || slot).replace(/"/g, '&quot;');
+                pdHtml += `<div class="pd-slot pd-slot-dual" data-pd-slot="${slot}" title="${pdTitle} + ${title2}">
+                    <div class="pd-dual-icons">
+                        ${itemIcon(bis.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis.itemId))}
+                        ${itemIcon(bis2.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis2.itemId))}
+                    </div>
+                    <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
+                    ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
+                </div>`;
+            } else {
+                pdHtml += `<div class="pd-slot${isOverridden ? ' pd-slot-overridden' : ''}${isWeaponDimmed ? ' pd-slot-dimmed' : ''}" data-pd-slot="${slot}" title="${pdTitle}">
+                    ${itemIcon(bis.itemId, 'medium', 'pd-slot-icon ' + qualityClass(bis.itemId))}
+                    <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
+                    ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
+                    ${isOverridden ? '<span class="pd-custom-dot"></span>' : ''}
+                    ${isWeaponDimmed ? '<span class="pd-dimmed-x">✕</span>' : ''}
+                </div>`;
+            }
         }
         paperdoll.innerHTML = pdHtml;
 
@@ -2854,7 +2929,7 @@
 
         // ── Category-based rendering ──
         const ARMOR_SLOTS   = ['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist', 'Legs', 'Feet'];
-        const JEWELRY_SLOTS = ['Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2'];
+        const JEWELRY_SLOTS = ['Rings', 'Trinkets'];
         const WEAPON_SLOTS  = new Set(['Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic']);
 
         // Helper: render a category header

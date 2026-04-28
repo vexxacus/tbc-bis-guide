@@ -613,6 +613,16 @@ body {
 .pd-slot:active { transform: scale(0.9); }
 .pd-slot:hover { background: var(--bg-card-hover); }
 
+.pd-dual-icons {
+    display: flex;
+    gap: 2px;
+}
+.pd-dual-icons .pd-slot-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+}
+
 .pd-slot-icon {
     width: 36px;
     height: 36px;

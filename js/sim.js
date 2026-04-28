@@ -26,6 +26,12 @@ const SLOT_MAP = {
     'Ranged/Relic':  'Ranged',
 };
 
+// Merged dual-slot mapping: Rings → [Finger1, Finger2], Trinkets → [Trinket1, Trinket2]
+const MERGED_SLOT_MAP = {
+    'Rings':    ['Finger1', 'Finger2'],
+    'Trinkets': ['Trinket1', 'Trinket2'],
+};
+
 // Spell ID (from data.json enchants) → wowsims enchant item ID
 // ONLY include enchants that wowsims actually knows — unknown IDs crash the sim.
 const SPELL_TO_ENCHANT_ID = {
@@ -210,6 +216,34 @@ function buildGearSlotsFromBis(slotGroups, getActiveItemFn, weaponMode, enchantL
 
     for (const [bisSlot, items] of Object.entries(slotGroups)) {
         if (!items || !items.length) continue;
+
+        // Handle merged dual slots (Rings, Trinkets) — push top 2 items into separate sim slots
+        const mergedSlots = MERGED_SLOT_MAP[bisSlot];
+        if (mergedSlots) {
+            for (let mi = 0; mi < Math.min(2, items.length); mi++) {
+                const wsSlot = mergedSlots[mi];
+                if (usedWsSlots.has(wsSlot)) continue;
+                const item = items[mi];
+                if (!item || !item.itemId) continue;
+                const id = parseInt(item.itemId);
+                if (!id) continue;
+                usedWsSlots.add(wsSlot);
+                const enchantEntry = enchantLookup
+                    ? (enchantLookup[bisSlot] || enchantLookup['Ring'] || enchantLookup['Trinket'])
+                    : null;
+                const enchantId = enchantEntry ? (SPELL_TO_ENCHANT_ID[enchantEntry.spellId] || 0) : 0;
+                let itemGems = [];
+                const sockets = (typeof ITEM_SOCKETS !== 'undefined' && ITEM_SOCKETS[String(id)]) || null;
+                if (sockets && sockets.length) {
+                    for (const socketColor of sockets) {
+                        if (socketColor === 'm') { if (metaGemId) itemGems.push(metaGemId); }
+                        else { if (regularGems.length) itemGems.push(regularGems[0]); }
+                    }
+                }
+                gearSlots.push({ slot: wsSlot, id, enchant: enchantId, gems: itemGems });
+            }
+            continue;
+        }
 
         // Skip inactive weapon slots based on weapon mode
         if (weaponMode === '2h' && (bisSlot === 'Main Hand' || bisSlot === 'Off Hand')) continue;
