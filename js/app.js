@@ -1779,7 +1779,8 @@
         const alts = si.filter(i => String(i.itemId) !== String(bis.itemId));
 
         const isPvPItem = bis.rank?.toLowerCase().includes('pvp');
-        const badgeCls = isPvPItem ? 'bis' : (bis.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
+        const isGuideItem = bis.rank === 'Guide';
+        const badgeCls = isGuideItem ? 'guide' : isPvPItem ? 'bis' : (bis.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
         const badgeStyle = isPvPItem ? ' style="background:#c41e3a"' : '';
 
         // Source info
@@ -1811,6 +1812,9 @@
         // WCL popularity meta
         const bisWclHtml = wclMetaHtml(bis);
 
+        // Guide meta (Wowhead original rank)
+        const bisGuideHtml = guideMetaHtml(bis);
+
         let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}">
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
@@ -1823,6 +1827,7 @@
                     ${srcText ? `<div class="slot-source">${srcText}</div>` : ''}
                     ${bisPvpHtml}
                     ${bisWclHtml}
+                    ${bisGuideHtml}
                     ${clonedNote}
                 </div>
                 <div class="slot-meta">
@@ -1846,7 +1851,8 @@
                 const isBisFallback = isOverridden && String(alt.itemId) === String(si[0].itemId);
                 const isActive = String(alt.itemId) === String(bis.itemId);
                 const ap = alt.rank?.toLowerCase().includes('pvp');
-                const ac = ap ? 'bis' : (alt.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
+                const ag = alt.rank === 'Guide';
+                const ac = ag ? 'guide' : ap ? 'bis' : (alt.rank.toLowerCase().startsWith('bis') ? 'bis' : 'alt');
                 const as = ap ? ' style="background:#c41e3a"' : '';
                 const altSrc = getItemSource(alt.itemId);
                 const altSrcText = altSrc ? `${srcEmoji(altSrc.sourceType)} ${altSrc.source || altSrc.sourceType}` : '';
@@ -1854,6 +1860,7 @@
                 const altIconHtml = itemIcon(alt.itemId, 'small', 'alt-icon ' + altQuality);
                 const altPvpHtml = pvpMetaHtml(alt);
                 const altWclHtml = wclMetaHtml(alt);
+                const altGuideHtml = guideMetaHtml(alt);
                 const bisLabel = isBisFallback ? ' <span class="alt-bis-label">BiS</span>' : '';
                 const selectBtn = showSelectUI
                     ? `<button class="alt-select-btn${isActive ? ' active' : ''}" data-slot="${slot}" data-item-id="${alt.itemId}" title="${isActive ? 'Selected' : 'Use this item'}">${isActive ? '✓' : 'Use'}</button>`
@@ -1865,6 +1872,7 @@
                         ${altSrcText ? `<div class="slot-source">${altSrcText}</div>` : ''}
                         ${altPvpHtml}
                         ${altWclHtml}
+                        ${altGuideHtml}
                         ${getNote(alt.itemId)}
                     </div>
                     ${showSelectUI ? selectBtn : `<span class="slot-badge ${ac}"${as}>${alt.rank}</span>`}
@@ -2005,6 +2013,12 @@
         return `<div class="wcl-meta-row"><span class="wcl-pop-badge ${tierMeta.cls || ''}">${tierMeta.badge || ''} ${m.popularity}% used</span></div>`;
     }
 
+    // ─── Guide meta HTML (Wowhead original rank) ────────────────────
+    function guideMetaHtml(item) {
+        if (!item._guideMeta) return '';
+        return `<div class="wcl-meta-row"><span class="wcl-pop-badge guide-source">📖 ${item._guideMeta.originalRank}</span></div>`;
+    }
+
     // ─── Get WCL data for current spec + phase ──────────────────────
     // App spec names → WCL spec names mapping
     const APP_TO_WCL_SPEC = {
@@ -2069,6 +2083,70 @@
                         topGems: pi.topGems || [],
                         topEnchants: pi.topEnchants || [],
                         quality: pi.quality,
+                    }
+                });
+            }
+        }
+        return items;
+    }
+
+    // ─── Wowhead Guide data — supplemental items ─────────────────────
+    // Maps app spec names to Wowhead guide spec names
+    const APP_TO_GUIDE_SPEC = {
+        'Druid|Cat':    'Druid|Cat',       // guide already mapped by build script
+        'Druid|Bear':   'Druid|Bear',
+        'Priest|Holy':  'Priest|Holy',
+        'Priest|Discipline': 'Priest|Discipline',
+    };
+
+    // Slot name normalisation from guide data → app slot names
+    const GUIDE_SLOT_MAP = {
+        'Helm': 'Head',
+        'Two-Hand': 'Two Hand',
+        'Weapon': 'Main Hand',
+        'Relic': 'Ranged',       // Totems/Idols/Librams → Ranged slot in app
+    };
+
+    function getGuideSpecData() {
+        if (typeof GUIDE_DATA === 'undefined' || !GUIDE_DATA.phases) return null;
+        if (state.isPvP) return null;
+        const phase = state.selectedPhase;
+        if (!phase) return null; // P0 has no guide data
+        const appKey = `${state.selectedClass}|${state.selectedSpec}`;
+        const guideKey = APP_TO_GUIDE_SPEC[appKey] || appKey;
+        const phaseData = GUIDE_DATA.phases[phase];
+        if (!phaseData) return null;
+        return phaseData[guideKey] || null;
+    }
+
+    /**
+     * Build guide items list, excluding any items already present in the WCL/existing list.
+     * Returns items with rank='Guide' to be appended to slot groups.
+     */
+    function buildGuideItemsList(guideSpecData, existingItemIds) {
+        const has2HSet = typeof ITEM_TWO_HAND_WEAPON !== 'undefined';
+        const items = [];
+        for (const [guideSlot, slotItems] of Object.entries(guideSpecData.slots)) {
+            let appSlot = GUIDE_SLOT_MAP[guideSlot] || guideSlot;
+
+            for (const gi of slotItems) {
+                if (!gi.id) continue;
+                // Skip items already in WCL/existing data
+                if (existingItemIds.has(String(gi.id))) continue;
+
+                let finalSlot = appSlot;
+                // Reclassify 2H weapons
+                if (finalSlot === 'Main Hand' && has2HSet && ITEM_TWO_HAND_WEAPON.has(Number(gi.id))) {
+                    finalSlot = 'Two Hand';
+                }
+
+                items.push({
+                    itemId: String(gi.id),
+                    slot: finalSlot,
+                    rank: 'Guide',
+                    name: gi.n,
+                    _guideMeta: {
+                        originalRank: gi.r,  // e.g. "Best", "Alternative", "Hit Option"
                     }
                 });
             }
@@ -2300,6 +2378,16 @@
             }
         }
 
+        // ── Guide data: append Wowhead guide items not already in WCL data ──
+        if (wclSpecData && !state.isPvP) {
+            const guideSpecData = getGuideSpecData();
+            if (guideSpecData) {
+                const existingIds = new Set(items.map(i => String(i.itemId)));
+                const guideItems = buildGuideItemsList(guideSpecData, existingIds);
+                items = [...items, ...guideItems];
+            }
+        }
+
         if (!items.length) {
             slotList.innerHTML = '<p>No data found.</p>';
             return;
@@ -2339,7 +2427,7 @@
 
         // Now merge deferred MH~OH items into MH and OH by rank order
         if (_mhohBuf.length) {
-            const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2, 'PvP BIS': 3, 'PvP Alt': 4 };
+            const rankOrder = { 'BIS': 0, 'Pre-BIS': 1, 'Alt': 2, 'PvP BIS': 3, 'PvP Alt': 4, 'Guide': 5 };
             for (const item of _mhohBuf) {
                 for (const s of ['Main Hand', 'Off Hand']) {
                     if (!slotGroups[s]) slotGroups[s] = [];
