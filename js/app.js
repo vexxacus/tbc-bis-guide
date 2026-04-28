@@ -2034,18 +2034,26 @@
     function buildPvpItemsList(pvpSpecData) {
         // With very few players, rating gate is just noise — suppress it
         const suppressRatingGate = (pvpSpecData.playerCount || 0) < 10;
+        const has2HSet = typeof ITEM_TWO_HAND_WEAPON !== 'undefined';
 
         const items = [];
         for (const [pvpSlot, slotItems] of Object.entries(pvpSpecData.slots)) {
-            const appSlot = PVP_SLOT_MAP[pvpSlot] || pvpSlot;
+            let appSlot = PVP_SLOT_MAP[pvpSlot] || pvpSlot;
             for (let i = 0; i < slotItems.length; i++) {
                 const pi = slotItems[i];
+                let finalSlot = appSlot;
+
+                // Reclassify 2H weapons from "Main Hand" to "Two Hand"
+                if (finalSlot === 'Main Hand' && has2HSet && ITEM_TWO_HAND_WEAPON.has(pi.id)) {
+                    finalSlot = 'Two Hand';
+                }
+
                 const tierMeta = PVP_TIER_META[pi.tier] || {};
                 const popLabel = `${pi.popularity}%`;
                 const rank = i === 0 ? 'PvP BIS' : 'PvP Alt';
                 items.push({
                     itemId: String(pi.id),
-                    slot: appSlot,
+                    slot: finalSlot,
                     rank,
                     name: pi.name,
                     _pvpMeta: {
