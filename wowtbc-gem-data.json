@@ -1,0 +1,4020 @@
+{
+  "Druid|Balance": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 13
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 6
+      },
+      {
+        "itemId": "24059",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Potent Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 10
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 4
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 10
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 4
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 9
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 4
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Druid|Cat": {
+    "0": [
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 13
+      }
+    ],
+    "1": [
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 13
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 10
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 13
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ]
+  },
+  "Druid|Bear": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 6
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 3
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 2
+      },
+      {
+        "itemId": "31860",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Mystic Dawnstone",
+        "count": 1
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 4
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 4
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 6
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 3
+      },
+      {
+        "itemId": "32220",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glinting Pyrestone",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 5
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 4
+      },
+      {
+        "itemId": "32220",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glinting Pyrestone",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 3
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ]
+  },
+  "Druid|Restoration": {
+    "0": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 9
+      },
+      {
+        "itemId": "32836",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Purified Shadow Pearl",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 14
+      }
+    ],
+    "2": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 15
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 13
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 13
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 14
+      }
+    ]
+  },
+  "Hunter|Beast Mastery": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 10
+      },
+      {
+        "itemId": "31869",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Wicked Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 12
+      },
+      {
+        "itemId": "31869",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Wicked Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 7
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 3
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 1
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 5
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Hunter|Marksmanship": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 10
+      },
+      {
+        "itemId": "31869",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Wicked Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 12
+      },
+      {
+        "itemId": "31869",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Wicked Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 7
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 3
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 1
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32222",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Wicked Pyrestone",
+        "count": 5
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Hunter|Survival": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 10
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 14
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24028",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Delicate Living Ruby",
+        "count": 13
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 15
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 15
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32193",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Delicate Crimson Spinel",
+        "count": 14
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ]
+  },
+  "Paladin|Holy": {
+    "0": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 13
+      }
+    ],
+    "1": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 13
+      }
+    ],
+    "2": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 14
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 9
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 12
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 15
+      }
+    ]
+  },
+  "Paladin|Protection": {
+    "0": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 9
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 11
+      }
+    ],
+    "2": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 1
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 11
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 11
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25896",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Powerful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 10
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 4
+      }
+    ]
+  },
+  "Paladin|Retribution": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 3
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 9
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24051",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Rigid Dawnstone",
+        "count": 1
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 5
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 3
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 3
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 3
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 5
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Priest|Holy": {
+    "0": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 8
+      },
+      {
+        "itemId": "32836",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Purified Shadow Pearl",
+        "count": 2
+      },
+      {
+        "itemId": "31868",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Luminous Noble Topaz",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 6
+      },
+      {
+        "itemId": "32836",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Purified Shadow Pearl",
+        "count": 2
+      },
+      {
+        "itemId": "31868",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Luminous Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 7
+      },
+      {
+        "itemId": "31868",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Luminous Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "32836",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Purified Shadow Pearl",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32211",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Royal Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32224",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Luminous Pyrestone",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 9
+      },
+      {
+        "itemId": "32211",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Royal Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32224",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Luminous Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25901",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Insightful Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "32214",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Purified Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32224",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Luminous Pyrestone",
+        "count": 2
+      }
+    ]
+  },
+  "Priest|Shadow": {
+    "0": [
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 18
+      }
+    ],
+    "1": [
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 17
+      }
+    ],
+    "2": [
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 17
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25893",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Mystical Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 1
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25893",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Mystical Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25893",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Mystical Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 15
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 1
+      }
+    ]
+  },
+  "Rogue|Dps": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "24051",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Rigid Dawnstone",
+        "count": 14
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 8
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 4
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 15
+      },
+      {
+        "itemId": "24051",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Rigid Dawnstone",
+        "count": 7
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 4
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "24051",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Rigid Dawnstone",
+        "count": 16
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 4
+      },
+      {
+        "itemId": "24055",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Shifting Nightseye",
+        "count": 4
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "32220",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glinting Pyrestone",
+        "count": 12
+      },
+      {
+        "itemId": "32206",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Rigid Lionseye",
+        "count": 10
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 4
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "32220",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glinting Pyrestone",
+        "count": 12
+      },
+      {
+        "itemId": "32206",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Rigid Lionseye",
+        "count": 10
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 4
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "32220",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glinting Pyrestone",
+        "count": 22
+      },
+      {
+        "itemId": "32206",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Rigid Lionseye",
+        "count": 6
+      },
+      {
+        "itemId": "32210",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Shifting Shadowsong Amethyst",
+        "count": 4
+      }
+    ]
+  },
+  "Shaman|Elemental": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24059",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Potent Noble Topaz",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 8
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 4
+      },
+      {
+        "itemId": "24059",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Potent Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24059",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Potent Noble Topaz",
+        "count": 6
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 3
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "35761",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Quick Lionseye",
+        "count": 7
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 6
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Shaman|Enhancement": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 12
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 12
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24027",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Bold Living Ruby",
+        "count": 7
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24054",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sovereign Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 10
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 7
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Shaman|Restoration": {
+    "0": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 9
+      },
+      {
+        "itemId": "24057",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Royal Nightseye",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 13
+      },
+      {
+        "itemId": "24057",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Royal Nightseye",
+        "count": 1
+      }
+    ],
+    "2": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24029",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Teardrop Living Ruby",
+        "count": 16
+      }
+    ],
+    "3": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "32224",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Luminous Pyrestone",
+        "count": 1
+      }
+    ],
+    "4": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "32224",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Luminous Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "25897",
+        "quality": 3,
+        "isMeta": true,
+        "name": "Bracing Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "35761",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Quick Lionseye",
+        "count": 14
+      },
+      {
+        "itemId": "32194",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Teardrop Crimson Spinel",
+        "count": 1
+      }
+    ]
+  },
+  "Mage|Arcane": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 2
+      },
+      {
+        "itemId": "24047",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Brilliant Dawnstone",
+        "count": 13
+      },
+      {
+        "itemId": "24035",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sparkling Star of Elune",
+        "count": 2
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24047",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Brilliant Dawnstone",
+        "count": 11
+      },
+      {
+        "itemId": "24035",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sparkling Star of Elune",
+        "count": 2
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24047",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Brilliant Dawnstone",
+        "count": 6
+      },
+      {
+        "itemId": "24035",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Sparkling Star of Elune",
+        "count": 3
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32204",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Brilliant Lionseye",
+        "count": 9
+      },
+      {
+        "itemId": "32201",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sparkling Empyrean Sapphire",
+        "count": 5
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32204",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Brilliant Lionseye",
+        "count": 9
+      },
+      {
+        "itemId": "32201",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sparkling Empyrean Sapphire",
+        "count": 6
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32204",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Brilliant Lionseye",
+        "count": 7
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32201",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sparkling Empyrean Sapphire",
+        "count": 2
+      }
+    ]
+  },
+  "Mage|Fire": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 9
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 4
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 11
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 8
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 2
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 12
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 11
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 6
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Mage|Frost": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 7
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 6
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 9
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 4
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 10
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 10
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 9
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 1
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 6
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Warlock|Affliction": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "31861",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Great Dawnstone",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 6
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 1
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32221",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Veiled Pyrestone",
+        "count": 2
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 3
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 7
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Warlock|Demonology": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "31861",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Great Dawnstone",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 6
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 1
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32221",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Veiled Pyrestone",
+        "count": 2
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 3
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 7
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Warlock|Destruction": {
+    "0": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "31861",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Great Dawnstone",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 12
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "31867",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Veiled Noble Topaz",
+        "count": 6
+      },
+      {
+        "itemId": "24056",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glowing Nightseye",
+        "count": 2
+      },
+      {
+        "itemId": "24030",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Runed Living Ruby",
+        "count": 1
+      }
+    ],
+    "3": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32221",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Veiled Pyrestone",
+        "count": 2
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32218",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Potent Pyrestone",
+        "count": 3
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "34220",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Chaotic Skyfire Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "35759",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Reckless Pyrestone",
+        "count": 7
+      },
+      {
+        "itemId": "32196",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Runed Crimson Spinel",
+        "count": 7
+      },
+      {
+        "itemId": "32215",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Glowing Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Warrior|Arms": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 5
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 4
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 14
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 8
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 4
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32205",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Smooth Lionseye",
+        "count": 6
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32205",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Smooth Lionseye",
+        "count": 6
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 8
+      },
+      {
+        "itemId": "32205",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Smooth Lionseye",
+        "count": 4
+      },
+      {
+        "itemId": "35758",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Jagged Seaspray Emerald",
+        "count": 2
+      }
+    ]
+  },
+  "Warrior|Fury": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 6
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 6
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 14
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24048",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Smooth Dawnstone",
+        "count": 6
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 2
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32195",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Bold Crimson Spinel",
+        "count": 8
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 5
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  },
+  "Warrior|Protection": {
+    "0": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 5
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 3
+      },
+      {
+        "itemId": "24067",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Jagged Talasite",
+        "count": 1
+      }
+    ],
+    "1": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 10
+      },
+      {
+        "itemId": "24058",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Inscribed Noble Topaz",
+        "count": 2
+      }
+    ],
+    "2": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "24033",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Solid Star of Elune",
+        "count": 11
+      },
+      {
+        "itemId": "24061",
+        "quality": 3,
+        "isMeta": false,
+        "name": "Glinting Noble Topaz",
+        "count": 2
+      }
+    ],
+    "3": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 6
+      },
+      {
+        "itemId": "35760",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Mystic Lionseye",
+        "count": 3
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ],
+    "4": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 5
+      },
+      {
+        "itemId": "32217",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Inscribed Pyrestone",
+        "count": 2
+      }
+    ],
+    "5": [
+      {
+        "itemId": "32409",
+        "quality": 4,
+        "isMeta": true,
+        "name": "Relentless Earthstorm Diamond",
+        "count": 1
+      },
+      {
+        "itemId": "32200",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Solid Empyrean Sapphire",
+        "count": 12
+      },
+      {
+        "itemId": "32206",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Rigid Lionseye",
+        "count": 2
+      },
+      {
+        "itemId": "32212",
+        "quality": 4,
+        "isMeta": false,
+        "name": "Sovereign Shadowsong Amethyst",
+        "count": 2
+      }
+    ]
+  }
+}
