@@ -2892,11 +2892,13 @@
             'Legs', 'Feet', 'Rings', 'Trinkets',
             'Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic'
         ];
+        const RELIC_CLASSES_PD = new Set(['Paladin', 'Shaman', 'Druid']);
+        const rangedLabel = RELIC_CLASSES_PD.has(state.selectedClass) ? 'Relic' : 'Rng';
         const PD_LABELS = {
             Head:'Head', Neck:'Neck', Shoulder:'Shld', Back:'Back', Chest:'Chest', Wrist:'Wrist',
             Hands:'Hands', Waist:'Waist', Legs:'Legs', Feet:'Feet',
             'Rings':'Ring', 'Trinkets':'Trkt',
-            'Main Hand':'MH', 'Off Hand':'OH', 'Two Hand':'2H', 'Ranged/Relic':'Rng'
+            'Main Hand':'MH', 'Off Hand':'OH', 'Two Hand':'2H', 'Ranged/Relic':rangedLabel
         };
 
         let pdHtml = '';
