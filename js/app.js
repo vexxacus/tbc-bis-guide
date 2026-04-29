@@ -1942,6 +1942,10 @@
         'Shoulders': 'Shoulder',
         'Wrists':    'Wrist',
         'Ranged':    'Ranged/Relic',
+        'Ring 1':    'Ring',
+        'Ring 2':    'Ring',
+        'Trinket 1': 'Trinket',
+        'Trinket 2': 'Trinket',
     };
 
     // ─── WCL popularity tier thresholds ──────────────────────────────
