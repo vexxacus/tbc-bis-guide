@@ -1771,7 +1771,12 @@
         if (!si || !si.length) return '';
 
         // Display name: "Rings" → "Ring", "Trinkets" → "Trinket", "Ring 1" → "Ring" etc.
-        const slotDisplayName = slot === 'Rings' ? 'Ring' : slot === 'Trinkets' ? 'Trinket' : slot.replace(/ [12]$/, '');
+        // "Ranged/Relic" → class-appropriate label (Relic for Paladin/Shaman/Druid, Ranged for others)
+        const RELIC_CLASSES = new Set(['Paladin', 'Shaman', 'Druid']);
+        let slotDisplayName = slot === 'Rings' ? 'Ring' : slot === 'Trinkets' ? 'Trinket' : slot.replace(/ [12]$/, '');
+        if (slotDisplayName === 'Ranged/Relic') {
+            slotDisplayName = RELIC_CLASSES.has(state.selectedClass) ? 'Relic' : 'Ranged';
+        }
 
         // ── Active item: user selection or BiS (index 0) ──
         const bis = getActiveItem(slot, si);
