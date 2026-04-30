@@ -3668,13 +3668,13 @@
 
         modalTitle.innerHTML = `
             <span class="icon-link"><img src="${WH_ICON_CDN}/large/${iconName}.jpg" alt="" class="modal-item-icon" onerror="this.src='${WH_ICON_CDN}/large/inv_misc_questionmark.jpg'"></span>
-            <span class="q-epic">${gemName || 'Gem #'+itemId}</span>`;
+            <span class="${qualityClass(itemId)}">${gemName || 'Gem #'+itemId}</span>`;
 
         let html = '';
         if (source) {
             html += `<div class="modal-section"><div class="modal-section-title">How to Get</div>
-                <div class="modal-row"><span class="modal-row-icon">${srcIcon(source.sourceType)}</span>
-                    <div><div class="modal-row-label">${source.sourceType}</div><div class="modal-row-value">${source.source || 'Unknown'}</div></div></div>`;
+                <div class="modal-row"><span class="modal-row-icon">📦</span>
+                    <div><div class="modal-row-label">Source</div><div class="modal-row-value">${source.source || 'Unknown'}</div></div></div>`;
             if (source.sourceLocation)
                 html += `<div class="modal-row"><span class="modal-row-icon">📍</span>
                     <div><div class="modal-row-label">Location</div><div class="modal-row-value">${source.sourceLocation}</div></div></div>`;
