@@ -408,6 +408,11 @@
         }
 
         updateStructuredData(pageTitle, metaDesc, fullUrl);
+
+        // Google Analytics — SPA page view
+        if (typeof gtag === 'function') {
+            gtag('event', 'page_view', { page_title: pageTitle, page_location: fullUrl, page_path: path });
+        }
     }
 
     // ─── JSON-LD Structured Data ─────────────────────────────────────
