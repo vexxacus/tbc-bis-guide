@@ -3623,41 +3623,41 @@
         refreshWH();
 
         // Fetch Wowhead tooltip and embed inline for item stats
+        embedWowheadTooltip(modalBody);
+    }
+
+    // ─── Shared: embed Wowhead tooltip inline ────────────────────────
+    function embedWowheadTooltip(container) {
         try {
-            const wrap = modalBody.querySelector('.modal-wh-tooltip-wrap');
-            if (wrap) {
-                const whId = wrap.dataset.whItemId;
-                // Create a temporary hidden link to trigger Wowhead tooltip fetch
-                const probe = document.createElement('a');
-                probe.href = `https://www.wowhead.com/${WH}/item=${whId}`;
-                probe.dataset.wowhead = `item=${whId}&domain=${WH}`;
-                probe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
-                document.body.appendChild(probe);
-                refreshWH();
-                // Wowhead caches tooltip data — poll until available
-                let attempts = 0;
-                const poll = setInterval(() => {
-                    attempts++;
-                    try {
-                        // Trigger mouseover to force tooltip render
-                        probe.dispatchEvent(new MouseEvent('mouseover', {bubbles:true}));
-                        setTimeout(() => {
-                            const ttNode = document.querySelector('.wowhead-tooltip');
-                            if (ttNode && ttNode.innerHTML.length > 100) {
-                                wrap.innerHTML = `<div class="modal-inline-tooltip">${ttNode.innerHTML}</div>`;
-                                // Hide the floating tooltip
-                                ttNode.style.display = 'none';
-                                probe.dispatchEvent(new MouseEvent('mouseout', {bubbles:true}));
-                                probe.remove();
-                                clearInterval(poll);
-                            } else if (attempts >= 8) {
-                                probe.remove();
-                                clearInterval(poll);
-                            }
-                        }, 100);
-                    } catch(e4) { clearInterval(poll); probe.remove(); }
-                }, 400);
-            }
+            const wrap = container.querySelector('.modal-wh-tooltip-wrap');
+            if (!wrap) return;
+            const whId = wrap.dataset.whItemId;
+            const probe = document.createElement('a');
+            probe.href = `https://www.wowhead.com/${WH}/item=${whId}`;
+            probe.dataset.wowhead = `item=${whId}&domain=${WH}`;
+            probe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(probe);
+            refreshWH();
+            let attempts = 0;
+            const poll = setInterval(() => {
+                attempts++;
+                try {
+                    probe.dispatchEvent(new MouseEvent('mouseover', {bubbles:true}));
+                    setTimeout(() => {
+                        const ttNode = document.querySelector('.wowhead-tooltip');
+                        if (ttNode && ttNode.innerHTML.length > 100) {
+                            wrap.innerHTML = `<div class="modal-inline-tooltip">${ttNode.innerHTML}</div>`;
+                            ttNode.style.display = 'none';
+                            probe.dispatchEvent(new MouseEvent('mouseout', {bubbles:true}));
+                            probe.remove();
+                            clearInterval(poll);
+                        } else if (attempts >= 8) {
+                            probe.remove();
+                            clearInterval(poll);
+                        }
+                    }, 100);
+                } catch(e4) { clearInterval(poll); probe.remove(); }
+            }, 400);
         } catch(e3) {}
     }
 
@@ -3670,7 +3670,7 @@
             <span class="icon-link"><img src="${WH_ICON_CDN}/large/${iconName}.jpg" alt="" class="modal-item-icon" onerror="this.src='${WH_ICON_CDN}/large/inv_misc_questionmark.jpg'"></span>
             <span class="${qualityClass(itemId)}">${gemName || 'Gem #'+itemId}</span>`;
 
-        let html = '';
+        let html = `<div class="modal-wh-tooltip-wrap" data-wh-item-id="${toWhId(itemId)}"></div>`;
         if (source) {
             html += `<div class="modal-section"><div class="modal-section-title">How to Get</div>
                 <div class="modal-row"><span class="modal-row-icon">📦</span>
@@ -3692,6 +3692,7 @@
         modalOverlay.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         refreshWH();
+        embedWowheadTooltip(modalBody);
     }
 
     // ─── Enchant Modal ───────────────────────────────────────────────
