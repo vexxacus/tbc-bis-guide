@@ -685,7 +685,10 @@ body {
 /* Paperdoll-slot som är inaktiv pga weapon mode */
 .pd-slot.pd-slot-dimmed {
     opacity: 0.3;
-    pointer-events: none;
+    transition: opacity 0.2s;
+}
+.pd-slot.pd-slot-dimmed:hover {
+    opacity: 0.7;
 }
 .pd-slot .pd-dimmed-x {
     position: absolute;

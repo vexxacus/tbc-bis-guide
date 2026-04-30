@@ -171,7 +171,15 @@
             <div class="gs-summary hidden" id="gsSummary" style="display:none!important"></div>
             <!-- 5. Stats panel + SIM -->
             <div class="sim-panel" id="simPanel" style="display:none">
-                <div class="sim-panel-title">📊 Character Stats <span class="sim-panel-subtitle">incl. buffs & consumables</span></div>
+                <div class="sim-panel-title">📊 Character Stats <span class="sim-panel-subtitle">incl. buffs & consumables</span>
+                    <span class="sim-info-icon-wrap">
+                        <span class="sim-info-icon" id="simInfoIcon" tabindex="0">ℹ️</span>
+                        <div class="sim-info-tooltip" id="simInfoTooltip">
+                            <p id="simDisclaimer"></p>
+                            <p class="sim-tip">Take DPS results with a grain of salt — factors like raid composition, buffs, and fight mechanics all affect real performance. The value of this tool is experimenting: swap items in the list above and re-simulate to see how different gear choices impact your DPS.</p>
+                        </div>
+                    </span>
+                </div>
                 <div class="sim-panel-stats" id="simStats">
                     <div class="sim-stat-loading">Loading stats…</div>
                 </div>
@@ -185,13 +193,6 @@
                         <span class="sim-dps-number" id="simDpsNumber">—</span>
                         <span class="sim-dps-label">DPS</span>
                         <span class="sim-dps-stdev" id="simDpsStdev"></span>
-                    </div>
-                    <div class="sim-info-icon-wrap">
-                        <span class="sim-info-icon" id="simInfoIcon" tabindex="0">ℹ️</span>
-                        <div class="sim-info-tooltip" id="simInfoTooltip">
-                            <p id="simDisclaimer"></p>
-                            <p class="sim-tip">Take DPS results with a grain of salt — factors like raid composition, buffs, and fight mechanics all affect real performance. The value of this tool is experimenting: swap items in the list above and re-simulate to see how different gear choices impact your DPS.</p>
-                        </div>
                     </div>
                 </div>
             </div>
