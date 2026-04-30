@@ -1806,24 +1806,14 @@ a[data-wh-item]:hover {
 /* Inline Wowhead tooltip embed in modal */
 .modal-wh-tooltip-wrap {
     margin-bottom: 12px;
-    text-align: center;
-}
-.modal-wh-embed {
-    display: inline-block;
-    padding: 8px 14px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    color: var(--text-muted);
-    font-size: 0.78rem;
-    text-decoration: none;
+    min-height: 20px;
 }
 .modal-inline-tooltip {
     background: #1a1a2e;
     border: 1px solid #3a3a5a;
     border-radius: var(--radius);
     padding: 10px 12px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     line-height: 1.5;
     text-align: left;
     color: #e0e0e0;
@@ -1834,6 +1824,7 @@ a[data-wh-item]:hover {
 .modal-inline-tooltip .q3 { color: #0070dd; }
 .modal-inline-tooltip .q4 { color: #a335ee; }
 .modal-inline-tooltip .q5 { color: #ff8000; }
+.modal-inline-tooltip .q { font-weight: 600; }
 
 /* Wowhead button at the bottom of the modal */
 .modal-wowhead-btn {

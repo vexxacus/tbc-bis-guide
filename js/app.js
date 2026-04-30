@@ -3558,9 +3558,7 @@
 
         // Embedded Wowhead tooltip for item stats (especially useful on mobile)
         let html = `
-            <div class="modal-wh-tooltip-wrap">
-                <a href="https://www.wowhead.com/${WH}/item=${toWhId(itemId)}" data-wowhead="item=${toWhId(itemId)}&domain=${WH}" target="_blank" rel="noopener" class="modal-wh-embed" data-wh-rename-link="false">Tap to view stats</a>
-            </div>
+            <div class="modal-wh-tooltip-wrap" data-wh-item-id="${toWhId(itemId)}"></div>
             <div class="modal-gs">
                 <div class="modal-gs-box"><div class="modal-gs-label">Item GS</div><div class="modal-gs-val" style="color:${gsColor}">${itemGS}</div></div>
                 <div class="modal-gs-box"><div class="modal-gs-label">Est. iLevel</div><div class="modal-gs-val">${iLvl}</div></div>
@@ -3624,19 +3622,41 @@
         document.body.style.overflow = 'hidden';
         refreshWH();
 
-        // Grab Wowhead tooltip HTML and embed inline (for mobile users who can't hover)
+        // Fetch Wowhead tooltip and embed inline for item stats
         try {
-            const embedEl = modalBody.querySelector('.modal-wh-embed');
-            if (embedEl) {
-                setTimeout(() => {
+            const wrap = modalBody.querySelector('.modal-wh-tooltip-wrap');
+            if (wrap) {
+                const whId = wrap.dataset.whItemId;
+                // Create a temporary hidden link to trigger Wowhead tooltip fetch
+                const probe = document.createElement('a');
+                probe.href = `https://www.wowhead.com/${WH}/item=${whId}`;
+                probe.dataset.wowhead = `item=${whId}&domain=${WH}`;
+                probe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+                document.body.appendChild(probe);
+                refreshWH();
+                // Wowhead caches tooltip data — poll until available
+                let attempts = 0;
+                const poll = setInterval(() => {
+                    attempts++;
                     try {
-                        const ttNode = document.querySelector('.wowhead-tooltip');
-                        if (ttNode && ttNode.offsetParent !== null && ttNode.innerHTML.length > 50) {
-                            const wrap = modalBody.querySelector('.modal-wh-tooltip-wrap');
-                            if (wrap) wrap.innerHTML = `<div class="modal-inline-tooltip">${ttNode.innerHTML}</div>`;
-                        }
-                    } catch(e4) {}
-                }, 800);
+                        // Trigger mouseover to force tooltip render
+                        probe.dispatchEvent(new MouseEvent('mouseover', {bubbles:true}));
+                        setTimeout(() => {
+                            const ttNode = document.querySelector('.wowhead-tooltip');
+                            if (ttNode && ttNode.innerHTML.length > 100) {
+                                wrap.innerHTML = `<div class="modal-inline-tooltip">${ttNode.innerHTML}</div>`;
+                                // Hide the floating tooltip
+                                ttNode.style.display = 'none';
+                                probe.dispatchEvent(new MouseEvent('mouseout', {bubbles:true}));
+                                probe.remove();
+                                clearInterval(poll);
+                            } else if (attempts >= 8) {
+                                probe.remove();
+                                clearInterval(poll);
+                            }
+                        }, 100);
+                    } catch(e4) { clearInterval(poll); probe.remove(); }
+                }, 400);
             }
         } catch(e3) {}
     }
