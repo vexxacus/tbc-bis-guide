@@ -20,27 +20,17 @@ Prioritet: 🔴 Hög | 🟡 Medium | 🟢 Låg | ✅ KlarPrioritet: 🔴 Hög | 
 
  🔴 | 📋 Todo || 2 | Thalassian Cloak — säger Kael men notes säger Mag | 🟡 | 📋 Todo |
 
- 🔴 | 📋 Todo || 3 | Visa ranged hit för Hunters istället för melee hit | 🟡 | 📋 Todo |
-
- Måste gå igenom gems igen. Exempelvis visas spell haste gems för shamaner i p1 / p2, men de finns inte i den fasen. Tror jag inte. VIll dubbelkolla
-
 | 3 | 2H-alternatives saknar mouseover tooltip (t.ex. MM Hunter) — borde gå att hovra även på non-BIS | 🔴 | 📋 Todo || 4 | Desktop layout — smalare/kortare sidor | 🟢 | 📋 Todo |
 
-| 4 | Totem/Libram/Idol visas som "Ranged" — borde heta Relic eller liknande | 🟡 | 📋 Todo |Kan vi ha en tabb med highest simulated dps eller liknande per specc? Ta från WCL API?
+|Kan vi ha en tabb med highest simulated dps eller liknande per specc? Ta från WCL API?
 
-| 5 | Neck kategoriseras som "Armor" — borde vara Jewelry/Accessories | 🟡 | 📋 Todo |Totem och librams står some range - kan vi ändra så det står rätt?
+| 5 | Neck kategoriseras som "Armor" — borde vara Jewelry/Accessories | 🟡 | 📋 Todo |
 
 COMMUNITY-DRIVEN BACKLOGG? LÄMNA FEEDBACK?
 
-KAN VI HÄMTA GEMS FRÅN WOWTBC.GG ISTÄLLET?!
 
 | 6 | Thalassian Cloak — säger Kael men item-notes säger Mag | 🟡 | 📋 Todo |2h alternatives har ingen mouseover tooltip på exempelvis MM hunters. Borde ju kunna hoovra även om det inte är bis
 
-Kan vi lägga in hela wowhead-item-lista som alternativ per specc och fas? WCL är alltid BIS, men items som inte används av parsers kan vara "ALT" eller liknande. Vad tror du?
-
----Alla summeringar om speccarna är fel nu när vi ändrat items.
-
-Om man tar bort professions så ska vi inte dölja items som skapas av professions, men inte kräver profession för att använda. Exempelvis Wolfshead helm
 
 ## 🟡 UI & LayoutSka vi sätta widget "professions & pvp" precis under beskrivningen av specc / fas? Vad tycker du?
 

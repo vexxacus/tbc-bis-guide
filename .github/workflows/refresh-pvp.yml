@@ -24,7 +24,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -69,11 +69,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git rebase origin/main
           git add js/pvp-data.js
           git commit -m "chore: auto-refresh PvP BiS data $(date -u '+%Y-%m-%d')"
           git push
+
+      - name: Deploy to Firebase
+        if: steps.changes.outputs.changed == 'true'
+        run: npx firebase-tools deploy --only hosting --project tbc-bis-guide --token "$FIREBASE_TOKEN" --non-interactive
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: No changes detected
         if: steps.changes.outputs.changed == 'false'
