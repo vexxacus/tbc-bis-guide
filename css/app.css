@@ -2395,3 +2395,52 @@ a[data-wh-item]:hover {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+/* ─── Feedback Page ─────────────────────────────────────────────── */
+.feedback-form-wrap {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 24px 0;
+}
+.feedback-form-wrap h2 { margin-top: 0; font-size: 1.1rem; }
+.fb-field { margin-bottom: 14px; }
+.fb-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
+.fb-optional { font-weight: 400; opacity: 0.6; }
+.fb-field input, .fb-field select, .fb-field textarea {
+    width: 100%; padding: 10px 12px; font-size: 0.9rem;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius); color: var(--text-primary);
+    font-family: inherit;
+}
+.fb-field textarea { resize: vertical; min-height: 80px; }
+.fb-submit {
+    display: inline-block; padding: 10px 24px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius); font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s;
+}
+.fb-submit:hover { opacity: 0.85; }
+.fb-success { margin-top: 12px; padding: 10px; background: rgba(30,200,100,.12); border-radius: var(--radius); color: #4ade80; font-size: 0.85rem; }
+
+.feedback-board { margin-top: 32px; }
+.fb-section { margin-bottom: 28px; }
+.fb-section h2 { font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.fb-count { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+.fb-items { display: flex; flex-direction: column; gap: 8px; }
+.fb-item {
+    display: flex; gap: 12px; padding: 12px 14px;
+    background: var(--bg-secondary); border: 1px solid var(--border-light);
+    border-radius: var(--radius); align-items: flex-start;
+}
+.fb-item-done { border-left: 3px solid #4ade80; }
+.fb-item-backlog { border-left: 3px solid var(--accent); }
+.fb-item-rejected { border-left: 3px solid #f87171; opacity: 0.7; }
+.fb-cat { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.fb-item-title { font-weight: 600; font-size: 0.9rem; }
+.fb-item-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+.fb-item-date { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; opacity: 0.7; }
+.fb-item-reason { font-size: 0.78rem; color: #f87171; margin-top: 4px; font-style: italic; }
+.fb-loading { color: var(--text-muted); font-size: 0.85rem; }
+.fb-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; }

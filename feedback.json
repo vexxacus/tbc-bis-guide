@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "title": "Show item stats in modal (mobile)",
+        "description": "Mobile users can't hover for Wowhead tooltips — show item stats directly in the modal.",
+        "category": "feature",
+        "status": "done",
+        "date": "2026-04-30"
+    },
+    {
+        "id": 2,
+        "title": "Paperdoll clicks should open item modal",
+        "description": "Clicking an item icon in the paperdoll navigates to Wowhead instead of opening the item details modal.",
+        "category": "bug",
+        "status": "done",
+        "date": "2026-04-30"
+    },
+    {
+        "id": 3,
+        "title": "Gem modal shows wrong quality color",
+        "description": "All gems appear as epic (purple) regardless of actual quality.",
+        "category": "bug",
+        "status": "done",
+        "date": "2026-04-30"
+    },
+    {
+        "id": 4,
+        "title": "2H weapon tooltip not showing on hover",
+        "description": "When selecting 2H spec, the 2H weapon slot doesn't show tooltips on hover.",
+        "category": "bug",
+        "status": "done",
+        "date": "2026-04-28"
+    },
+    {
+        "id": 5,
+        "title": "Move profession filter higher on page",
+        "description": "Profession filter is too far down — easy to miss. Should be above the gear list.",
+        "category": "feature",
+        "status": "done",
+        "date": "2026-04-28"
+    },
+    {
+        "id": 6,
+        "title": "Dark mode improvements",
+        "description": "Some text is hard to read in dark mode, especially muted labels.",
+        "category": "feature",
+        "status": "backlog"
+    },
+    {
+        "id": 7,
+        "title": "Export gear list to text/image",
+        "description": "Allow users to export their BiS list as a shareable image or text format for Discord.",
+        "category": "feature",
+        "status": "backlog"
+    }
+]

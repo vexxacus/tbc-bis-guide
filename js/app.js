@@ -227,8 +227,8 @@
         const parts = location.pathname.replace(/^\//, '').split('/').filter(Boolean);
         if (!parts.length) return false;
 
-        // Static pages: /about, /privacy
-        if (parts[0] === 'about' || parts[0] === 'privacy') {
+        // Static pages: /about, /privacy, /feedback
+        if (parts[0] === 'about' || parts[0] === 'privacy' || parts[0] === 'feedback') {
             showStaticPage(parts[0]);
             return true;
         }
@@ -3832,6 +3832,45 @@
                 <h2>Changes</h2>
                 <p>We may update this policy occasionally. Changes will be reflected on this page with an updated date.</p>
             `
+        },
+        feedback: {
+            title: 'Feedback & Roadmap — TBC BiS Guide',
+            description: 'Submit feedback, report bugs, and see what features are planned or completed for TBC BiS Guide.',
+            html: `
+                <h1>Feedback & Roadmap</h1>
+                <p>Help us improve! Submit your ideas, bug reports, or feature requests below. You can also see what we're working on and what's been completed.</p>
+
+                <div class="feedback-form-wrap">
+                    <h2>💡 Submit Feedback</h2>
+                    <form id="feedbackForm" class="feedback-form">
+                        <div class="fb-field">
+                            <label for="fbName">Name <span class="fb-optional">(optional)</span></label>
+                            <input type="text" id="fbName" placeholder="Anonymous hero">
+                        </div>
+                        <div class="fb-field">
+                            <label for="fbCategory">Category</label>
+                            <select id="fbCategory">
+                                <option value="bug">🐛 Bug Report</option>
+                                <option value="feature">✨ Feature Request</option>
+                                <option value="data">📊 Data Issue (wrong item/source)</option>
+                                <option value="other">💬 Other</option>
+                            </select>
+                        </div>
+                        <div class="fb-field">
+                            <label for="fbMessage">Description</label>
+                            <textarea id="fbMessage" rows="4" placeholder="Describe the bug or feature you'd like to see..." required></textarea>
+                        </div>
+                        <button type="submit" class="fb-submit">Submit on GitHub →</button>
+                        <div id="fbSuccess" class="fb-success hidden">✅ A GitHub Issue window opened — submit it there to complete your feedback!</div>
+                        <p class="fb-hint">This will open a pre-filled issue on our GitHub repo. You'll need a GitHub account.</p>
+                    </form>
+                </div>
+
+                <div id="feedbackBoard" class="feedback-board">
+                    <p class="fb-loading">Loading roadmap...</p>
+                </div>
+            `,
+            onLoad: function() { loadFeedbackBoard(); }
         }
     };
 
@@ -3862,8 +3901,123 @@
         const canonical = document.getElementById('canonicalLink');
         if (canonical) canonical.setAttribute('href', `https://tbc-bis-guide.web.app/${page}`);
 
+        // Page-specific init
+        if (data.onLoad) data.onLoad();
+
         // Scroll to top
         window.scrollTo(0, 0);
+    }
+
+    // ─── Feedback Board (GitHub Issues) ────────────────────────────
+    const GH_REPO = 'vexxacus/tbc-bis-guide';
+    const GH_LABEL = 'feedback';
+
+    function loadFeedbackBoard() {
+        // Fetch issues labeled 'feedback' from GitHub (public API, no auth needed)
+        fetch(`https://api.github.com/repos/${GH_REPO}/issues?labels=${GH_LABEL}&state=all&per_page=50&sort=created&direction=desc`)
+            .then(r => r.json())
+            .then(issues => {
+                const board = document.getElementById('feedbackBoard');
+                if (!board || !Array.isArray(issues)) return;
+
+                const groups = { done: [], backlog: [], rejected: [] };
+                for (const issue of issues) {
+                    const labels = issue.labels.map(l => l.name.toLowerCase());
+                    let status = 'backlog';
+                    if (labels.includes('done') || issue.state === 'closed') status = 'done';
+                    if (labels.includes('rejected') || labels.includes('wontfix')) status = 'rejected';
+
+                    const catLabel = labels.find(l => ['bug','feature','data'].includes(l));
+                    groups[status].push({
+                        title: issue.title,
+                        description: issue.body ? issue.body.slice(0, 200) : '',
+                        category: catLabel || 'other',
+                        date: issue.closed_at ? issue.closed_at.slice(0,10) : issue.created_at.slice(0,10),
+                        url: issue.html_url,
+                        number: issue.number
+                    });
+                }
+
+                const catIcon = { bug: '🐛', feature: '✨', data: '📊', other: '💬' };
+                const statusIcon = { done: '✅', backlog: '📋', rejected: '❌' };
+                const statusLabel = { done: 'Completed', backlog: 'Planned / Backlog', rejected: 'Not Planned' };
+
+                function renderSection(key) {
+                    const list = groups[key];
+                    if (!list.length) return '';
+                    let h = `<div class="fb-section">
+                        <h2>${statusIcon[key]} ${statusLabel[key]} <span class="fb-count">(${list.length})</span></h2>
+                        <div class="fb-items">`;
+                    for (const item of list) {
+                        h += `<div class="fb-item fb-item-${key}">
+                            <span class="fb-cat">${catIcon[item.category] || '💬'}</span>
+                            <div class="fb-item-body">
+                                <div class="fb-item-title">${item.title}</div>
+                                <div class="fb-item-desc">${item.description}</div>
+                                <div class="fb-item-date">${item.date}</div>
+                            </div>
+                        </div>`;
+                    }
+                    h += '</div></div>';
+                    return h;
+                }
+
+                let html = renderSection('done') + renderSection('backlog') + renderSection('rejected');
+                if (!html) html = '<p style="color:var(--text-muted)">No feedback items yet. Be the first!</p>';
+                board.innerHTML = html;
+            })
+            .catch(() => {
+                // Fallback: load from local JSON
+                fetch('/feedback.json?v=' + Date.now())
+                    .then(r => r.json())
+                    .then(items => {
+                        const board = document.getElementById('feedbackBoard');
+                        if (!board) return;
+                        const groups = { done: [], backlog: [], rejected: [] };
+                        for (const item of items) { (groups[item.status] || groups.backlog).push(item); }
+                        const catIcon = { bug: '🐛', feature: '✨', data: '📊', other: '💬' };
+                        const statusIcon = { done: '✅', backlog: '📋', rejected: '❌' };
+                        const statusLabel = { done: 'Completed', backlog: 'Planned / Backlog', rejected: 'Not Planned' };
+                        function renderSection(key) {
+                            const list = groups[key];
+                            if (!list.length) return '';
+                            let h = `<div class="fb-section"><h2>${statusIcon[key]} ${statusLabel[key]} <span class="fb-count">(${list.length})</span></h2><div class="fb-items">`;
+                            for (const item of list) { h += `<div class="fb-item fb-item-${key}"><span class="fb-cat">${catIcon[item.category]||'💬'}</span><div class="fb-item-body"><div class="fb-item-title">${item.title}</div><div class="fb-item-desc">${item.description||''}</div>${item.date?`<div class="fb-item-date">${item.date}</div>`:''}</div></div>`; }
+                            h += '</div></div>'; return h;
+                        }
+                        board.innerHTML = renderSection('done') + renderSection('backlog') + renderSection('rejected');
+                    })
+                    .catch(() => {
+                        const board = document.getElementById('feedbackBoard');
+                        if (board) board.innerHTML = '<p>Could not load roadmap.</p>';
+                    });
+            });
+
+        // Form submit → opens pre-filled GitHub Issue
+        setTimeout(() => {
+            const form = document.getElementById('feedbackForm');
+            if (!form) return;
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                const name = document.getElementById('fbName').value.trim() || 'Anonymous';
+                const category = document.getElementById('fbCategory').value;
+                const message = document.getElementById('fbMessage').value.trim();
+                if (!message) return;
+
+                const title = encodeURIComponent(message.slice(0, 80));
+                const body = encodeURIComponent(`**Category:** ${category}\n**From:** ${name}\n\n---\n\n${message}`);
+                const labels = encodeURIComponent(`feedback,${category}`);
+                const url = `https://github.com/${GH_REPO}/issues/new?title=${title}&body=${body}&labels=${labels}`;
+                window.open(url, '_blank');
+
+                document.getElementById('fbSuccess').classList.remove('hidden');
+                form.reset();
+                setTimeout(() => {
+                    const s = document.getElementById('fbSuccess');
+                    if (s) s.classList.add('hidden');
+                }, 5000);
+            });
+        }, 100);
     }
 
     // Footer link clicks — SPA navigation
