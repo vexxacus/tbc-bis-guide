@@ -3907,39 +3907,24 @@
         window.scrollTo(0, 0);
     }
 
-    // ─── Feedback Board (GitHub Issues) ────────────────────────────
-    const GH_REPO = 'vexxacus/tbc-bis-guide';
-    const GH_LABEL = 'feedback';
-
+    // ─── Feedback Board ─────────────────────────────────────────────
     function loadFeedbackBoard() {
-        // Fetch issues labeled 'feedback' from GitHub (public API, no auth needed)
-        fetch(`https://api.github.com/repos/${GH_REPO}/issues?labels=${GH_LABEL}&state=all&per_page=50&sort=created&direction=desc`)
+        fetch('/feedback.json?v=' + Date.now())
             .then(r => r.json())
-            .then(issues => {
+            .then(items => {
                 const board = document.getElementById('feedbackBoard');
-                if (!board || !Array.isArray(issues)) return;
+                if (!board) return;
 
-                const groups = { done: [], backlog: [], rejected: [] };
-                for (const issue of issues) {
-                    const labels = issue.labels.map(l => l.name.toLowerCase());
-                    let status = 'backlog';
-                    if (labels.includes('done') || issue.state === 'closed') status = 'done';
-                    if (labels.includes('rejected') || labels.includes('wontfix')) status = 'rejected';
+                // Add user-submitted items from localStorage ("Under Review")
+                const userItems = JSON.parse(localStorage.getItem('fb_submissions') || '[]');
 
-                    const catLabel = labels.find(l => ['bug','feature','data'].includes(l));
-                    groups[status].push({
-                        title: issue.title,
-                        description: issue.body ? issue.body.slice(0, 200) : '',
-                        category: catLabel || 'other',
-                        date: issue.closed_at ? issue.closed_at.slice(0,10) : issue.created_at.slice(0,10),
-                        url: issue.html_url,
-                        number: issue.number
-                    });
-                }
+                const groups = { review: [], done: [], backlog: [], rejected: [] };
+                for (const item of items) { (groups[item.status] || groups.backlog).push(item); }
+                for (const item of userItems) { groups.review.push(item); }
 
                 const catIcon = { bug: '🐛', feature: '✨', data: '📊', other: '💬' };
-                const statusIcon = { done: '✅', backlog: '📋', rejected: '❌' };
-                const statusLabel = { done: 'Completed', backlog: 'Planned / Backlog', rejected: 'Not Planned' };
+                const statusIcon = { review: '🔍', done: '✅', backlog: '📋', rejected: '❌' };
+                const statusLabel = { review: 'Under Review (yours)', done: 'Completed', backlog: 'Planned / Backlog', rejected: 'Not Planned' };
 
                 function renderSection(key) {
                     const list = groups[key];
@@ -3952,8 +3937,8 @@
                             <span class="fb-cat">${catIcon[item.category] || '💬'}</span>
                             <div class="fb-item-body">
                                 <div class="fb-item-title">${item.title}</div>
-                                <div class="fb-item-desc">${item.description}</div>
-                                <div class="fb-item-date">${item.date}</div>
+                                <div class="fb-item-desc">${item.description || ''}</div>
+                                ${item.date ? `<div class="fb-item-date">${item.date}</div>` : ''}
                             </div>
                         </div>`;
                     }
@@ -3961,35 +3946,13 @@
                     return h;
                 }
 
-                let html = renderSection('done') + renderSection('backlog') + renderSection('rejected');
+                let html = renderSection('review') + renderSection('done') + renderSection('backlog') + renderSection('rejected');
                 if (!html) html = '<p style="color:var(--text-muted)">No feedback items yet. Be the first!</p>';
                 board.innerHTML = html;
             })
             .catch(() => {
-                // Fallback: load from local JSON
-                fetch('/feedback.json?v=' + Date.now())
-                    .then(r => r.json())
-                    .then(items => {
-                        const board = document.getElementById('feedbackBoard');
-                        if (!board) return;
-                        const groups = { done: [], backlog: [], rejected: [] };
-                        for (const item of items) { (groups[item.status] || groups.backlog).push(item); }
-                        const catIcon = { bug: '🐛', feature: '✨', data: '📊', other: '💬' };
-                        const statusIcon = { done: '✅', backlog: '📋', rejected: '❌' };
-                        const statusLabel = { done: 'Completed', backlog: 'Planned / Backlog', rejected: 'Not Planned' };
-                        function renderSection(key) {
-                            const list = groups[key];
-                            if (!list.length) return '';
-                            let h = `<div class="fb-section"><h2>${statusIcon[key]} ${statusLabel[key]} <span class="fb-count">(${list.length})</span></h2><div class="fb-items">`;
-                            for (const item of list) { h += `<div class="fb-item fb-item-${key}"><span class="fb-cat">${catIcon[item.category]||'💬'}</span><div class="fb-item-body"><div class="fb-item-title">${item.title}</div><div class="fb-item-desc">${item.description||''}</div>${item.date?`<div class="fb-item-date">${item.date}</div>`:''}</div></div>`; }
-                            h += '</div></div>'; return h;
-                        }
-                        board.innerHTML = renderSection('done') + renderSection('backlog') + renderSection('rejected');
-                    })
-                    .catch(() => {
-                        const board = document.getElementById('feedbackBoard');
-                        if (board) board.innerHTML = '<p>Could not load roadmap.</p>';
-                    });
+                const board = document.getElementById('feedbackBoard');
+                if (board) board.innerHTML = '<p>Could not load roadmap.</p>';
             });
 
         // Form submit → Web3Forms API (free, no account needed for user)
@@ -4031,8 +3994,14 @@
                     btn.textContent = 'Submit Feedback';
                     if (data.success) {
                         localStorage.setItem('fb_last_sent', Date.now().toString());
+                        // Save to localStorage so it appears immediately under "Under Review"
+                        const subs = JSON.parse(localStorage.getItem('fb_submissions') || '[]');
+                        subs.unshift({ title: message.slice(0, 80), description: message, category: category, date: new Date().toISOString().slice(0,10) });
+                        localStorage.setItem('fb_submissions', JSON.stringify(subs.slice(0, 20)));
                         document.getElementById('fbSuccess').classList.remove('hidden');
                         form.reset();
+                        // Re-render board to show the new item
+                        loadFeedbackBoard();
                         setTimeout(() => {
                             const s = document.getElementById('fbSuccess');
                             if (s) s.classList.add('hidden');
