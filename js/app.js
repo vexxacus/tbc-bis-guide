@@ -3860,9 +3860,8 @@
                             <label for="fbMessage">Description</label>
                             <textarea id="fbMessage" rows="4" placeholder="Describe the bug or feature you'd like to see..." required></textarea>
                         </div>
-                        <button type="submit" class="fb-submit">Submit on GitHub →</button>
-                        <div id="fbSuccess" class="fb-success hidden">✅ A GitHub Issue window opened — submit it there to complete your feedback!</div>
-                        <p class="fb-hint">This will open a pre-filled issue on our GitHub repo. You'll need a GitHub account.</p>
+                        <button type="submit" class="fb-submit">Submit Feedback</button>
+                        <div id="fbSuccess" class="fb-success hidden">✅ Thanks for your feedback! We'll review it soon.</div>
                     </form>
                 </div>
 
@@ -3993,29 +3992,59 @@
                     });
             });
 
-        // Form submit → opens pre-filled GitHub Issue
+        // Form submit → Web3Forms API (free, no account needed for user)
         setTimeout(() => {
             const form = document.getElementById('feedbackForm');
             if (!form) return;
             form.addEventListener('submit', e => {
                 e.preventDefault();
+
+                // Rate limit: 1 submission per hour per browser
+                const lastSent = localStorage.getItem('fb_last_sent');
+                if (lastSent && Date.now() - parseInt(lastSent) < 3600000) {
+                    alert('You already submitted feedback recently. Please wait a bit before sending more.');
+                    return;
+                }
+
                 const name = document.getElementById('fbName').value.trim() || 'Anonymous';
                 const category = document.getElementById('fbCategory').value;
                 const message = document.getElementById('fbMessage').value.trim();
                 if (!message) return;
 
-                const title = encodeURIComponent(message.slice(0, 80));
-                const body = encodeURIComponent(`**Category:** ${category}\n**From:** ${name}\n\n---\n\n${message}`);
-                const labels = encodeURIComponent(`feedback,${category}`);
-                const url = `https://github.com/${GH_REPO}/issues/new?title=${title}&body=${body}&labels=${labels}`;
-                window.open(url, '_blank');
+                const btn = form.querySelector('.fb-submit');
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
 
-                document.getElementById('fbSuccess').classList.remove('hidden');
-                form.reset();
-                setTimeout(() => {
-                    const s = document.getElementById('fbSuccess');
-                    if (s) s.classList.add('hidden');
-                }, 5000);
+                fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: 'f9b4c65d-dae7-4dbc-a4b2-28cc12fc7aed',
+                        subject: '[TBC BiS Feedback] ' + category + ': ' + message.slice(0, 60),
+                        from_name: name,
+                        category: category,
+                        message: message,
+                        botcheck: ''
+                    })
+                }).then(r => r.json()).then(data => {
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Feedback';
+                    if (data.success) {
+                        localStorage.setItem('fb_last_sent', Date.now().toString());
+                        document.getElementById('fbSuccess').classList.remove('hidden');
+                        form.reset();
+                        setTimeout(() => {
+                            const s = document.getElementById('fbSuccess');
+                            if (s) s.classList.add('hidden');
+                        }, 5000);
+                    } else {
+                        alert('Could not send feedback. Please try again later.');
+                    }
+                }).catch(() => {
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Feedback';
+                    alert('Network error. Please try again.');
+                });
             });
         }, 100);
     }

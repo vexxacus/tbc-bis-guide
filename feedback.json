@@ -1,56 +1,22 @@
 [
-    {
-        "id": 1,
-        "title": "Show item stats in modal (mobile)",
-        "description": "Mobile users can't hover for Wowhead tooltips — show item stats directly in the modal.",
-        "category": "feature",
-        "status": "done",
-        "date": "2026-04-30"
-    },
-    {
-        "id": 2,
-        "title": "Paperdoll clicks should open item modal",
-        "description": "Clicking an item icon in the paperdoll navigates to Wowhead instead of opening the item details modal.",
-        "category": "bug",
-        "status": "done",
-        "date": "2026-04-30"
-    },
-    {
-        "id": 3,
-        "title": "Gem modal shows wrong quality color",
-        "description": "All gems appear as epic (purple) regardless of actual quality.",
-        "category": "bug",
-        "status": "done",
-        "date": "2026-04-30"
-    },
-    {
-        "id": 4,
-        "title": "2H weapon tooltip not showing on hover",
-        "description": "When selecting 2H spec, the 2H weapon slot doesn't show tooltips on hover.",
-        "category": "bug",
-        "status": "done",
-        "date": "2026-04-28"
-    },
-    {
-        "id": 5,
-        "title": "Move profession filter higher on page",
-        "description": "Profession filter is too far down — easy to miss. Should be above the gear list.",
-        "category": "feature",
-        "status": "done",
-        "date": "2026-04-28"
-    },
-    {
-        "id": 6,
-        "title": "Dark mode improvements",
-        "description": "Some text is hard to read in dark mode, especially muted labels.",
-        "category": "feature",
-        "status": "backlog"
-    },
-    {
-        "id": 7,
-        "title": "Export gear list to text/image",
-        "description": "Allow users to export their BiS list as a shareable image or text format for Discord.",
-        "category": "feature",
-        "status": "backlog"
-    }
+    {"id":1,"title":"Show item stats in modal (mobile)","description":"Mobile users can't hover for Wowhead tooltips — now stats are shown directly inline in the item modal.","category":"feature","status":"done","date":"2026-04-30"},
+    {"id":2,"title":"Paperdoll clicks open item modal instead of Wowhead","description":"Clicking an item icon in the paperdoll now opens the detail modal instead of navigating away.","category":"bug","status":"done","date":"2026-04-30"},
+    {"id":3,"title":"Gem modal shows correct quality color","description":"Fixed: all gems appeared as epic purple. Now shows correct rarity color.","category":"bug","status":"done","date":"2026-04-30"},
+    {"id":4,"title":"Gem modal shows Wowhead tooltip inline","description":"Gem details (stats, socket info) now appear directly in the modal.","category":"feature","status":"done","date":"2026-04-30"},
+    {"id":5,"title":"Mobile paperdoll overflow fix","description":"Paperdoll no longer overflows on small screens — responsive grid with smaller icons.","category":"bug","status":"done","date":"2026-04-30"},
+    {"id":6,"title":"Mobile tooltip positioning fix","description":"Tooltips on mobile no longer clip off-screen — centered fixed positioning.","category":"bug","status":"done","date":"2026-04-30"},
+    {"id":7,"title":"Sim disclaimer moved to compact info icon","description":"The long sim disclaimer is now a hover tooltip, saving vertical space.","category":"feature","status":"done","date":"2026-04-28"},
+    {"id":8,"title":"Profession filter moved higher on page","description":"Profession filter is now above the gear list so it's easier to find.","category":"feature","status":"done","date":"2026-04-28"},
+    {"id":9,"title":"2H weapon tooltip not showing on hover","description":"Fixed: hovering inactive 2H weapon slot showed no tooltip.","category":"bug","status":"done","date":"2026-04-28"},
+    {"id":10,"title":"Neck moved from Armor to Jewelry category","description":"Neck slot now grouped with Rings and Trinkets.","category":"feature","status":"done","date":"2026-04-28"},
+    {"id":11,"title":"WarcraftLogs rankings link in meta banner","description":"Added direct link to WarcraftLogs rankings per spec/phase.","category":"feature","status":"done","date":"2026-04-30"},
+    {"id":12,"title":"Show Relic for Paladin/Shaman/Druid paperdoll","description":"Paperdoll correctly shows Relic instead of Rng for those classes.","category":"bug","status":"done","date":"2026-04-29"},
+    {"id":13,"title":"Hunter stat labels: Ranged Hit/Crit/Haste","description":"Hunters now see ranged-specific stat labels instead of melee ones.","category":"bug","status":"done","date":"2026-04-29"},
+    {"id":14,"title":"Fix WCL Ring/Trinket slot mapping","description":"Ring 1/2 and Trinket 1/2 from WarcraftLogs were not matched correctly.","category":"bug","status":"done","date":"2026-04-28"},
+    {"id":15,"title":"Updated gems from wowtbc.gg data","description":"129 gem recommendation changes synced + missing gem colors added.","category":"data","status":"done","date":"2026-04-28"},
+    {"id":16,"title":"Wowhead guide items as alternatives","description":"Added items from Wowhead class guides as supplemental alternative picks.","category":"feature","status":"done","date":"2026-04-27"},
+    {"id":17,"title":"PvP 2H weapons reclassified correctly","description":"Fixed PvP weapons incorrectly categorized as Main Hand.","category":"bug","status":"done","date":"2026-04-27"},
+    {"id":18,"title":"Public feedback page","description":"Feedback & Roadmap page where users can submit suggestions and see progress.","category":"feature","status":"done","date":"2026-04-30"},
+    {"id":19,"title":"Export gear list as shareable image","description":"Allow users to export their BiS list as a shareable image for Discord.","category":"feature","status":"backlog"},
+    {"id":20,"title":"Compare two specs/phases side by side","description":"Show a diff view to compare gear changes between phases or specs.","category":"feature","status":"backlog"}
 ]
