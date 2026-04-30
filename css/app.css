@@ -702,9 +702,13 @@ body {
 /* Slot-grupper som är inaktiva pga weapon mode toggle */
 .slot-group-inactive-wrap {
     opacity: 0.35;
-    pointer-events: none;
     filter: grayscale(60%);
     position: relative;
+    transition: opacity 0.2s, filter 0.2s;
+}
+.slot-group-inactive-wrap:hover {
+    opacity: 0.7;
+    filter: grayscale(30%);
 }
 .slot-group-inactive-wrap::after {
     content: 'Not used in current weapon mode';
@@ -761,13 +765,53 @@ body {
     display: none;
 }
 
+.prof-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
 .prof-filter-label {
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+}
+.prof-info-icon-wrap {
+    position: relative;
+    display: inline-block;
+}
+.prof-info-icon {
+    cursor: pointer;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+.prof-info-icon:hover,
+.prof-info-icon:focus {
+    opacity: 1;
+}
+.prof-info-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 280px;
+    max-width: 85vw;
+    background: var(--bg-card, #1a1a2e);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+    font-size: 0.68rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #aaa);
+}
+.prof-info-icon-wrap:hover .prof-info-tooltip,
+.prof-info-icon-wrap:focus-within .prof-info-tooltip {
+    display: block;
 }
 
 .prof-filter-chips {
@@ -1305,19 +1349,55 @@ body {
 }
 
 .sim-disclaimer {
-    margin: 10px 0 0;
+    margin: 0 0 6px;
     font-size: 0.68rem;
     color: var(--text-muted);
     line-height: 1.45;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding-top: 8px;
 }
 .sim-tip {
     margin-top: 6px;
-    border-top: none;
-    padding-top: 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 6px;
     font-style: italic;
     color: rgba(255,255,255,0.35);
+}
+
+/* Sim info icon tooltip */
+.sim-info-icon-wrap {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+}
+.sim-info-icon {
+    cursor: pointer;
+    font-size: 0.85rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.sim-info-icon:hover,
+.sim-info-icon:focus {
+    opacity: 1;
+}
+.sim-info-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 300px;
+    max-width: 85vw;
+    background: var(--bg-card, #1a1a2e);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #aaa);
+}
+.sim-info-icon-wrap:hover .sim-info-tooltip,
+.sim-info-icon-wrap:focus-within .sim-info-tooltip {
+    display: block;
 }
 
 /* Item notes / gearing tips */

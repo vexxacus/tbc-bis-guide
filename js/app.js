@@ -2192,13 +2192,11 @@
             state._profsLoaded = true;
         }
 
-        let html = '<div class="prof-filter-label">🔨 Professions &amp; PvP</div>';
-        html += hintHtml('prof-filter', '🔧',
-            `Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes), ` +
-            `a <strong>PvP arena rating</strong> to purchase (e.g. Merciless/Vengeful/Brutal Gladiator weapons &amp; shoulders), ` +
-            `or drop from <strong>outdoor world bosses</strong> (Doom Lord Kazzak, Doomwalker) which have a weekly respawn and may be camped or controlled by the opposite faction. ` +
-            `Tap a button to <strong>toggle it off</strong> — the list will update to show the next-best alternative for that slot.`
-        );
+        let html = '<div class="prof-filter-header"><span class="prof-filter-label">🔨 Professions &amp; PvP</span>';
+        html += `<span class="prof-info-icon-wrap">
+            <span class="prof-info-icon" tabindex="0">ℹ️</span>
+            <span class="prof-info-tooltip">Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes), a <strong>PvP arena rating</strong> to purchase, or drop from <strong>outdoor world bosses</strong> (weekly respawn). Toggle off to show the next-best alternative.</span>
+        </span></div>`;
         html += '<div class="prof-filter-chips">';
 
         // Profession chips
@@ -3048,8 +3046,8 @@
         }
 
         // ── Category-based rendering ──
-        const ARMOR_SLOTS   = ['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist', 'Legs', 'Feet'];
-        const JEWELRY_SLOTS = ['Rings', 'Trinkets'];
+        const ARMOR_SLOTS   = ['Head', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Waist', 'Legs', 'Feet'];
+        const JEWELRY_SLOTS = ['Neck', 'Rings', 'Trinkets'];
         const WEAPON_SLOTS  = new Set(['Main Hand', 'Off Hand', 'Two Hand', 'Ranged/Relic']);
 
         // Helper: render a category header

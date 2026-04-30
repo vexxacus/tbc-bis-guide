@@ -163,6 +163,8 @@
             <div class="share-toast hidden" id="shareToast">✓ Link copied to clipboard!</div>
             <!-- 2. SEO / build description -->
             <div class="seo-description hidden" id="seoDescription"></div>
+            <!-- 6. Profession & PvP toggle (moved up near description) -->
+            <div class="profession-filter hidden" id="professionFilter"></div>
             <!-- 3. Paperdoll Overview -->
             <div class="paperdoll" id="paperdoll"></div>
             <!-- 4. GearScore summary — hidden -->
@@ -184,12 +186,15 @@
                         <span class="sim-dps-label">DPS</span>
                         <span class="sim-dps-stdev" id="simDpsStdev"></span>
                     </div>
-                    <p class="sim-disclaimer" id="simDisclaimer"></p>
-                    <p class="sim-disclaimer sim-tip">Take DPS results with a grain of salt — factors like raid composition, buffs, and fight mechanics all affect real performance. The value of this tool is experimenting: swap items in the list above and re-simulate to see how different gear choices impact your DPS.</p>
+                    <div class="sim-info-icon-wrap">
+                        <span class="sim-info-icon" id="simInfoIcon" tabindex="0">ℹ️</span>
+                        <div class="sim-info-tooltip" id="simInfoTooltip">
+                            <p id="simDisclaimer"></p>
+                            <p class="sim-tip">Take DPS results with a grain of salt — factors like raid composition, buffs, and fight mechanics all affect real performance. The value of this tool is experimenting: swap items in the list above and re-simulate to see how different gear choices impact your DPS.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- 6. Profession & PvP toggle -->
-            <div class="profession-filter hidden" id="professionFilter"></div>
             <!-- 7. Slot list -->
             <div class="slot-list" id="slotList"></div>
         </section>

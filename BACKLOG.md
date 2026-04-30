@@ -12,15 +12,13 @@ Prioritet: 🔴 Hög | 🟡 Medium | 🟢 Låg | ✅ KlarPrioritet: 🔴 Hög | 
 
 ## 🔴 Buggar & Fixar
 
-| 1 | GitHub Actions: auto-refresh + deploy PvP-data | 🟡 | 📋 Failar varje gång på grund av autehtication |
-
 | # | Uppgift | Prio | Status |
 
 |---|---------|------|--------|
 
- 🔴 | 📋 Todo || 2 | Thalassian Cloak — säger Kael men notes säger Mag | 🟡 | 📋 Todo |
+| 3 | 2H-alternatives saknar mouseover tooltip (t.ex. MM Hunter) — borde gå att hovra även på non-BIS | 🔴 | 
 
-| 3 | 2H-alternatives saknar mouseover tooltip (t.ex. MM Hunter) — borde gå att hovra även på non-BIS | 🔴 | 📋 Todo || 4 | Desktop layout — smalare/kortare sidor | 🟢 | 📋 Todo |
+📋 Todo || 4 | Desktop layout — smalare/kortare sidor | 🟢 | 📋 Todo |
 
 |Kan vi ha en tabb med highest simulated dps eller liknande per specc? Ta från WCL API?
 
@@ -34,7 +32,6 @@ COMMUNITY-DRIVEN BACKLOGG? LÄMNA FEEDBACK?
 
 ## 🟡 UI & LayoutSka vi sätta widget "professions & pvp" precis under beskrivningen av specc / fas? Vad tycker du?
 
-WCL top meta parses - kan vi där länka till speccen för den zonen?
 
 | # | Uppgift | Prio | Status |Sim-disclaimer kaske räcker att ha som en (i) mousover jämte knappen? Så att den inte tar så mkt plats
 
