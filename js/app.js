@@ -3011,11 +3011,24 @@
                 const dateStr = meta.scrapedAt
                     ? new Date(meta.scrapedAt).toLocaleDateString('sv-SE')
                     : '';
+                // Build WCL rankings link
+                const WCL_ZONE_IDS = { 1: 1007, 2: 1008, 3: 1010, 4: 1012, 5: 1013 };
+                const WCL_SPEC_NAMES = {
+                    'Cat': 'Feral', 'Bear': 'Guardian', 'Beast Mastery': 'BeastMastery',
+                    'Dps': 'Rogue', 'Combat': 'Combat', 'Assassination': 'Assassination',
+                };
+                const wclZone = WCL_ZONE_IDS[state.selectedPhase] || '';
+                const wclClass = state.selectedClass;
+                const wclSpec = WCL_SPEC_NAMES[state.selectedSpec] || state.selectedSpec;
+                const wclMetric = ['Protection', 'Guardian'].includes(wclSpec) ? 'tankhps' : (['Holy', 'Restoration', 'Discipline'].includes(wclSpec) ? 'hps' : 'dps');
+                const wclLink = wclZone ? `https://classic.warcraftlogs.com/zone/rankings/${wclZone}#class=${wclClass}&spec=${wclSpec}&metric=${wclMetric}` : '';
+                const wclLinkHtml = wclLink ? `<a href="${wclLink}" target="_blank" rel="noopener" class="wcl-banner-link">View on WarcraftLogs →</a>` : '';
                 html += `<div class="wcl-info-banner">
                     <div class="wcl-banner-title">📊 <strong>WarcraftLogs Meta — Top Parsers</strong></div>
                     <div class="wcl-banner-meta">
                         What the top ${wclSpecData.totalPlayers} ${state.selectedSpec} ${state.selectedClass} parsers are wearing in Phase ${state.selectedPhase}.
                         ${dateStr ? '<br>📅 Data snapshot: ' + dateStr : ''}
+                        ${wclLinkHtml}
                     </div>
                     <div class="wcl-banner-legend">
                         <span class="wcl-legend-item"><span class="wcl-pop-badge wcl-tier-gold">🥇 70%+</span> Meta</span>

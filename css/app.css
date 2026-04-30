@@ -1927,6 +1927,19 @@ a[data-wh-item]:hover {
     color: var(--text-secondary);
     margin-bottom: 8px;
 }
+.wcl-banner-link {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    color: #ff8c00;
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+}
+.wcl-banner-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
 .wcl-banner-legend {
     display: flex;
     flex-wrap: wrap;
