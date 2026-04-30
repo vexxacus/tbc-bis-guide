@@ -2945,9 +2945,21 @@
         }
         paperdoll.innerHTML = pdHtml;
 
-        // Paperdoll click → scroll to slot
-        paperdoll.querySelectorAll('.pd-slot').forEach(pd => {
-            pd.addEventListener('click', () => {
+        // Paperdoll click → intercept item icon clicks to open modal
+        paperdoll.addEventListener('click', e => {
+            const el = e.target.closest('[data-wh-item]');
+            if (el) {
+                e.preventDefault();
+                e.stopPropagation();
+                const itemId = el.dataset.whItem;
+                const pdSlot = el.closest('.pd-slot');
+                const slot = pdSlot?.dataset.pdSlot || '';
+                openItemModal(itemId, slot);
+                return;
+            }
+            // Fallback: click on pd-slot label/area → scroll to slot
+            const pd = e.target.closest('.pd-slot');
+            if (pd) {
                 const target = slotList.querySelector(`.slot-group[data-slot="${pd.dataset.pdSlot}"]`);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2955,7 +2967,7 @@
                     target.style.boxShadow = '0 0 0 2px var(--accent)';
                     setTimeout(() => target.style.boxShadow = '', 1500);
                 }
-            });
+            }
         });
 
         // ── GearScore summary ──
@@ -3544,7 +3556,11 @@
             modalGems = modalRegularGems;
         }
 
+        // Embedded Wowhead tooltip for item stats (especially useful on mobile)
         let html = `
+            <div class="modal-wh-tooltip-wrap">
+                <a href="https://www.wowhead.com/${WH}/item=${toWhId(itemId)}" data-wowhead="item=${toWhId(itemId)}&domain=${WH}" target="_blank" rel="noopener" class="modal-wh-embed" data-wh-rename-link="false">Tap to view stats</a>
+            </div>
             <div class="modal-gs">
                 <div class="modal-gs-box"><div class="modal-gs-label">Item GS</div><div class="modal-gs-val" style="color:${gsColor}">${itemGS}</div></div>
                 <div class="modal-gs-box"><div class="modal-gs-label">Est. iLevel</div><div class="modal-gs-val">${iLvl}</div></div>
@@ -3607,6 +3623,22 @@
         modalOverlay.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         refreshWH();
+
+        // Grab Wowhead tooltip HTML and embed inline (for mobile users who can't hover)
+        try {
+            const embedEl = modalBody.querySelector('.modal-wh-embed');
+            if (embedEl) {
+                setTimeout(() => {
+                    try {
+                        const ttNode = document.querySelector('.wowhead-tooltip');
+                        if (ttNode && ttNode.offsetParent !== null && ttNode.innerHTML.length > 50) {
+                            const wrap = modalBody.querySelector('.modal-wh-tooltip-wrap');
+                            if (wrap) wrap.innerHTML = `<div class="modal-inline-tooltip">${ttNode.innerHTML}</div>`;
+                        }
+                    } catch(e4) {}
+                }, 800);
+            }
+        } catch(e3) {}
     }
 
     // ─── Gem Modal ───────────────────────────────────────────────────
