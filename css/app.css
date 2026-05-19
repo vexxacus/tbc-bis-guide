@@ -584,6 +584,80 @@ body {
     color: var(--text-secondary);
 }
 
+.seo-desc-heading {
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+/* ─── SEO FAQ (visible Q&A on phase pages) ───────────────────────── */
+.seo-faq {
+    margin: 24px 0 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.seo-faq-heading {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.seo-faq dl {
+    margin: 0;
+}
+
+.seo-faq dt {
+    margin: 10px 0 2px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.seo-faq dt:first-of-type {
+    margin-top: 0;
+}
+
+.seo-faq dd {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+/* ─── SEO Summary (closing keyword-rich block + related links) ───── */
+.seo-summary {
+    margin: 12px 0 4px;
+    padding: 12px 14px;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+}
+
+.seo-summary p {
+    margin: 0 0 8px;
+}
+
+.seo-summary p:last-child {
+    margin-bottom: 0;
+}
+
+.seo-summary a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-decoration-color: rgba(255,255,255,0.2);
+}
+
+.seo-summary a:hover {
+    color: var(--text-primary);
+}
+
 /* ─── Paperdoll Overview ─────────────────────────────────────────── */
 .paperdoll {
     position: relative;

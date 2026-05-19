@@ -838,8 +838,22 @@
         return phaseDesc[phase] || null;
     }
 
+    // Phase → raid-tier context, used in the closing summary paragraph.
+    const PHASE_RAID_CONTEXT = {
+        0: 'Pre-Raid dungeons and heroics',
+        1: "Karazhan, Gruul's Lair, and Magtheridon's Lair",
+        2: 'Serpentshrine Cavern and Tempest Keep',
+        3: 'Black Temple and Mount Hyjal',
+        4: "Zul'Aman and Badge of Justice gear",
+        5: 'Sunwell Plateau'
+    };
+
+    function escapeHtmlText(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     /**
-     * Render the SEO description block below the GS summary.
+     * Render the SEO description block (H2 + paragraph) below the GS summary.
      * Only shows in PvE BiS view with a known class/spec/phase.
      */
     function renderSeoDescription() {
@@ -852,18 +866,103 @@
             return;
         }
 
-        const text = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
-        if (!text) {
+        const rawDesc = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
+        if (!rawDesc) {
             el.classList.add('hidden');
             el.innerHTML = '';
             return;
         }
 
-        const phInfo = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
+        const phInfo  = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
+        const seoPhLabel = state.selectedPhase === 0 ? 'Pre-Raid' : phInfo.label;
+        const heading = `${specWithAbbrev(state.selectedClass, state.selectedSpec)} ${seoPhLabel} BiS Guide`;
+        const text    = injectAbbrev(rawDesc, state.selectedClass, state.selectedSpec);
         el.innerHTML = `<div class="seo-desc-inner">
             <span class="seo-desc-icon">📖</span>
-            <p class="seo-desc-text">${text}</p>
+            <div>
+                <h2 class="seo-desc-heading">${escapeHtmlText(heading)}</h2>
+                <p class="seo-desc-text">${escapeHtmlText(text)}</p>
+            </div>
         </div>`;
+        el.classList.remove('hidden');
+    }
+
+    /**
+     * Render the visible FAQ block (same Q&A as the JSON-LD FAQPage schema).
+     * Only shows on phase pages.
+     */
+    function renderSeoFaq() {
+        const el = $('seoFaq');
+        if (!el) return;
+        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+        const phLabel = (PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` }).label;
+        const rawDesc = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase) || '';
+        const desc    = injectAbbrev(rawDesc, state.selectedClass, state.selectedSpec);
+        const items = [
+            {
+                q: `What is BiS for ${state.selectedSpec} ${state.selectedClass} in ${phLabel}?`,
+                a: desc
+            },
+            {
+                q: `Where do I get ${state.selectedSpec} ${state.selectedClass} ${phLabel} gear?`,
+                a: state.selectedPhase === 0
+                    ? 'The best gear comes from dungeons, heroics, reputation vendors, and crafting. See the full list above with item sources for each slot.'
+                    : 'The best gear comes from raid drops, Badge of Justice vendor, arena, and crafted items. See the full list above with item sources for each slot.'
+            },
+            {
+                q: `What enchants and gems should ${state.selectedSpec} ${state.selectedClass} use in ${phLabel}?`,
+                a: `Each slot has a recommended enchant and gem shown next to the item. Enchants and gems are chosen based on the stat priority for ${state.selectedSpec} ${state.selectedClass} in TBC Classic.`
+            }
+        ];
+        const dl = items.map(i => `<dt>${escapeHtmlText(i.q)}</dt><dd>${escapeHtmlText(i.a)}</dd>`).join('');
+        el.innerHTML = `<h2 class="seo-faq-heading">Frequently Asked Questions</h2><dl>${dl}</dl>`;
+        el.classList.remove('hidden');
+    }
+
+    /**
+     * Render the closing summary block: keyword-rich paragraph + cross-links to
+     * sibling phases and sibling specs. Strong internal-linking signal.
+     */
+    function renderSeoSummary() {
+        const el = $('seoSummary');
+        if (!el) return;
+        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+        const seoPhLabel = state.selectedPhase === 0 ? 'Pre-Raid' : (PHASE_NAMES[state.selectedPhase] || {}).label;
+        const raid       = PHASE_RAID_CONTEXT[state.selectedPhase] || '';
+        const specName   = specWithAbbrev(state.selectedClass, state.selectedSpec);
+        const cls        = state.selectedClass;
+        const spec       = state.selectedSpec;
+
+        const otherPhases = [0, 1, 2, 3, 4, 5]
+            .filter(p => p !== state.selectedPhase)
+            .map(p => {
+                const slug  = PHASE_TO_SLUG[p];
+                const label = p === 0 ? 'Pre-Raid' : PHASE_NAMES[p].label;
+                return `<a href="/${toSlug(cls)}/${toSlug(spec)}/${slug}">${escapeHtmlText(label)}</a>`;
+            }).join(' · ');
+
+        const otherSpecs = (CLASS_META[cls] ? CLASS_META[cls].specs : [])
+            .filter(s => s !== spec)
+            .map(s => {
+                const abbrev = SPEC_ABBREV[`${cls}-${s}`];
+                const label  = abbrev ? `${s} (${abbrev})` : s;
+                return `<a href="/${toSlug(cls)}/${toSlug(s)}/${PHASE_TO_SLUG[state.selectedPhase]}">${escapeHtmlText(label)}</a>`;
+            }).join(' · ');
+
+        let html = `<p>This <strong>${escapeHtmlText(specName)} ${escapeHtmlText(seoPhLabel)} Best in Slot</strong> list covers gear for ${escapeHtmlText(raid)} in TBC Classic — including enchants, gems, and stat priority recommendations.</p>
+        <p>Other phases: ${otherPhases}</p>`;
+        if (otherSpecs) {
+            html += `<p>Other ${escapeHtmlText(cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
+        }
+        el.innerHTML = html;
         el.classList.remove('hidden');
     }
 
@@ -3029,8 +3128,10 @@
             <div class="gs-stat"><div class="gs-label">Slots</div>
                 <div class="gs-value">${Object.keys(slotGroups).length}</div></div>`;
 
-        // ── SEO contextual description ──
+        // ── SEO contextual description + visible FAQ + closing summary ──
         renderSeoDescription();
+        renderSeoFaq();
+        renderSeoSummary();
 
         // ── Build slot HTML ──
         let html = '';

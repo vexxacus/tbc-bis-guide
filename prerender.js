@@ -158,7 +158,7 @@ function seoForRoute(route, fullUrl) {
     switch (route.type) {
         case 'home':
             title = 'TBC Classic BiS Guide — Best in Slot for Every Class & Spec';
-            desc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell. Includes enchants, gems, and phase-by-phase progression.';
+            desc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-Raid through Sunwell. Includes enchants, gems, stat priority, and phase-by-phase progression.';
             h1    = 'TBC Best in Slot';
             break;
         case 'static':
@@ -179,17 +179,18 @@ function seoForRoute(route, fullUrl) {
         case 'class':
             title = `${route.cls} BiS Guide — TBC Classic`;
             desc  = `WoW Classic TBC Best in Slot gear for ${route.cls} — every spec, Pre-Raid through Sunwell Plateau. Includes enchants, gems, and stat priority for each phase.`;
-            h1    = route.cls;
+            // H1 matches post-JS keyword-rich version (was "Druid"; JS later sets "Druid BiS Guide")
+            h1    = `${route.cls} BiS Guide`;
             break;
         case 'spec':
             title = `${route.spec} ${route.cls} BiS Guide — TBC Classic`;
             desc  = `${specWithAbbrev(route.cls, route.spec)} BiS for TBC Classic — Pre-Raid through Sunwell Plateau. Full gear lists with enchants, gems, and stat priority. Pick a phase below.`;
-            h1    = `${route.cls} — ${route.spec}`;
+            h1    = `${route.spec} ${route.cls} BiS Guide`;
             break;
         case 'pvp':
             title = `${route.spec} ${route.cls} PvP BiS — TBC Classic`;
             desc  = `Live arena snapshot of the best gear for ${specWithAbbrev(route.cls, route.spec)} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now. Includes enchants and gems.`;
-            h1    = `${route.cls} — ${route.spec} PvP`;
+            h1    = `${route.spec} ${route.cls} PvP BiS`;
             break;
         case 'phase':
             const phLabel    = PHASE_NAMES[route.phase].label;
@@ -201,13 +202,105 @@ function seoForRoute(route, fullUrl) {
             desc  = phaseSpecDesc
                 ? injectAbbrev(phaseSpecDesc, route.cls, route.spec)
                 : `Best in Slot gear for ${specWithAbbrev(route.cls, route.spec)} in TBC Classic ${phLabel}. Full gear list with enchants, gems, stat priority, and item sources.`;
-            h1    = `${route.spec} — ${phLabel}`;   // UI keeps the "Pre-BiS" label
+            // H1 matches the keyword-rich title (minus "— TBC Classic" suffix) — same as JS sets post-render
+            h1    = `${route.spec} ${route.cls} ${seoPhLabel}${bisSuffix}`;
             break;
         default:
             return null;
     }
 
     return { title, desc, h1, url: fullUrl };
+}
+
+// ─── Visible SEO body content (#seoDescription, #seoFaq, #seoSummary) ─
+
+const PHASE_RAID_CONTEXT = {
+    0: 'Pre-Raid dungeons and heroics',
+    1: 'Karazhan, Gruul\'s Lair, and Magtheridon\'s Lair',
+    2: 'Serpentshrine Cavern and Tempest Keep',
+    3: 'Black Temple and Mount Hyjal',
+    4: 'Zul\'Aman and Badge of Justice gear',
+    5: 'Sunwell Plateau'
+};
+
+const PHASE_TO_SLUG_REV = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
+
+/** Build the visible #seoDescription content (H2 + paragraph). */
+function buildSeoDescriptionBlock(route, seo) {
+    if (route.type !== 'phase') return null;
+    const seoPhLabel = route.phase === 0 ? 'Pre-Raid' : PHASE_NAMES[route.phase].label;
+    const heading = `${specWithAbbrev(route.cls, route.spec)} ${seoPhLabel} BiS Guide`;
+    return `<div class="seo-desc-inner">
+        <span class="seo-desc-icon">📖</span>
+        <div>
+            <h2 class="seo-desc-heading">${escapeHtmlText(heading)}</h2>
+            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
+        </div>
+    </div>`;
+}
+
+/** Build the visible #seoFaq content (3 Q&A items in a <dl>). */
+function buildSeoFaqBlock(route, seo) {
+    if (route.type !== 'phase') return null;
+    const phLabel = PHASE_NAMES[route.phase].label;
+    const items = [
+        {
+            q: `What is BiS for ${route.spec} ${route.cls} in ${phLabel}?`,
+            a: seo.desc
+        },
+        {
+            q: `Where do I get ${route.spec} ${route.cls} ${phLabel} gear?`,
+            a: route.phase === 0
+                ? 'The best gear comes from dungeons, heroics, reputation vendors, and crafting. See the full list above with item sources for each slot.'
+                : 'The best gear comes from raid drops, Badge of Justice vendor, arena, and crafted items. See the full list above with item sources for each slot.'
+        },
+        {
+            q: `What enchants and gems should ${route.spec} ${route.cls} use in ${phLabel}?`,
+            a: `Each slot has a recommended enchant and gem shown next to the item. Enchants and gems are chosen based on the stat priority for ${route.spec} ${route.cls} in TBC Classic.`
+        }
+    ];
+    const dl = items.map(i =>
+        `<dt>${escapeHtmlText(i.q)}</dt><dd>${escapeHtmlText(i.a)}</dd>`
+    ).join('\n        ');
+    return `<h2 class="seo-faq-heading">Frequently Asked Questions</h2>
+    <dl>
+        ${dl}
+    </dl>`;
+}
+
+/** Build the visible #seoSummary content (closing paragraph + cross-links). */
+function buildSeoSummaryBlock(route) {
+    if (route.type !== 'phase') return null;
+    const seoPhLabel = route.phase === 0 ? 'Pre-Raid' : PHASE_NAMES[route.phase].label;
+    const raid = PHASE_RAID_CONTEXT[route.phase];
+    const specName = specWithAbbrev(route.cls, route.spec);
+
+    // Sibling-phase cross-links (all phases except current)
+    const otherPhases = [0, 1, 2, 3, 4, 5]
+        .filter(p => p !== route.phase)
+        .map(p => {
+            const slug = PHASE_TO_SLUG_REV[p];
+            const label = p === 0 ? 'Pre-Raid' : PHASE_NAMES[p].label;
+            const href = `/${toSlug(route.cls)}/${toSlug(route.spec)}/${slug}`;
+            return `<a href="${href}">${escapeHtmlText(label)}</a>`;
+        }).join(' · ');
+
+    // Sibling-spec cross-links (other specs in same class, same phase)
+    const otherSpecs = (CLASS_META[route.cls] ? CLASS_META[route.cls].specs : [])
+        .filter(s => s !== route.spec)
+        .map(s => {
+            const abbrev = SPEC_ABBREV[`${route.cls}-${s}`];
+            const label = abbrev ? `${s} (${abbrev})` : s;
+            const href = `/${toSlug(route.cls)}/${toSlug(s)}/${PHASE_TO_SLUG_REV[route.phase]}`;
+            return `<a href="${href}">${escapeHtmlText(label)}</a>`;
+        }).join(' · ');
+
+    let html = `<p>This <strong>${escapeHtmlText(specName)} ${escapeHtmlText(seoPhLabel)} Best in Slot</strong> list covers gear for ${escapeHtmlText(raid)} in TBC Classic — including enchants, gems, and stat priority recommendations.</p>
+    <p>Other phases: ${otherPhases}</p>`;
+    if (otherSpecs) {
+        html += `\n    <p>Other ${escapeHtmlText(route.cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
+    }
+    return html;
 }
 
 // ─── JSON-LD builder ─────────────────────────────────────────────────
@@ -306,7 +399,7 @@ function escapeHtmlText(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function rewriteHtml(template, seo, jsonLd) {
+function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
     let html = template;
 
     // <title>
@@ -364,6 +457,28 @@ function rewriteHtml(template, seo, jsonLd) {
         /<h1 id="headerTitle">[\s\S]*?<\/h1>/,
         `<h1 id="headerTitle">${escapeHtmlText(seo.h1)}</h1>`
     );
+
+    // Body content: visible SEO blocks (phase pages only — these are no-ops on other routes)
+    if (bodyBlocks) {
+        if (bodyBlocks.seoDesc) {
+            html = html.replace(
+                /<div class="seo-description hidden" id="seoDescription"><\/div>/,
+                `<div class="seo-description" id="seoDescription">${bodyBlocks.seoDesc}</div>`
+            );
+        }
+        if (bodyBlocks.seoFaq) {
+            html = html.replace(
+                /<section class="seo-faq hidden" id="seoFaq"([^>]*)><\/section>/,
+                `<section class="seo-faq" id="seoFaq"$1>${bodyBlocks.seoFaq}</section>`
+            );
+        }
+        if (bodyBlocks.seoSummary) {
+            html = html.replace(
+                /<div class="seo-summary hidden" id="seoSummary"><\/div>/,
+                `<div class="seo-summary" id="seoSummary">${bodyBlocks.seoSummary}</div>`
+            );
+        }
+    }
 
     return html;
 }
@@ -431,7 +546,12 @@ function main() {
         }
 
         const jsonLd = buildJsonLd(route, seo);
-        const html = rewriteHtml(template, seo, jsonLd);
+        const bodyBlocks = {
+            seoDesc:    buildSeoDescriptionBlock(route, seo),
+            seoFaq:     buildSeoFaqBlock(route, seo),
+            seoSummary: buildSeoSummaryBlock(route),
+        };
+        const html = rewriteHtml(template, seo, jsonLd, bodyBlocks);
         const outPath = urlToOutputPath(urlPath);
 
         if (dryRun) {
