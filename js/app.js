@@ -178,7 +178,8 @@
     const CLASS_SLUG_MAP = {};
     const SPEC_SLUG_MAP  = {};   // "warrior-fury" → {cls, spec}
     const PHASE_SLUG_MAP = {
-        'pre-bis': 0, 'phase-1': 1, 'phase-2': 2,
+        'pre-bis': 0, 'phase-0': 0,
+        'phase-1': 1, 'phase-2': 2,
         'phase-3': 3, 'phase-4': 4, 'phase-5': 5
     };
     const PHASE_TO_SLUG = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
@@ -383,7 +384,8 @@
             const phInfo  = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
             const phSlug  = PHASE_TO_SLUG[state.selectedPhase] || `phase-${state.selectedPhase}`;
             const specDesc = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
-            pageTitle = `${state.selectedSpec} ${state.selectedClass} ${phInfo.label} BiS — TBC Classic`;
+            const bisSuffix = /bis/i.test(phInfo.label) ? '' : ' BiS';
+            pageTitle = `${state.selectedSpec} ${state.selectedClass} ${phInfo.label}${bisSuffix} — TBC Classic`;
             metaDesc  = specDesc || `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic ${phInfo.label}. Full gear list with enchants, gems, and item sources.`;
             path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/${phSlug}`;
         }

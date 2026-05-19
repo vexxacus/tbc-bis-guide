@@ -16,3 +16,18 @@ data.backup-*.json
 community feedback.md
 scraper/output/wcl-cache/
 scraper/output/wcl-test-rankings.json
+
+# Prerendered SEO pages — generated from sitemap.xml by prerender.js.
+# Regenerated automatically before each `firebase deploy` (see firebase.json predeploy).
+/warrior/
+/paladin/
+/hunter/
+/rogue/
+/priest/
+/shaman/
+/mage/
+/warlock/
+/druid/
+/about/
+/feedback/
+/privacy/

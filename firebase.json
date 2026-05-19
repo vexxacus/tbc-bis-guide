@@ -1,6 +1,9 @@
 {
   "hosting": {
     "public": ".",
+    "predeploy": [
+      "node prerender.js"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -18,7 +21,9 @@
       "scraper/**",
       ".icon-cache.json",
       ".quality-cache.json",
-      ".socket-cache.json"
+      ".socket-cache.json",
+      "prerender.js",
+      "prerender-descriptions.js"
     ],
     "headers": [
       {
