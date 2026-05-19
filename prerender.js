@@ -71,6 +71,47 @@ const PVP_SPEC_OVERRIDES = {
     'druid-feral-combat': { cls: 'Druid', spec: 'Feral Combat' },
 };
 
+// Spec abbreviations injected into meta descriptions to capture searches like
+// "ret pally bis", "bm hunter bis", "boomkin enchants". Volume data from Ahrefs.
+// Only specs with a widely-used short form are listed — Arms/Fury/Frost etc. are
+// already short and don't need expansion.
+const SPEC_ABBREV = {
+    'Paladin-Retribution':  'Ret',
+    'Paladin-Protection':   'Prot',
+    'Warrior-Protection':   'Prot',
+    'Hunter-Beast Mastery': 'BM',
+    'Hunter-Marksmanship':  'MM',
+    'Warlock-Destruction':  'Destro',
+    'Warlock-Affliction':   'Affli',
+    'Druid-Restoration':    'Resto',
+    'Shaman-Restoration':   'Resto',
+    'Shaman-Elemental':     'Ele',
+    'Shaman-Enhancement':   'Enh',
+    'Rogue-Subtlety':       'Sub',
+    'Priest-Discipline':    'Disc',
+    'Druid-Balance':        'Boomkin',
+    'Druid-Cat':            'Feral DPS',
+    'Druid-Bear':           'Feral Tank',
+};
+
+/** Return "Spec Cls (Abbrev)" if an abbrev exists, otherwise just "Spec Cls". */
+function specWithAbbrev(cls, spec) {
+    const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
+    return abbrev ? `${spec} ${cls} (${abbrev})` : `${spec} ${cls}`;
+}
+
+/** Inject the abbreviation into a description that already mentions "Spec Cls". */
+function injectAbbrev(desc, cls, spec) {
+    const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
+    if (!abbrev || !desc) return desc;
+    const needle = `${spec} ${cls}`;
+    if (desc.includes(needle)) {
+        // Replace only the first occurrence, append abbrev *after* the class name
+        return desc.replace(needle, `${spec} ${cls} (${abbrev})`);
+    }
+    return desc;
+}
+
 // ─── Per-spec phase descriptions (extracted from app.js) ─────────────
 // Only the ones we need for prerendering. Full set lives in app.js.
 const SPEC_PHASE_DESCRIPTIONS = require('./prerender-descriptions.js');
@@ -137,26 +178,30 @@ function seoForRoute(route, fullUrl) {
             break;
         case 'class':
             title = `${route.cls} BiS Guide — TBC Classic`;
-            desc  = `Best in Slot gear lists for every ${route.cls} spec in TBC Classic — from Pre-BiS dungeons to Sunwell Plateau.`;
+            desc  = `WoW Classic TBC Best in Slot gear for ${route.cls} — every spec, Pre-Raid through Sunwell Plateau. Includes enchants, gems, and stat priority for each phase.`;
             h1    = route.cls;
             break;
         case 'spec':
             title = `${route.spec} ${route.cls} BiS Guide — TBC Classic`;
-            desc  = `Best in Slot gear for ${route.spec} ${route.cls} in TBC Classic. Choose a phase to see the full gear list.`;
+            desc  = `${specWithAbbrev(route.cls, route.spec)} BiS for TBC Classic — Pre-Raid through Sunwell Plateau. Full gear lists with enchants, gems, and stat priority. Pick a phase below.`;
             h1    = `${route.cls} — ${route.spec}`;
             break;
         case 'pvp':
             title = `${route.spec} ${route.cls} PvP BiS — TBC Classic`;
-            desc  = `Live arena snapshot of the best gear for ${route.spec} ${route.cls} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now.`;
+            desc  = `Live arena snapshot of the best gear for ${specWithAbbrev(route.cls, route.spec)} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now. Includes enchants and gems.`;
             h1    = `${route.cls} — ${route.spec} PvP`;
             break;
         case 'phase':
-            const phLabel = PHASE_NAMES[route.phase].label;
-            const specDesc = (SPEC_PHASE_DESCRIPTIONS[`${route.cls}-${route.spec}`] || {})[route.phase];
-            const bisSuffix = /bis/i.test(phLabel) ? '' : ' BiS';
-            title = `${route.spec} ${route.cls} ${phLabel}${bisSuffix} — TBC Classic`;
-            desc  = specDesc || `Best in Slot gear for ${route.spec} ${route.cls} in TBC Classic ${phLabel}. Full gear list with enchants, gems, and item sources.`;
-            h1    = `${route.spec} — ${phLabel}`;
+            const phLabel    = PHASE_NAMES[route.phase].label;
+            // SEO label: "Pre-Raid" matches search volume better than "Pre-BiS" (Ahrefs).
+            const seoPhLabel = route.phase === 0 ? 'Pre-Raid' : phLabel;
+            const phaseSpecDesc = (SPEC_PHASE_DESCRIPTIONS[`${route.cls}-${route.spec}`] || {})[route.phase];
+            const bisSuffix = /bis/i.test(seoPhLabel) ? '' : ' BiS';
+            title = `${route.spec} ${route.cls} ${seoPhLabel}${bisSuffix} — TBC Classic`;
+            desc  = phaseSpecDesc
+                ? injectAbbrev(phaseSpecDesc, route.cls, route.spec)
+                : `Best in Slot gear for ${specWithAbbrev(route.cls, route.spec)} in TBC Classic ${phLabel}. Full gear list with enchants, gems, stat priority, and item sources.`;
+            h1    = `${route.spec} — ${phLabel}`;   // UI keeps the "Pre-BiS" label
             break;
         default:
             return null;

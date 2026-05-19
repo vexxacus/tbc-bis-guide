@@ -348,6 +348,43 @@
 
     const BASE_URL = 'https://tbc-bis-guide.web.app';
 
+    // Spec abbreviations injected into meta descriptions to capture searches like
+    // "ret pally bis", "bm hunter bis", "boomkin enchants". Keep in sync with
+    // SPEC_ABBREV in prerender.js.
+    const SPEC_ABBREV = {
+        'Paladin-Retribution':  'Ret',
+        'Paladin-Protection':   'Prot',
+        'Warrior-Protection':   'Prot',
+        'Hunter-Beast Mastery': 'BM',
+        'Hunter-Marksmanship':  'MM',
+        'Warlock-Destruction':  'Destro',
+        'Warlock-Affliction':   'Affli',
+        'Druid-Restoration':    'Resto',
+        'Shaman-Restoration':   'Resto',
+        'Shaman-Elemental':     'Ele',
+        'Shaman-Enhancement':   'Enh',
+        'Rogue-Subtlety':       'Sub',
+        'Priest-Discipline':    'Disc',
+        'Druid-Balance':        'Boomkin',
+        'Druid-Cat':            'Feral DPS',
+        'Druid-Bear':           'Feral Tank',
+    };
+
+    function specWithAbbrev(cls, spec) {
+        const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
+        return abbrev ? `${spec} ${cls} (${abbrev})` : `${spec} ${cls}`;
+    }
+
+    function injectAbbrev(desc, cls, spec) {
+        const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
+        if (!abbrev || !desc) return desc;
+        const needle = `${spec} ${cls}`;
+        if (desc.indexOf(needle) !== -1) {
+            return desc.replace(needle, `${spec} ${cls} (${abbrev})`);
+        }
+        return desc;
+    }
+
     /**
      * Update <title>, meta description, canonical and OG tags to reflect
      * the currently selected class/spec/phase.
@@ -366,27 +403,31 @@
 
         if (!state.selectedClass) {
             pageTitle = 'TBC Classic BiS Guide — Best in Slot for Every Class & Spec';
-            metaDesc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-BiS through Sunwell. Includes enchants, gems, and phase-by-phase progression.';
+            metaDesc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-Raid through Sunwell. Includes enchants, gems, stat priority, and phase-by-phase progression.';
             path      = '/';
         } else if (!state.selectedSpec) {
             pageTitle = `${state.selectedClass} BiS Guide — TBC Classic`;
-            metaDesc  = `Best in Slot gear lists for every ${state.selectedClass} spec in TBC Classic — from Pre-BiS dungeons to Sunwell Plateau.`;
+            metaDesc  = `WoW Classic TBC Best in Slot gear for ${state.selectedClass} — every spec, Pre-Raid through Sunwell Plateau. Includes enchants, gems, and stat priority for each phase.`;
             path      = `/${toSlug(state.selectedClass)}`;
         } else if (state.isPvP) {
             pageTitle = `${state.selectedSpec} ${state.selectedClass} PvP BiS — TBC Classic`;
-            metaDesc  = `Live arena snapshot of the best gear for ${state.selectedSpec} ${state.selectedClass} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now.`;
+            metaDesc  = `Live arena snapshot of the best gear for ${specWithAbbrev(state.selectedClass, state.selectedSpec)} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now. Includes enchants and gems.`;
             path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/pvp`;
         } else if (state.selectedPhase == null) {
             pageTitle = `${state.selectedSpec} ${state.selectedClass} BiS Guide — TBC Classic`;
-            metaDesc  = `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic. Choose a phase to see the full gear list.`;
+            metaDesc  = `${specWithAbbrev(state.selectedClass, state.selectedSpec)} BiS for TBC Classic — Pre-Raid through Sunwell Plateau. Full gear lists with enchants, gems, and stat priority. Pick a phase below.`;
             path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}`;
         } else {
             const phInfo  = PHASE_NAMES[state.selectedPhase] || { label: `Phase ${state.selectedPhase}` };
             const phSlug  = PHASE_TO_SLUG[state.selectedPhase] || `phase-${state.selectedPhase}`;
             const specDesc = generateSpecDescription(state.selectedClass, state.selectedSpec, state.selectedPhase);
-            const bisSuffix = /bis/i.test(phInfo.label) ? '' : ' BiS';
-            pageTitle = `${state.selectedSpec} ${state.selectedClass} ${phInfo.label}${bisSuffix} — TBC Classic`;
-            metaDesc  = specDesc || `Best in Slot gear for ${state.selectedSpec} ${state.selectedClass} in TBC Classic ${phInfo.label}. Full gear list with enchants, gems, and item sources.`;
+            // SEO label: "Pre-Raid" matches search volume better than "Pre-BiS" (Ahrefs).
+            const seoPhLabel = state.selectedPhase === 0 ? 'Pre-Raid' : phInfo.label;
+            const bisSuffix = /bis/i.test(seoPhLabel) ? '' : ' BiS';
+            pageTitle = `${state.selectedSpec} ${state.selectedClass} ${seoPhLabel}${bisSuffix} — TBC Classic`;
+            metaDesc  = specDesc
+                ? injectAbbrev(specDesc, state.selectedClass, state.selectedSpec)
+                : `Best in Slot gear for ${specWithAbbrev(state.selectedClass, state.selectedSpec)} in TBC Classic ${phInfo.label}. Full gear list with enchants, gems, stat priority, and item sources.`;
             path      = `/${toSlug(state.selectedClass)}/${toSlug(state.selectedSpec)}/${phSlug}`;
         }
 
