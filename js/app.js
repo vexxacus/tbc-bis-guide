@@ -1006,17 +1006,36 @@
             const role   = SPEC_ROLES[s] || '';
             return `<li><a href="/${toSlug(cls)}/${toSlug(s)}"><strong>${escapeHtmlText(label)} BiS</strong></a>${role ? ' — ' + escapeHtmlText(role) : ''}</li>`;
         }).join('');
-        const firstSpec = specs[0];
-        const phaseLinks = firstSpec ? [0, 1, 2, 3, 4, 5].map(p => {
-            const slug = PHASE_TO_SLUG[p];
-            const href = `/${toSlug(cls)}/${toSlug(firstSpec)}/${slug}`;
-            return `<a href="${href}">${escapeHtmlText(phaseAnchorText(p))}</a>`;
-        }).join(' · ') : '';
+
+        // Phase quick-links: one row per spec, all six phases each.
+        const phaseSpecBlocks = specs.map(s => {
+            const links = [0, 1, 2, 3, 4, 5].map(p => {
+                const slug = PHASE_TO_SLUG[p];
+                const href = `/${toSlug(cls)}/${toSlug(s)}/${slug}`;
+                return `<a href="${href}">${escapeHtmlText(phaseAnchorText(p))}</a>`;
+            }).join(' · ');
+            return `<p><strong>${escapeHtmlText(s)}:</strong> ${links}</p>`;
+        }).join('');
+
+        // PvP cross-links: only specs with scraped arena data (includes PvP-only
+        // specs like Druid Feral Combat that aren't in CLASS_META).
+        const pvpSpecs = [];
+        if (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) {
+            for (const key of Object.keys(PVP_DATA.specs)) {
+                const [pvpCls, pvpSpec] = key.split('|');
+                if (pvpCls === cls && !pvpSpecs.includes(pvpSpec)) pvpSpecs.push(pvpSpec);
+            }
+        }
+        const pvpLinks = pvpSpecs.map(spec =>
+            `<a href="/${toSlug(cls)}/${toSlug(spec)}/pvp">${escapeHtmlText(spec)} PvP</a>`
+        ).join(' · ');
+
         el.innerHTML = `<h2>${escapeHtmlText(cls)} BiS for TBC Classic — Every Spec, Every Phase</h2>
             <p>Best in Slot gear guides for <strong>${escapeHtmlText(cls)}</strong> in WoW Classic TBC. Pick a spec for phase-by-phase BiS lists from Pre-Raid through Sunwell Plateau, including enchants, gems, and stat priority recommendations.</p>
             <h3>${escapeHtmlText(cls)} specs</h3>
             <ul>${specLis}</ul>
-            ${phaseLinks ? `<h3>Quick links by phase</h3><p>${phaseLinks}</p>` : ''}`;
+            ${phaseSpecBlocks ? `<h3>Quick links by phase</h3>${phaseSpecBlocks}` : ''}
+            ${pvpLinks ? `<h3>${escapeHtmlText(cls)} PvP BiS</h3><p>Live arena snapshot of top-rated players. ${pvpLinks}</p>` : ''}`;
         el.classList.remove('hidden');
     }
 
