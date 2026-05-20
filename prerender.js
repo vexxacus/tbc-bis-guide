@@ -486,6 +486,40 @@ function buildJsonLd(route, seo) {
         });
     }
 
+    // Article schema for phase + PvP pages — eligible for rich results in search.
+    // datePublished is fixed (original go-live); dateModified bumps on every prerender.
+    if (route.type === 'phase' || route.type === 'pvp') {
+        const today = new Date().toISOString().slice(0, 10);
+        schemas.push({
+            '@context': 'https://schema.org',
+            '@type':    'Article',
+            headline:    seo.title,
+            description: seo.desc,
+            url:         seo.url,
+            datePublished: '2026-04-01',
+            dateModified:  today,
+            image:        BASE_URL + '/og-image.png',
+            author: {
+                '@type': 'Organization',
+                name:    'TBC BiS Guide',
+                url:     BASE_URL + '/'
+            },
+            publisher: {
+                '@type': 'Organization',
+                name:    'TBC BiS Guide',
+                url:     BASE_URL + '/',
+                logo: {
+                    '@type': 'ImageObject',
+                    url:     BASE_URL + '/android-chrome-192x192.png'
+                }
+            },
+            mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id':   seo.url
+            }
+        });
+    }
+
     if (route.type === 'phase') {
         const phLabel = PHASE_NAMES[route.phase].label;
         const faq = [
