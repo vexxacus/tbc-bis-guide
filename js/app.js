@@ -3398,6 +3398,13 @@
         }
 
         slotList.innerHTML = html;
+        // Hide the prerendered static BiS summary now that the interactive
+        // list has rendered. Doing this in the same JS tick as the innerHTML
+        // assignment means the browser paints both changes together → no flicker.
+        const staticBis = document.getElementById('bisStaticSummary');
+        if (staticBis && !staticBis.classList.contains('hidden')) {
+            staticBis.classList.add('hidden');
+        }
         bindHintDismiss(slotList);
 
         // ── Weapon toggle buttons ──

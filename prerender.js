@@ -116,6 +116,85 @@ function injectAbbrev(desc, cls, spec) {
 // Only the ones we need for prerendering. Full set lives in app.js.
 const SPEC_PHASE_DESCRIPTIONS = require('./prerender-descriptions.js');
 
+// ─── BiS item data (for static BiS summary, prerendered into pages) ──
+// Lazy-loaded on first use to keep prerender startup fast.
+let _bisData = null;
+function getBisData() {
+    if (_bisData) return _bisData;
+    _bisData = require('./data.json');
+    return _bisData;
+}
+
+// Static BiS summary is rendered on all phase pages. Set to a specific URL
+// (e.g. '/druid/balance/phase-5') to limit while testing UX changes.
+const STATIC_BIS_PROTOTYPE_URL = null;
+
+const STATIC_BIS_SLOT_ORDER = [
+    'Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Wrist',
+    'Hands', 'Waist', 'Legs', 'Feet',
+    'Ring', 'Trinket',
+    'Main Hand', 'Off Hand', 'Two Hand',
+    'Ranged/Relic', 'Ranged', 'Relic'
+];
+
+/** Pick top-BIS items per slot (1 each, except Ring/Trinket = 2). Returns
+ *  ordered array suitable for a summary table. */
+function pickTopBisItems(items) {
+    const seenIds = new Set();
+    const picked = [];
+    for (const it of items) {
+        if (it.rank !== 'BIS') continue;
+        if (seenIds.has(it.itemId)) continue;
+        const limit = (it.slot === 'Ring' || it.slot === 'Trinket') ? 2 : 1;
+        const count = picked.filter(p => p.slot === it.slot).length;
+        if (count >= limit) continue;
+        picked.push(it);
+        seenIds.add(it.itemId);
+    }
+    picked.sort((a, b) => {
+        const ai = STATIC_BIS_SLOT_ORDER.indexOf(a.slot);
+        const bi = STATIC_BIS_SLOT_ORDER.indexOf(b.slot);
+        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+    return picked;
+}
+
+/** Build the visible static BiS summary block — a definition-list of top BIS
+ *  items per slot with Wowhead links and source descriptions. Used by
+ *  Googlebot on first crawl before JS renders the interactive list. */
+function buildStaticBisBlock(route) {
+    if (route.type !== 'phase') return null;
+    const data = getBisData();
+    const spec = data.specs.find(s =>
+        s.className === route.cls && s.specName === route.spec
+    );
+    if (!spec || !spec.phases || !spec.phases[route.phase]) return null;
+    const phase = spec.phases[route.phase];
+    const top = pickTopBisItems(phase.items || []);
+    if (!top.length) return null;
+
+    const phLabel = route.phase === 0 ? 'Pre-Raid' : PHASE_NAMES[route.phase].label;
+    const heading = `${route.spec} ${route.cls} ${phLabel} BiS Items — Quick Reference`;
+
+    const rows = top.map(it => {
+        const src = data.itemSources[it.itemId];
+        const srcText = src
+            ? [src.source || src.sourceType, src.sourceLocation]
+                .filter(Boolean).join(' — ')
+            : '';
+        const wowheadHref = `https://www.wowhead.com/tbc/item=${it.itemId}`;
+        const link = `<a href="${wowheadHref}" rel="external">${escapeHtmlText(it.name)}</a>`;
+        const srcSpan = srcText ? `<span class="bis-static-src">(${escapeHtmlText(srcText)})</span>` : '';
+        return `<dt>${escapeHtmlText(it.slot)}</dt><dd>${link} ${srcSpan}</dd>`;
+    }).join('\n        ');
+
+    return `<h3>${escapeHtmlText(heading)}</h3>
+    <dl>
+        ${rows}
+    </dl>
+    <p class="bis-static-note">Interactive view with alternatives, enchants, gems &amp; sim loads below.</p>`;
+}
+
 // ─── Route parser ────────────────────────────────────────────────────
 
 function parseRoute(urlPath) {
@@ -659,6 +738,13 @@ function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
                 `<div class="seo-landing" id="seoSpecLanding">${bodyBlocks.specLanding}</div>`
             );
         }
+        // Static BiS summary (#bisStaticSummary) — prerendered top BIS per slot.
+        if (bodyBlocks.staticBis) {
+            html = html.replace(
+                /<div class="bis-static-summary hidden" id="bisStaticSummary"><\/div>/,
+                `<div class="bis-static-summary" id="bisStaticSummary">${bodyBlocks.staticBis}</div>`
+            );
+        }
     }
 
     return html;
@@ -747,12 +833,15 @@ function main() {
         // Phase pages get description+FAQ+summary; PvP pages get a PvP-specific
         // description and summary (no FAQ, since arena gear has fewer canonical Q&A);
         // class/spec landing pages get their dedicated landing blocks.
+        // Prototype: static BiS only on the prototype URL while we verify UX.
+        const enableStaticBis = STATIC_BIS_PROTOTYPE_URL === null || urlPath === STATIC_BIS_PROTOTYPE_URL;
         const bodyBlocks = {
             seoDesc:      buildSeoDescriptionBlock(route, seo) || buildPvpDescriptionBlock(route, seo),
             seoFaq:       buildSeoFaqBlock(route, seo),
             seoSummary:   buildSeoSummaryBlock(route) || buildPvpSummaryBlock(route),
             classLanding: buildClassLandingBlock(route),
             specLanding:  buildSpecLandingBlock(route),
+            staticBis:    enableStaticBis ? buildStaticBisBlock(route) : null,
         };
         const html = rewriteHtml(template, seo, jsonLd, bodyBlocks);
         const outPath = urlToOutputPath(urlPath);
