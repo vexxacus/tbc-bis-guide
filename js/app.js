@@ -1094,13 +1094,16 @@
     }
 
     // ─── Icon helpers ────────────────────────────────────────────────
-    function itemIcon(itemId, size, cssClass) {
+    function itemIcon(itemId, size, cssClass, altText) {
         size = size || 'medium';    // tiny|small|medium|large
         cssClass = cssClass || '';
         // For wowsims negative IDs (random enchant suffix items), use the base Wowhead item ID
         const whId = toWhId(itemId);
         const iconName = (typeof ICONS !== 'undefined' && ICONS[whId]) || 'inv_misc_questionmark';
-        const img = `<img src="${WH_ICON_CDN}/${size}/${iconName}.jpg" alt="" class="${cssClass}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/${size}/inv_misc_questionmark.jpg'">`;
+        // Alt text: descriptive when provided (improves accessibility + image-search SEO).
+        // Escape quotes since this goes inside attribute context.
+        const altAttr = altText ? String(altText).replace(/"/g, '&quot;') : '';
+        const img = `<img src="${WH_ICON_CDN}/${size}/${iconName}.jpg" alt="${altAttr}" class="${cssClass}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/${size}/inv_misc_questionmark.jpg'">`;
         // Intercept click → open modal, keep data-wowhead for hover tooltip (link to base item on Wowhead)
         return `<a href="https://www.wowhead.com/${WH}/item=${whId}" data-wowhead="item=${whId}&domain=${WH}" data-wh-item="${itemId}" class="icon-link">${img}</a>`;
     }
@@ -1956,7 +1959,8 @@
 
         // Gem sockets — show gem icons below item icon
         const gemOverlayHtml = _buildGemOverlay(slot, bis);
-        const bisIconHtml = `<div class="slot-icon-wrap">${itemIcon(bis.itemId, 'medium', bisQuality)}</div>${gemOverlayHtml}`;
+        const bisItemAlt = `${bis.name || 'Item #' + bis.itemId} — ${slot} BiS for ${state.selectedSpec} ${state.selectedClass}`;
+        const bisIconHtml = `<div class="slot-icon-wrap">${itemIcon(bis.itemId, 'medium', bisQuality, bisItemAlt)}</div>${gemOverlayHtml}`;
 
         // PvP popularity meta
         const bisPvpHtml = pvpMetaHtml(bis);
@@ -2009,7 +2013,8 @@
                 const altSrc = getItemSource(alt.itemId);
                 const altSrcText = altSrc ? `${srcEmoji(altSrc.sourceType)} ${altSrc.source || altSrc.sourceType}` : '';
                 const altQuality = pvpQualityClass(alt);
-                const altIconHtml = itemIcon(alt.itemId, 'small', 'alt-icon ' + altQuality);
+                const altItemAlt = `${alt.name || 'Item #' + alt.itemId} — ${slot} alternative for ${state.selectedSpec} ${state.selectedClass}`;
+                const altIconHtml = itemIcon(alt.itemId, 'small', 'alt-icon ' + altQuality, altItemAlt);
                 const altPvpHtml = pvpMetaHtml(alt);
                 const altWclHtml = wclMetaHtml(alt);
                 const altGuideHtml = guideMetaHtml(alt);
@@ -3072,17 +3077,20 @@
             if ((slot === 'Rings' || slot === 'Trinkets') && si.length >= 2) {
                 const bis2 = si[1];
                 const title2 = (bis2.name || slot).replace(/"/g, '&quot;');
+                const pdAlt1 = `${bis.name || 'Item #' + bis.itemId} — ${slot} BiS`;
+                const pdAlt2 = `${bis2.name || 'Item #' + bis2.itemId} — ${slot} BiS`;
                 pdHtml += `<div class="pd-slot pd-slot-dual" data-pd-slot="${slot}" title="${pdTitle} + ${title2}">
                     <div class="pd-dual-icons">
-                        ${itemIcon(bis.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis.itemId))}
-                        ${itemIcon(bis2.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis2.itemId))}
+                        ${itemIcon(bis.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis.itemId), pdAlt1)}
+                        ${itemIcon(bis2.itemId, 'small', 'pd-slot-icon ' + qualityClass(bis2.itemId), pdAlt2)}
                     </div>
                     <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
                     ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
                 </div>`;
             } else {
+                const pdAlt = `${bis.name || 'Item #' + bis.itemId} — ${slot} BiS`;
                 pdHtml += `<div class="pd-slot${isOverridden ? ' pd-slot-overridden' : ''}${isWeaponDimmed ? ' pd-slot-dimmed' : ''}" data-pd-slot="${slot}" title="${pdTitle}">
-                    ${itemIcon(bis.itemId, 'medium', 'pd-slot-icon ' + qualityClass(bis.itemId))}
+                    ${itemIcon(bis.itemId, 'medium', 'pd-slot-icon ' + qualityClass(bis.itemId), pdAlt)}
                     <span class="pd-slot-label">${PD_LABELS[slot] || slot}</span>
                     ${hasEnchant ? '<span class="pd-enchant-dot"></span>' : ''}
                     ${isOverridden ? '<span class="pd-custom-dot"></span>' : ''}
