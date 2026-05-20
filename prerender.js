@@ -223,7 +223,40 @@ const PHASE_RAID_CONTEXT = {
     5: 'Sunwell Plateau'
 };
 
+// Short raid name for anchor-text use (e.g., "Phase 1 (Karazhan)"). Targets
+// raid-specific search volume (Sunwell 2300, Karazhan 800, ZA 400 etc.).
+const PHASE_RAID_SHORT = {
+    0: 'Pre-Raid Dungeons',
+    1: 'Karazhan',
+    2: 'SSC & TK',
+    3: 'Black Temple',
+    4: "Zul'Aman",
+    5: 'Sunwell'
+};
+
 const PHASE_TO_SLUG_REV = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
+
+// Lightweight role hint for class-landing spec lists.
+const SPEC_ROLE = {
+    Arms: 'Melee DPS', Fury: 'Melee DPS', Protection: 'Tank',
+    Holy: 'Healer', Retribution: 'Melee DPS', Discipline: 'Healer',
+    'Beast Mastery': 'Ranged DPS', Marksmanship: 'Ranged DPS', Survival: 'Ranged DPS',
+    Combat: 'Melee DPS', Assassination: 'Melee DPS', Subtlety: 'Melee DPS',
+    Shadow: 'Ranged DPS', Elemental: 'Ranged DPS', Enhancement: 'Melee DPS',
+    Restoration: 'Healer',
+    Arcane: 'Ranged DPS', Fire: 'Ranged DPS', Frost: 'Ranged DPS',
+    Affliction: 'Ranged DPS', Demonology: 'Ranged DPS', Destruction: 'Ranged DPS',
+    Balance: 'Ranged DPS', Bear: 'Tank', Cat: 'Melee DPS',
+};
+
+/** Phase anchor text: e.g. "Phase 1 (Karazhan)", "Pre-Raid (Dungeons)". */
+function phaseAnchorText(phase) {
+    const label = phase === 0 ? 'Pre-Raid' : PHASE_NAMES[phase].label;
+    const raid  = PHASE_RAID_SHORT[phase];
+    if (!raid) return label;
+    if (phase === 0) return `Pre-Raid (Dungeons)`;
+    return `${label} (${raid})`;
+}
 
 /** Build the visible #seoDescription content (H2 + paragraph). */
 function buildSeoDescriptionBlock(route, seo) {
@@ -268,6 +301,105 @@ function buildSeoFaqBlock(route, seo) {
     </dl>`;
 }
 
+/** Build the visible #seoClassLanding block for class landing pages (e.g. /paladin). */
+function buildClassLandingBlock(route) {
+    if (route.type !== 'class') return null;
+    const cls   = route.cls;
+    const specs = (CLASS_META[cls] || {}).specs || [];
+
+    const specLis = specs.map(s => {
+        const abbrev = SPEC_ABBREV[`${cls}-${s}`];
+        const label  = abbrev ? `${s} (${abbrev}) ${cls}` : `${s} ${cls}`;
+        const role   = SPEC_ROLE[s] || '';
+        const href   = `/${toSlug(cls)}/${toSlug(s)}`;
+        return `<li><a href="${href}"><strong>${escapeHtmlText(label)} BiS</strong></a>${role ? ' — ' + escapeHtmlText(role) : ''}</li>`;
+    }).join('\n        ');
+
+    // Phase quick-links pointing to first spec (best-effort browse entry point).
+    const firstSpec = specs[0];
+    const phaseLis = firstSpec ? [0, 1, 2, 3, 4, 5].map(p => {
+        const slug  = PHASE_TO_SLUG_REV[p];
+        const href  = `/${toSlug(cls)}/${toSlug(firstSpec)}/${slug}`;
+        const label = phaseAnchorText(p);
+        return `<a href="${href}">${escapeHtmlText(label)}</a>`;
+    }).join(' · ') : '';
+
+    return `<h2>${escapeHtmlText(cls)} BiS for TBC Classic — Every Spec, Every Phase</h2>
+    <p>Best in Slot gear guides for <strong>${escapeHtmlText(cls)}</strong> in WoW Classic TBC. Pick a spec for phase-by-phase BiS lists from Pre-Raid through Sunwell Plateau, including enchants, gems, and stat priority recommendations.</p>
+    <h3>${escapeHtmlText(cls)} specs</h3>
+    <ul>
+        ${specLis}
+    </ul>
+    ${phaseLis ? `<h3>Quick links by phase</h3>\n    <p>${phaseLis}</p>` : ''}`;
+}
+
+/** Build the visible #seoSpecLanding block for spec landing pages (e.g. /paladin/retribution). */
+function buildSpecLandingBlock(route) {
+    if (route.type !== 'spec') return null;
+    const cls    = route.cls;
+    const spec   = route.spec;
+    const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
+    const specFull = abbrev ? `${spec} ${cls} (${abbrev})` : `${spec} ${cls}`;
+    const role   = SPEC_ROLE[spec] || '';
+
+    const phaseLis = [0, 1, 2, 3, 4, 5].map(p => {
+        const slug  = PHASE_TO_SLUG_REV[p];
+        const href  = `/${toSlug(cls)}/${toSlug(spec)}/${slug}`;
+        const phLabel = p === 0 ? 'Pre-Raid BiS' : `${PHASE_NAMES[p].label} BiS`;
+        const raid    = PHASE_RAID_CONTEXT[p];
+        return `<li><a href="${href}"><strong>${escapeHtmlText(phLabel)}</strong></a> — ${escapeHtmlText(raid)}</li>`;
+    }).join('\n        ');
+
+    const otherSpecs = (CLASS_META[cls] ? CLASS_META[cls].specs : [])
+        .filter(s => s !== spec)
+        .map(s => {
+            const a = SPEC_ABBREV[`${cls}-${s}`];
+            const label = a ? `${s} (${a})` : s;
+            return `<a href="/${toSlug(cls)}/${toSlug(s)}">${escapeHtmlText(label)}</a>`;
+        }).join(' · ');
+
+    return `<h2>${escapeHtmlText(specFull)} BiS for TBC Classic</h2>
+    <p>Best in Slot gear lists for <strong>${escapeHtmlText(specFull)}</strong>${role ? ` (${escapeHtmlText(role)})` : ''} in TBC Classic. Choose a phase below for the full gear list with enchants, gems, stat priority, and item sources.</p>
+    <h3>Phase guides</h3>
+    <ul>
+        ${phaseLis}
+    </ul>
+    ${otherSpecs ? `<h3>Other ${escapeHtmlText(cls)} specs</h3>\n    <p>${otherSpecs}</p>` : ''}`;
+}
+
+/** Build the visible #seoDescription content (H2 + paragraph) for PvP landing pages. */
+function buildPvpDescriptionBlock(route, seo) {
+    if (route.type !== 'pvp') return null;
+    const spec = specWithAbbrev(route.cls, route.spec);
+    return `<div class="seo-desc-inner">
+        <span class="seo-desc-icon">⚔️</span>
+        <div>
+            <h2 class="seo-desc-heading">${escapeHtmlText(spec)} PvP BiS — TBC Classic Arena</h2>
+            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
+        </div>
+    </div>`;
+}
+
+/** Build the visible PvP summary (cross-links to PvE BiS + sibling PvP specs). */
+function buildPvpSummaryBlock(route) {
+    if (route.type !== 'pvp') return null;
+    const cls  = route.cls;
+    const spec = route.spec;
+
+    const pveLink = `<a href="/${toSlug(cls)}/${toSlug(spec)}"><strong>${escapeHtmlText(spec)} ${escapeHtmlText(cls)} PvE BiS</strong></a>`;
+
+    const otherSpecs = (CLASS_META[cls] ? CLASS_META[cls].specs : [])
+        .filter(s => s !== spec)
+        .map(s => {
+            const a = SPEC_ABBREV[`${cls}-${s}`];
+            const label = a ? `${s} (${a})` : s;
+            return `<a href="/${toSlug(cls)}/${toSlug(s)}/pvp">${escapeHtmlText(label)} PvP</a>`;
+        }).join(' · ');
+
+    return `<p>Looking for raid gear instead? See ${pveLink} for phase-by-phase PvE Best in Slot.</p>
+    ${otherSpecs ? `<p>Other ${escapeHtmlText(cls)} PvP specs: ${otherSpecs}</p>` : ''}`;
+}
+
 /** Build the visible #seoSummary content (closing paragraph + cross-links). */
 function buildSeoSummaryBlock(route) {
     if (route.type !== 'phase') return null;
@@ -275,13 +407,14 @@ function buildSeoSummaryBlock(route) {
     const raid = PHASE_RAID_CONTEXT[route.phase];
     const specName = specWithAbbrev(route.cls, route.spec);
 
-    // Sibling-phase cross-links (all phases except current)
+    // Sibling-phase cross-links with raid-context anchor text
+    // ("Phase 1 (Karazhan)" captures raid keyword volume in addition to phase keyword).
     const otherPhases = [0, 1, 2, 3, 4, 5]
         .filter(p => p !== route.phase)
         .map(p => {
-            const slug = PHASE_TO_SLUG_REV[p];
-            const label = p === 0 ? 'Pre-Raid' : PHASE_NAMES[p].label;
-            const href = `/${toSlug(route.cls)}/${toSlug(route.spec)}/${slug}`;
+            const slug  = PHASE_TO_SLUG_REV[p];
+            const label = phaseAnchorText(p);
+            const href  = `/${toSlug(route.cls)}/${toSlug(route.spec)}/${slug}`;
             return `<a href="${href}">${escapeHtmlText(label)}</a>`;
         }).join(' · ');
 
@@ -458,7 +591,7 @@ function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
         `<h1 id="headerTitle">${escapeHtmlText(seo.h1)}</h1>`
     );
 
-    // Body content: visible SEO blocks (phase pages only — these are no-ops on other routes)
+    // Body content: visible SEO blocks
     if (bodyBlocks) {
         if (bodyBlocks.seoDesc) {
             html = html.replace(
@@ -476,6 +609,20 @@ function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
             html = html.replace(
                 /<div class="seo-summary hidden" id="seoSummary"><\/div>/,
                 `<div class="seo-summary" id="seoSummary">${bodyBlocks.seoSummary}</div>`
+            );
+        }
+        // Class landing (#seoClassLanding) — visible content for /paladin, /warrior, etc.
+        if (bodyBlocks.classLanding) {
+            html = html.replace(
+                /<div class="seo-landing hidden" id="seoClassLanding"><\/div>/,
+                `<div class="seo-landing" id="seoClassLanding">${bodyBlocks.classLanding}</div>`
+            );
+        }
+        // Spec landing (#seoSpecLanding) — visible content for /paladin/retribution, etc.
+        if (bodyBlocks.specLanding) {
+            html = html.replace(
+                /<div class="seo-landing hidden" id="seoSpecLanding"><\/div>/,
+                `<div class="seo-landing" id="seoSpecLanding">${bodyBlocks.specLanding}</div>`
             );
         }
     }
@@ -506,11 +653,28 @@ function urlToOutputPath(urlPath) {
     return path.join(ROOT, clean, 'index.html');
 }
 
+/** Bump every <lastmod> in sitemap.xml / sitemap-index.xml to today's date. */
+function updateSitemapDates() {
+    const today = new Date().toISOString().slice(0, 10);   // YYYY-MM-DD
+    for (const file of ['sitemap.xml', 'sitemap-index.xml']) {
+        const p = path.join(ROOT, file);
+        if (!fs.existsSync(p)) continue;
+        const before = fs.readFileSync(p, 'utf8');
+        const after  = before.replace(/<lastmod>[^<]*<\/lastmod>/g, `<lastmod>${today}</lastmod>`);
+        if (after !== before) {
+            fs.writeFileSync(p, after);
+            console.log(`✓ Updated <lastmod> dates in ${file} → ${today}`);
+        }
+    }
+}
+
 function main() {
     const args = process.argv.slice(2);
     const onlyIdx = args.indexOf('--only');
     const dryRun  = args.includes('--dry-run');
     const only    = onlyIdx >= 0 ? args[onlyIdx + 1] : null;
+
+    if (!only && !dryRun) updateSitemapDates();
 
     const template = fs.readFileSync(TEMPLATE, 'utf8');
 
@@ -546,10 +710,15 @@ function main() {
         }
 
         const jsonLd = buildJsonLd(route, seo);
+        // Phase pages get description+FAQ+summary; PvP pages get a PvP-specific
+        // description and summary (no FAQ, since arena gear has fewer canonical Q&A);
+        // class/spec landing pages get their dedicated landing blocks.
         const bodyBlocks = {
-            seoDesc:    buildSeoDescriptionBlock(route, seo),
-            seoFaq:     buildSeoFaqBlock(route, seo),
-            seoSummary: buildSeoSummaryBlock(route),
+            seoDesc:      buildSeoDescriptionBlock(route, seo) || buildPvpDescriptionBlock(route, seo),
+            seoFaq:       buildSeoFaqBlock(route, seo),
+            seoSummary:   buildSeoSummaryBlock(route) || buildPvpSummaryBlock(route),
+            classLanding: buildClassLandingBlock(route),
+            specLanding:  buildSpecLandingBlock(route),
         };
         const html = rewriteHtml(template, seo, jsonLd, bodyBlocks);
         const outPath = urlToOutputPath(urlPath);

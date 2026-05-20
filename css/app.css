@@ -630,6 +630,59 @@ body {
     color: var(--text-secondary);
 }
 
+/* ─── SEO Landing (visible content on class/spec/PvP landing pages) ─ */
+.seo-landing {
+    margin: 24px 0 12px;
+    padding: 16px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+
+.seo-landing h2 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.seo-landing h3 {
+    margin: 14px 0 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.seo-landing p {
+    margin: 0 0 10px;
+}
+
+.seo-landing p:last-child {
+    margin-bottom: 0;
+}
+
+.seo-landing ul {
+    margin: 6px 0 10px;
+    padding-left: 20px;
+}
+
+.seo-landing li {
+    margin: 4px 0;
+}
+
+.seo-landing a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(255,255,255,0.25);
+}
+
+.seo-landing a:hover {
+    text-decoration-color: var(--text-primary);
+}
+
 /* ─── SEO Summary (closing keyword-rich block + related links) ───── */
 .seo-summary {
     margin: 12px 0 4px;

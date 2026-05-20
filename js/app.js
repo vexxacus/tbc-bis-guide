@@ -452,6 +452,10 @@
 
         updateStructuredData(pageTitle, metaDesc, fullUrl);
 
+        // SEO landing blocks for class/spec pages (each function self-gates on state)
+        renderClassLanding();
+        renderSpecLanding();
+
         // Google Analytics — SPA page view
         if (typeof gtag === 'function') {
             gtag('event', 'page_view', { page_title: pageTitle, page_location: fullUrl, page_path: path });
@@ -963,6 +967,103 @@
             html += `<p>Other ${escapeHtmlText(cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
         }
         el.innerHTML = html;
+        el.classList.remove('hidden');
+    }
+
+    // Short raid name for anchor text in cross-links (matches prerender.js).
+    const PHASE_RAID_SHORT = {
+        0: 'Pre-Raid Dungeons', 1: 'Karazhan', 2: 'SSC & TK',
+        3: 'Black Temple', 4: "Zul'Aman", 5: 'Sunwell'
+    };
+
+    function phaseAnchorText(phase) {
+        const label = phase === 0 ? 'Pre-Raid' : (PHASE_NAMES[phase] || {}).label;
+        const raid  = PHASE_RAID_SHORT[phase];
+        if (!raid) return label;
+        if (phase === 0) return 'Pre-Raid (Dungeons)';
+        return `${label} (${raid})`;
+    }
+
+    /**
+     * Render the SEO landing block for class pages (e.g. /paladin).
+     * Visible content: H2 + intro + spec list + phase quick-links.
+     * Uses existing SPEC_ROLES (defined further down — referenced lazily at call time).
+     */
+    function renderClassLanding() {
+        const el = document.getElementById('seoClassLanding');
+        if (!el) return;
+        const cls = state.selectedClass;
+        // Only render when on class landing (class selected, no spec).
+        if (!cls || state.selectedSpec) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+        const specs = (CLASS_META[cls] || {}).specs || [];
+        const specLis = specs.map(s => {
+            const abbrev = SPEC_ABBREV[`${cls}-${s}`];
+            const label  = abbrev ? `${s} (${abbrev}) ${cls}` : `${s} ${cls}`;
+            const role   = SPEC_ROLES[s] || '';
+            return `<li><a href="/${toSlug(cls)}/${toSlug(s)}"><strong>${escapeHtmlText(label)} BiS</strong></a>${role ? ' — ' + escapeHtmlText(role) : ''}</li>`;
+        }).join('');
+        const firstSpec = specs[0];
+        const phaseLinks = firstSpec ? [0, 1, 2, 3, 4, 5].map(p => {
+            const slug = PHASE_TO_SLUG[p];
+            const href = `/${toSlug(cls)}/${toSlug(firstSpec)}/${slug}`;
+            return `<a href="${href}">${escapeHtmlText(phaseAnchorText(p))}</a>`;
+        }).join(' · ') : '';
+        el.innerHTML = `<h2>${escapeHtmlText(cls)} BiS for TBC Classic — Every Spec, Every Phase</h2>
+            <p>Best in Slot gear guides for <strong>${escapeHtmlText(cls)}</strong> in WoW Classic TBC. Pick a spec for phase-by-phase BiS lists from Pre-Raid through Sunwell Plateau, including enchants, gems, and stat priority recommendations.</p>
+            <h3>${escapeHtmlText(cls)} specs</h3>
+            <ul>${specLis}</ul>
+            ${phaseLinks ? `<h3>Quick links by phase</h3><p>${phaseLinks}</p>` : ''}`;
+        el.classList.remove('hidden');
+    }
+
+    /**
+     * Render the SEO landing block for spec pages (e.g. /paladin/retribution).
+     * Visible content: H2 + intro + phase list with raid context.
+     */
+    function renderSpecLanding() {
+        const el = document.getElementById('seoSpecLanding');
+        if (!el) return;
+        const cls  = state.selectedClass;
+        const spec = state.selectedSpec;
+        // Only render when on spec landing (class+spec selected, no phase, no PvP).
+        if (!cls || !spec || state.selectedPhase != null || state.isPvP) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+        const abbrev   = SPEC_ABBREV[`${cls}-${spec}`];
+        const specFull = abbrev ? `${spec} ${cls} (${abbrev})` : `${spec} ${cls}`;
+        const role     = SPEC_ROLES[spec] || '';
+        const phaseLis = [0, 1, 2, 3, 4, 5].map(p => {
+            const slug = PHASE_TO_SLUG[p];
+            const href = `/${toSlug(cls)}/${toSlug(spec)}/${slug}`;
+            const phLabel = p === 0 ? 'Pre-Raid BiS' : `${PHASE_NAMES[p].label} BiS`;
+            const raid = {
+                0: 'Pre-Raid dungeons and heroics',
+                1: "Karazhan, Gruul's Lair, and Magtheridon's Lair",
+                2: 'Serpentshrine Cavern and Tempest Keep',
+                3: 'Black Temple and Mount Hyjal',
+                4: "Zul'Aman and Badge of Justice gear",
+                5: 'Sunwell Plateau'
+            }[p];
+            return `<li><a href="${href}"><strong>${escapeHtmlText(phLabel)}</strong></a> — ${escapeHtmlText(raid)}</li>`;
+        }).join('');
+        const otherSpecs = (CLASS_META[cls] ? CLASS_META[cls].specs : [])
+            .filter(s => s !== spec)
+            .map(s => {
+                const a = SPEC_ABBREV[`${cls}-${s}`];
+                const label = a ? `${s} (${a})` : s;
+                return `<a href="/${toSlug(cls)}/${toSlug(s)}">${escapeHtmlText(label)}</a>`;
+            }).join(' · ');
+        el.innerHTML = `<h2>${escapeHtmlText(specFull)} BiS for TBC Classic</h2>
+            <p>Best in Slot gear lists for <strong>${escapeHtmlText(specFull)}</strong>${role ? ` (${escapeHtmlText(role)})` : ''} in TBC Classic. Choose a phase below for the full gear list with enchants, gems, stat priority, and item sources.</p>
+            <h3>Phase guides</h3>
+            <ul>${phaseLis}</ul>
+            ${otherSpecs ? `<h3>Other ${escapeHtmlText(cls)} specs</h3><p>${otherSpecs}</p>` : ''}`;
         el.classList.remove('hidden');
     }
 

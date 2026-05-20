@@ -68,18 +68,18 @@
         <style>.class-grid,.spec-grid,.phase-tabs,.slot-list{display:none!important}</style>
         <div style="max-width:800px;margin:0 auto;padding:20px;color:#e0e0e0;font-family:sans-serif">
             <h1>TBC Classic Best in Slot Guide</h1>
-            <p>Complete gear guide for every class and spec in TBC Classic — Pre-BiS through Sunwell.</p>
+            <p>Complete gear guide for every class and spec in TBC Classic — Pre-Raid through Sunwell Plateau. Includes enchants, gems, and stat priority.</p>
             <h2>Classes</h2>
             <ul>
-                <li><a href="/warrior">Warrior</a> — <a href="/warrior/arms/phase-1">Arms</a>, <a href="/warrior/fury/phase-1">Fury</a>, <a href="/warrior/protection/phase-1">Protection</a></li>
-                <li><a href="/paladin">Paladin</a> — <a href="/paladin/holy/phase-1">Holy</a>, <a href="/paladin/protection/phase-1">Protection</a>, <a href="/paladin/retribution/phase-1">Retribution</a></li>
-                <li><a href="/hunter">Hunter</a> — <a href="/hunter/beast-mastery/phase-1">Beast Mastery</a>, <a href="/hunter/survival/phase-1">Survival</a></li>
-                <li><a href="/rogue">Rogue</a> — <a href="/rogue/dps/phase-1">DPS</a></li>
-                <li><a href="/priest">Priest</a> — <a href="/priest/holy/phase-1">Holy</a>, <a href="/priest/shadow/phase-1">Shadow</a></li>
-                <li><a href="/shaman">Shaman</a> — <a href="/shaman/elemental/phase-1">Elemental</a>, <a href="/shaman/enhancement/phase-1">Enhancement</a>, <a href="/shaman/restoration/phase-1">Restoration</a></li>
-                <li><a href="/mage">Mage</a> — <a href="/mage/arcane/phase-1">Arcane</a>, <a href="/mage/fire/phase-1">Fire</a></li>
-                <li><a href="/warlock">Warlock</a> — <a href="/warlock/affliction/phase-1">Affliction</a>, <a href="/warlock/destruction/phase-1">Destruction</a></li>
-                <li><a href="/druid">Druid</a> — <a href="/druid/balance/phase-1">Balance</a>, <a href="/druid/bear/phase-1">Bear</a>, <a href="/druid/cat/phase-1">Cat</a>, <a href="/druid/restoration/phase-1">Restoration</a></li>
+                <li><a href="/warrior">Warrior</a> — <a href="/warrior/arms/phase-1">Arms</a>, <a href="/warrior/fury/phase-1">Fury</a>, <a href="/warrior/protection/phase-1">Protection (Prot)</a></li>
+                <li><a href="/paladin">Paladin</a> — <a href="/paladin/holy/phase-1">Holy</a>, <a href="/paladin/protection/phase-1">Protection (Prot)</a>, <a href="/paladin/retribution/phase-1">Retribution (Ret)</a></li>
+                <li><a href="/hunter">Hunter</a> — <a href="/hunter/beast-mastery/phase-1">Beast Mastery (BM)</a>, <a href="/hunter/marksmanship/phase-1">Marksmanship (MM)</a>, <a href="/hunter/survival/phase-1">Survival</a></li>
+                <li><a href="/rogue">Rogue</a> — <a href="/rogue/combat/phase-1">Combat</a>, <a href="/rogue/assassination/phase-1">Assassination</a>, <a href="/rogue/subtlety/phase-1">Subtlety (Sub)</a></li>
+                <li><a href="/priest">Priest</a> — <a href="/priest/discipline/phase-1">Discipline (Disc)</a>, <a href="/priest/holy/phase-1">Holy</a>, <a href="/priest/shadow/phase-1">Shadow</a></li>
+                <li><a href="/shaman">Shaman</a> — <a href="/shaman/elemental/phase-1">Elemental (Ele)</a>, <a href="/shaman/enhancement/phase-1">Enhancement (Enh)</a>, <a href="/shaman/restoration/phase-1">Restoration (Resto)</a></li>
+                <li><a href="/mage">Mage</a> — <a href="/mage/arcane/phase-1">Arcane</a>, <a href="/mage/fire/phase-1">Fire</a>, <a href="/mage/frost/phase-1">Frost</a></li>
+                <li><a href="/warlock">Warlock</a> — <a href="/warlock/affliction/phase-1">Affliction (Affli)</a>, <a href="/warlock/demonology/phase-1">Demonology</a>, <a href="/warlock/destruction/phase-1">Destruction (Destro)</a></li>
+                <li><a href="/druid">Druid</a> — <a href="/druid/balance/phase-1">Balance (Boomkin)</a>, <a href="/druid/bear/phase-1">Bear (Feral Tank)</a>, <a href="/druid/cat/phase-1">Cat (Feral DPS)</a>, <a href="/druid/restoration/phase-1">Restoration (Resto)</a></li>
             </ul>
         </div>
     </noscript>
@@ -148,11 +148,15 @@
         <!-- Step 2: Spec Select -->
         <section class="step hidden" id="stepSpec">
             <div class="spec-grid" id="specGrid"></div>
+            <!-- SEO body content for class landing pages (e.g., /paladin) -->
+            <div class="seo-landing hidden" id="seoClassLanding"></div>
         </section>
 
         <!-- Step 3: Phase Select -->
         <section class="step hidden" id="stepPhase">
             <div class="phase-tabs" id="phaseTabs"></div>
+            <!-- SEO body content for spec landing pages (e.g., /paladin/retribution) -->
+            <div class="seo-landing hidden" id="seoSpecLanding"></div>
         </section>
 
         <!-- Step 4: BiS List -->
