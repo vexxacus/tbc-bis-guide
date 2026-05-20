@@ -381,7 +381,7 @@ function buildSeoFaqBlock(route, seo) {
 }
 
 /** Build the visible #seoClassLanding block for class landing pages (e.g. /paladin). */
-function buildClassLandingBlock(route) {
+function buildClassLandingBlock(route, pvpSpecsByClass) {
     if (route.type !== 'class') return null;
     const cls   = route.cls;
     const specs = (CLASS_META[cls] || {}).specs || [];
@@ -394,14 +394,23 @@ function buildClassLandingBlock(route) {
         return `<li><a href="${href}"><strong>${escapeHtmlText(label)} BiS</strong></a>${role ? ' — ' + escapeHtmlText(role) : ''}</li>`;
     }).join('\n        ');
 
-    // Phase quick-links pointing to first spec (best-effort browse entry point).
-    const firstSpec = specs[0];
-    const phaseLis = firstSpec ? [0, 1, 2, 3, 4, 5].map(p => {
-        const slug  = PHASE_TO_SLUG_REV[p];
-        const href  = `/${toSlug(cls)}/${toSlug(firstSpec)}/${slug}`;
-        const label = phaseAnchorText(p);
-        return `<a href="${href}">${escapeHtmlText(label)}</a>`;
-    }).join(' · ') : '';
+    // Phase quick-links: one row per spec, all six phases each.
+    const phaseSpecBlocks = specs.map(s => {
+        const links = [0, 1, 2, 3, 4, 5].map(p => {
+            const slug  = PHASE_TO_SLUG_REV[p];
+            const href  = `/${toSlug(cls)}/${toSlug(s)}/${slug}`;
+            const label = phaseAnchorText(p);
+            return `<a href="${href}">${escapeHtmlText(label)}</a>`;
+        }).join(' · ');
+        return `<p><strong>${escapeHtmlText(s)}:</strong> ${links}</p>`;
+    }).join('\n    ');
+
+    // PvP cross-links: only specs that actually have PvP data (sourced from sitemap).
+    // Includes PvP-only specs like Druid Feral Combat that aren't in CLASS_META.
+    const pvpSpecs = (pvpSpecsByClass && pvpSpecsByClass[cls]) || [];
+    const pvpLinks = pvpSpecs.map(spec =>
+        `<a href="/${toSlug(cls)}/${toSlug(spec)}/pvp">${escapeHtmlText(spec)} PvP</a>`
+    ).join(' · ');
 
     return `<h2>${escapeHtmlText(cls)} BiS for TBC Classic — Every Spec, Every Phase</h2>
     <p>Best in Slot gear guides for <strong>${escapeHtmlText(cls)}</strong> in WoW Classic TBC. Pick a spec for phase-by-phase BiS lists from Pre-Raid through Sunwell Plateau, including enchants, gems, and stat priority recommendations.</p>
@@ -409,7 +418,8 @@ function buildClassLandingBlock(route) {
     <ul>
         ${specLis}
     </ul>
-    ${phaseLis ? `<h3>Quick links by phase</h3>\n    <p>${phaseLis}</p>` : ''}`;
+    ${phaseSpecBlocks ? `<h3>Quick links by phase</h3>\n    ${phaseSpecBlocks}` : ''}
+    ${pvpLinks ? `<h3>${escapeHtmlText(cls)} PvP BiS</h3>\n    <p>Live arena snapshot of top-rated players. ${pvpLinks}</p>` : ''}`;
 }
 
 /** Build the visible #seoSpecLanding block for spec landing pages (e.g. /paladin/retribution). */
@@ -767,6 +777,30 @@ function parseSitemap(sitemapPath) {
     return urls;
 }
 
+/** Build a { [className]: [specName, ...] } map of specs that have PvP pages,
+ *  sourced from sitemap.xml so we never link to a non-existent /cls/spec/pvp URL.
+ *  Resolves slug pairs via SPEC_SLUG_MAP and PVP_SPEC_OVERRIDES (for PvP-only
+ *  specs like Druid Feral Combat that aren't in CLASS_META). */
+function loadPvpSpecsFromSitemap(sitemapPath) {
+    const xml = fs.readFileSync(sitemapPath, 'utf8');
+    const byClass = {};
+    const re = /<loc>([^<]+)<\/loc>/g;
+    let m;
+    while ((m = re.exec(xml))) {
+        const u = m[1].trim();
+        if (!u.startsWith(BASE_URL)) continue;
+        const p = u.slice(BASE_URL.length).replace(/^\//, '').replace(/\/$/, '');
+        const parts = p.split('/');
+        if (parts.length !== 3 || parts[2] !== 'pvp') continue;
+        const key = `${parts[0]}-${parts[1]}`;
+        const entry = SPEC_SLUG_MAP[key] || PVP_SPEC_OVERRIDES[key];
+        if (!entry) continue;
+        if (!byClass[entry.cls]) byClass[entry.cls] = [];
+        if (!byClass[entry.cls].includes(entry.spec)) byClass[entry.cls].push(entry.spec);
+    }
+    return byClass;
+}
+
 function urlToOutputPath(urlPath) {
     if (urlPath === '/') return path.join(ROOT, 'index.html');
     const clean = urlPath.replace(/^\//, '').replace(/\/$/, '');
@@ -797,12 +831,14 @@ function main() {
     if (!only && !dryRun) updateSitemapDates();
 
     const template = fs.readFileSync(TEMPLATE, 'utf8');
+    const sitemapPath = path.join(ROOT, 'sitemap.xml');
+    const pvpSpecsByClass = loadPvpSpecsFromSitemap(sitemapPath);
 
     let urls;
     if (only) {
         urls = [only];
     } else {
-        urls = parseSitemap(path.join(ROOT, 'sitemap.xml'));
+        urls = parseSitemap(sitemapPath);
     }
 
     let written = 0, skipped = 0, failed = 0;
@@ -839,7 +875,7 @@ function main() {
             seoDesc:      buildSeoDescriptionBlock(route, seo) || buildPvpDescriptionBlock(route, seo),
             seoFaq:       buildSeoFaqBlock(route, seo),
             seoSummary:   buildSeoSummaryBlock(route) || buildPvpSummaryBlock(route),
-            classLanding: buildClassLandingBlock(route),
+            classLanding: buildClassLandingBlock(route, pvpSpecsByClass),
             specLanding:  buildSpecLandingBlock(route),
             staticBis:    enableStaticBis ? buildStaticBisBlock(route) : null,
         };
