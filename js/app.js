@@ -346,7 +346,7 @@
 
     // ─── Meta tag updater ────────────────────────────────────────────
 
-    const BASE_URL = 'https://tbc-bis-guide.web.app';
+    const BASE_URL = 'https://tbc-bis-guide.com';
 
     // Spec abbreviations injected into meta descriptions to capture searches like
     // "ret pally bis", "bm hunter bis", "boomkin enchants". Keep in sync with
@@ -4182,7 +4182,7 @@
         const metaDesc = document.getElementById('metaDescription');
         if (metaDesc) metaDesc.setAttribute('content', data.description);
         const canonical = document.getElementById('canonicalLink');
-        if (canonical) canonical.setAttribute('href', `https://tbc-bis-guide.web.app/${page}`);
+        if (canonical) canonical.setAttribute('href', `${BASE_URL}/${page}`);
 
         // Page-specific init
         if (data.onLoad) data.onLoad();

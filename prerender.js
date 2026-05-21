@@ -19,7 +19,7 @@
 const fs   = require('fs');
 const path = require('path');
 
-const BASE_URL  = 'https://tbc-bis-guide.web.app';
+const BASE_URL  = 'https://tbc-bis-guide.com';
 const ROOT      = __dirname;
 const TEMPLATE  = path.join(ROOT, 'index.html');
 
@@ -248,7 +248,7 @@ function seoForRoute(route, fullUrl) {
             };
             const descMap = {
                 about:    'About the TBC Classic Best in Slot Guide — sources, methodology, and contact.',
-                privacy:  'Privacy policy for tbc-bis-guide.web.app.',
+                privacy:  'Privacy policy for tbc-bis-guide.com.',
                 feedback: 'Send feedback, request new features, or view the public roadmap for TBC BiS Guide.'
             };
             title = titleMap[route.page];
