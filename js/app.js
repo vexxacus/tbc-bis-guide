@@ -610,12 +610,17 @@
         if (twTitleEl)   twTitleEl.setAttribute('content', pageTitle);
         if (twDescEl)    twDescEl.setAttribute('content', metaDesc);
 
-        // Update H1 to match the SEO-friendly page title (without "— TBC Classic" suffix)
+        // Update H1 to match the SEO-friendly page title (without "— TBC Classic" suffix).
+        // Home gets a dedicated H1 — the keyword-loaded pageTitle is too long for it.
         if (headerTitle) {
-            const h1Text = pageTitle.replace(/\s*—\s*TBC Classic$/, '');
-            // Preserve any existing PvP tag HTML
-            const pvpTag = state.isPvP ? ' <span class="pvp-tag">PvP</span>' : '';
-            headerTitle.innerHTML = h1Text + pvpTag;
+            if (!state.selectedClass) {
+                headerTitle.textContent = 'TBC Best in Slot — Top Player Picks';
+            } else {
+                const h1Text = pageTitle.replace(/\s*—\s*TBC Classic$/, '');
+                // Preserve any existing PvP tag HTML
+                const pvpTag = state.isPvP ? ' <span class="pvp-tag">PvP</span>' : '';
+                headerTitle.innerHTML = h1Text + pvpTag;
+            }
         }
 
         updateStructuredData(pageTitle, metaDesc, fullUrl);
