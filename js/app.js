@@ -376,17 +376,13 @@
     }
 
     // Hand-written PvP arena context per spec. Mirrors PVP_SPEC_CONTEXT in
-    // prerender.js — keep both in sync when adding new specs. (Acceptable
-    // duplication for the pilot; extract to a shared module if it grows.)
+    // prerender.js — keep both in sync when adding new specs. Rendered as
+    // FAQ items (plain-text answers, matching FAQPage JSON-LD).
     const PVP_SPEC_CONTEXT = {
         'Warrior|Arms': {
-            roleSummary: 'Melee DPS with Mortal Strike pressure and target swaps',
-            playstyleHtml: `<p>Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from <strong>Mortal Strike</strong>, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original.</p>
-<p>Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker Stance for Whirlwind and crit chance, Defensive Stance for Spell Reflect and Disarm. Strong Arms Warriors rotate stances multiple times per opener.</p>`,
-            compsHtml: `<p><strong>Common 2v2 compositions:</strong> Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline).</p>
-<p><strong>Common 3v3 compositions:</strong> Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.</p>`,
-            statsHtml: `<p><strong>PvP stat priority:</strong> Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met.</p>
-<p>Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component. The PvP weapon tokens from Arena and the Sunwell-era Apolyon-style 2H are the targets.</p>`,
+            roleAnswer: `Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from Mortal Strike, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original. Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker for Whirlwind and crit chance, Defensive for Spell Reflect and Disarm.`,
+            compsAnswer: `In 2v2, Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline). In 3v3, Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.`,
+            statsAnswer: `Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met. Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component.`,
         },
     };
 
@@ -394,13 +390,38 @@
         return String(name || '').replace(/^Enchanted:\s*/, '');
     }
 
-    /** Build the same 5-item FAQ that prerender produces — used both for
-     *  visible runtime FAQ and (if we ever inject) JSON-LD parity. */
+    /** Build the FAQ list mirrored from prerender.js — static spec context
+     *  (when authored) followed by five dynamic data-driven Q&A. */
     function buildPvpFaqItemsRuntime(cls, spec, sd) {
-        if (!sd) return [];
         const items = [];
-        const rr = sd.ratingRange || {};
         const specName = `${spec} ${cls}`;
+
+        // Static spec context (when authored) — placed at the top of FAQ.
+        const ctx = PVP_SPEC_CONTEXT[`${cls}|${spec}`];
+        if (ctx) {
+            if (ctx.roleAnswer) {
+                items.push({
+                    q: `What is ${specName}'s role in TBC arena?`,
+                    a: ctx.roleAnswer,
+                });
+            }
+            if (ctx.compsAnswer) {
+                items.push({
+                    q: `Which arena compositions are strongest for ${specName}?`,
+                    a: ctx.compsAnswer,
+                });
+            }
+            if (ctx.statsAnswer) {
+                items.push({
+                    q: `What is the PvP stat priority for ${specName}?`,
+                    a: ctx.statsAnswer,
+                });
+            }
+        }
+
+        // Dynamic data-driven Q&A — skip if no scraped data for this spec.
+        if (!sd) return items;
+        const rr = sd.ratingRange || {};
 
         const chest = sd.slots && sd.slots.Chest && sd.slots.Chest[0];
         if (chest) {
@@ -956,31 +977,19 @@
         el.classList.remove('hidden');
     }
 
-    /** Render the PvP-specific seoDescription block — arena role, playstyle,
-     *  comps, stat priority. Mirrors buildPvpDescriptionBlock in prerender.js. */
+    /** Render the PvP-specific seoDescription block — kept minimal. Arena role,
+     *  comps, and stat priority live in the FAQ block below. */
     function renderPvpSeoDescription(el) {
         const cls  = state.selectedClass;
         const spec = state.selectedSpec;
-        const ctx  = PVP_SPEC_CONTEXT[`${cls}|${spec}`];
         const specLabel = specWithAbbrev(cls, spec);
         const baseDesc = `Live arena snapshot of the best gear for ${specLabel} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now. Includes enchants and gems.`;
-
-        const extra = ctx ? `
-        <div class="pvp-context">
-            <h3>Arena role</h3>
-            <p class="pvp-context-role">${escapeHtmlText(ctx.roleSummary)}</p>
-            ${ctx.playstyleHtml}
-            <h3>Common arena compositions</h3>
-            ${ctx.compsHtml}
-            <h3>Stat priority</h3>
-            ${ctx.statsHtml}
-        </div>` : '';
 
         el.innerHTML = `<div class="seo-desc-inner">
             <span class="seo-desc-icon">⚔️</span>
             <div>
                 <h2 class="seo-desc-heading">${escapeHtmlText(specLabel)} PvP BiS — TBC Classic Arena</h2>
-                <p class="seo-desc-text">${escapeHtmlText(baseDesc)}</p>${extra}
+                <p class="seo-desc-text">${escapeHtmlText(baseDesc)}</p>
             </div>
         </div>`;
         el.classList.remove('hidden');

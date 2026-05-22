@@ -137,20 +137,16 @@ function getPvpData() {
     return _pvpData;
 }
 
-// Static, hand-written PvP context per spec. Adds unique, evergreen prose that
-// the dynamic scraped data can't provide on its own (arena role, common comps,
-// stat priorities). Roll out one spec at a time after validation.
+// Static, hand-written PvP context per spec. Rendered as additional FAQ items
+// (plain-text answers, since FAQPage JSON-LD requires plain strings and we
+// want the visible FAQ to match the structured data exactly).
 //
 // Key format matches PVP_DATA.specs keys: "Class|Spec".
 const PVP_SPEC_CONTEXT = {
     'Warrior|Arms': {
-        roleSummary: 'Melee DPS with Mortal Strike pressure and target swaps',
-        playstyleHtml: `<p>Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from <strong>Mortal Strike</strong>, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original.</p>
-<p>Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker Stance for Whirlwind and crit chance, Defensive Stance for Spell Reflect and Disarm. Strong Arms Warriors rotate stances multiple times per opener.</p>`,
-        compsHtml: `<p><strong>Common 2v2 compositions:</strong> Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline).</p>
-<p><strong>Common 3v3 compositions:</strong> Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.</p>`,
-        statsHtml: `<p><strong>PvP stat priority:</strong> Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met.</p>
-<p>Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component. The PvP weapon tokens from Arena and the Sunwell-era Apolyon-style 2H are the targets.</p>`,
+        roleAnswer: `Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from Mortal Strike, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original. Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker for Whirlwind and crit chance, Defensive for Spell Reflect and Disarm.`,
+        compsAnswer: `In 2v2, Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline). In 3v3, Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.`,
+        statsAnswer: `Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met. Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component.`,
     },
 };
 
@@ -494,30 +490,16 @@ function buildSpecLandingBlock(route) {
 }
 
 /** Build the visible #seoDescription content (H2 + paragraph) for PvP landing pages.
- *  When a spec has a hand-written PVP_SPEC_CONTEXT entry, the intro is enriched
- *  with arena role, common comps, and stat priority — giving each PvP page unique
- *  evergreen prose alongside the dynamic scraped data. */
+ *  Stays intentionally minimal — arena role / comps / stat priority live in the
+ *  FAQ block below so the page doesn't open with a wall of text. */
 function buildPvpDescriptionBlock(route, seo) {
     if (route.type !== 'pvp') return null;
     const spec = specWithAbbrev(route.cls, route.spec);
-    const ctx  = PVP_SPEC_CONTEXT[`${route.cls}|${route.spec}`];
-
-    const extra = ctx ? `
-        <div class="pvp-context">
-            <h3>Arena role</h3>
-            <p class="pvp-context-role">${escapeHtmlText(ctx.roleSummary)}</p>
-            ${ctx.playstyleHtml}
-            <h3>Common arena compositions</h3>
-            ${ctx.compsHtml}
-            <h3>Stat priority</h3>
-            ${ctx.statsHtml}
-        </div>` : '';
-
     return `<div class="seo-desc-inner">
         <span class="seo-desc-icon">⚔️</span>
         <div>
             <h2 class="seo-desc-heading">${escapeHtmlText(spec)} PvP BiS — TBC Classic Arena</h2>
-            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>${extra}
+            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
         </div>
     </div>`;
 }
@@ -553,11 +535,11 @@ function buildPvpDataSummaryBlock(route) {
     </dl>`;
 }
 
-/** Build the auto-generated PvP FAQ block (visible) — five Q&A from scraped data
- *  plus the static spec context if present. Returns null if no PvP data. */
+/** Build the auto-generated PvP FAQ block (visible). Combines static spec
+ *  context (if authored) with five data-driven Q&A from scraped PVP_DATA. */
 function buildPvpFaqBlock(route) {
+    if (route.type !== 'pvp') return null;
     const sd = getPvpSpecData(route);
-    if (!sd) return null;
     const items = buildPvpFaqItems(route, sd);
     if (!items.length) return null;
     const dl = items.map(i =>
@@ -570,12 +552,41 @@ function buildPvpFaqBlock(route) {
 }
 
 /** Shared PvP FAQ item list — used both for visible block and FAQPage JSON-LD,
- *  so the structured data matches exactly what the user sees. */
+ *  so the structured data matches exactly what the user sees.
+ *
+ *  Order: static spec context first (arena role, comps, stats) when we have it,
+ *  then dynamic data-driven Q&A. Top placement of context Q&A means users see
+ *  it expanded near the page top while keeping the intro short. */
 function buildPvpFaqItems(route, sd) {
-    if (!sd) return [];
     const items = [];
-    const rr = sd.ratingRange || {};
     const specName = `${route.spec} ${route.cls}`;
+
+    // Static spec context (when authored) — placed at the top of FAQ.
+    const ctx = PVP_SPEC_CONTEXT[`${route.cls}|${route.spec}`];
+    if (ctx) {
+        if (ctx.roleAnswer) {
+            items.push({
+                q: `What is ${specName}'s role in TBC arena?`,
+                a: ctx.roleAnswer,
+            });
+        }
+        if (ctx.compsAnswer) {
+            items.push({
+                q: `Which arena compositions are strongest for ${specName}?`,
+                a: ctx.compsAnswer,
+            });
+        }
+        if (ctx.statsAnswer) {
+            items.push({
+                q: `What is the PvP stat priority for ${specName}?`,
+                a: ctx.statsAnswer,
+            });
+        }
+    }
+
+    // Dynamic data-driven Q&A — skip if no scraped data for this spec.
+    if (!sd) return items;
+    const rr = sd.ratingRange || {};
 
     // Q1: top chest piece (high-popularity gold/strong tier item)
     const chest = (sd.slots && sd.slots.Chest && sd.slots.Chest[0]);
