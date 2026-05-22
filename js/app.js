@@ -1063,14 +1063,34 @@
         const seoPhLabel = state.selectedPhase === 0 ? 'Pre-Raid' : phInfo.label;
         const heading = `${specWithAbbrev(state.selectedClass, state.selectedSpec)} ${seoPhLabel} BiS Guide`;
         const text    = injectAbbrev(rawDesc, state.selectedClass, state.selectedSpec);
+        const methodology = buildMethodologyLine(state.selectedClass, state.selectedSpec, state.selectedPhase);
         el.innerHTML = `<div class="seo-desc-inner">
             <span class="seo-desc-icon">📖</span>
             <div>
                 <h2 class="seo-desc-heading">${escapeHtmlText(heading)}</h2>
+                ${methodology}
                 <p class="seo-desc-text">${escapeHtmlText(text)}</p>
             </div>
         </div>`;
         el.classList.remove('hidden');
+    }
+
+    /**
+     * Methodology line: shows what the data actually is — top WCL parser gear, not theorycraft.
+     * Surfaces a real parser count when WCL_DATA covers this spec/phase.
+     * Mirrored in prerender.js buildMethodologyLine — keep in sync.
+     */
+    function buildMethodologyLine(cls, spec, phase) {
+        if (phase === 0 || phase == null) {
+            // Pre-Raid has no WCL data — use a neutral framing.
+            return `<p class="seo-methodology">📊 Pre-raid gear from dungeons, heroics, and crafting — the foundation top parsers build on before their first raid kill.</p>`;
+        }
+        const appKey = `${cls}|${spec}`;
+        const wclKey = APP_TO_WCL_SPEC[appKey] || appKey;
+        const players = (typeof WCL_DATA !== 'undefined') ? WCL_DATA?.phases?.[phase]?.[wclKey]?.totalPlayers : null;
+        const countStr = players ? `the top <strong>${players}</strong> ` : `top `;
+        const phLabel = (PHASE_NAMES[phase] || { label: `Phase ${phase}` }).label;
+        return `<p class="seo-methodology">✨ Based on what ${countStr}WarcraftLogs ${escapeHtmlText(spec)} ${escapeHtmlText(cls)} parsers actually wear in ${escapeHtmlText(phLabel)} — ranked by usage, not theorycraft.</p>`;
     }
 
     /** Render the PvP-specific seoDescription block — kept minimal. Arena role,

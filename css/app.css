@@ -592,6 +592,23 @@ body {
     line-height: 1.3;
 }
 
+/* Methodology framing line — clearly communicates "this is what top players wear,
+   not theorycraft". Sits between the H2 and the SEO description text. */
+.seo-methodology {
+    margin: 0 0 8px;
+    padding: 6px 10px;
+    background: rgba(94, 138, 230, 0.08);
+    border-left: 3px solid rgba(94, 138, 230, 0.55);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+.seo-methodology strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
 /* ─── Static BiS summary (prerendered for SEO; JS hides on render) ── */
 .bis-static-summary {
     margin: 16px 0 8px;

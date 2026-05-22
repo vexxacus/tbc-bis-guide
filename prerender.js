@@ -23,6 +23,37 @@ const BASE_URL  = 'https://tbc-bis-guide.com';
 const ROOT      = __dirname;
 const TEMPLATE  = path.join(ROOT, 'index.html');
 
+// WCL parser counts — used in the per-page methodology line. Built from the
+// same scrape JSON the runtime serves; loaded lazily so dev never breaks if missing.
+let WCL_COUNTS = null;
+function getWclTotalPlayers(cls, spec, phase) {
+    if (phase === 0 || phase == null) return null;
+    if (WCL_COUNTS === null) {
+        try {
+            const raw = fs.readFileSync(path.join(ROOT, 'scraper/output/wcl-bis-data.json'), 'utf8');
+            const data = JSON.parse(raw);
+            WCL_COUNTS = {};
+            for (const [ph, phData] of Object.entries(data.phases || {})) {
+                WCL_COUNTS[ph] = {};
+                for (const [specKey, specData] of Object.entries(phData.specs || {})) {
+                    WCL_COUNTS[ph][specKey] = specData.totalPlayers || null;
+                }
+            }
+        } catch (_) {
+            WCL_COUNTS = {};
+        }
+    }
+    const appKey = `${cls}|${spec}`;
+    const wclKey = APP_TO_WCL_SPEC[appKey] || appKey;
+    return WCL_COUNTS?.[phase]?.[wclKey] || null;
+}
+
+// Mirror of app.js APP_TO_WCL_SPEC
+const APP_TO_WCL_SPEC = {
+    'Druid|Cat':  'Druid|Feral',
+    'Druid|Bear': 'Druid|Guardian',
+};
+
 // ─── Route data (mirrors js/app.js) ──────────────────────────────────
 
 const CLASS_META = {
@@ -466,9 +497,21 @@ function buildSeoDescriptionBlock(route, seo) {
         <span class="seo-desc-icon">📖</span>
         <div>
             <h2 class="seo-desc-heading">${escapeHtmlText(heading)}</h2>
+            ${buildMethodologyLine(route.cls, route.spec, route.phase)}
             <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
         </div>
     </div>`;
+}
+
+/** Methodology framing line — mirrored in js/app.js buildMethodologyLine. */
+function buildMethodologyLine(cls, spec, phase) {
+    if (phase === 0 || phase == null) {
+        return `<p class="seo-methodology">📊 Pre-raid gear from dungeons, heroics, and crafting — the foundation top parsers build on before their first raid kill.</p>`;
+    }
+    const players = getWclTotalPlayers(cls, spec, phase);
+    const countStr = players ? `the top <strong>${players}</strong> ` : `top `;
+    const phLabel = (PHASE_NAMES[phase] || { label: `Phase ${phase}` }).label;
+    return `<p class="seo-methodology">✨ Based on what ${countStr}WarcraftLogs ${escapeHtmlText(spec)} ${escapeHtmlText(cls)} parsers actually wear in ${escapeHtmlText(phLabel)} — ranked by usage, not theorycraft.</p>`;
 }
 
 /** Build the visible #seoFaq content (3 Q&A items in a <dl>). */
