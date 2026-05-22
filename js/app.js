@@ -375,6 +375,65 @@
         return abbrev ? `${spec} ${cls} (${abbrev})` : `${spec} ${cls}`;
     }
 
+    // Hand-written PvP arena context per spec. Mirrors PVP_SPEC_CONTEXT in
+    // prerender.js — keep both in sync when adding new specs. (Acceptable
+    // duplication for the pilot; extract to a shared module if it grows.)
+    const PVP_SPEC_CONTEXT = {
+        'Warrior|Arms': {
+            roleSummary: 'Melee DPS with Mortal Strike pressure and target swaps',
+            playstyleHtml: `<p>Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from <strong>Mortal Strike</strong>, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original.</p>
+<p>Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker Stance for Whirlwind and crit chance, Defensive Stance for Spell Reflect and Disarm. Strong Arms Warriors rotate stances multiple times per opener.</p>`,
+            compsHtml: `<p><strong>Common 2v2 compositions:</strong> Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline).</p>
+<p><strong>Common 3v3 compositions:</strong> Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.</p>`,
+            statsHtml: `<p><strong>PvP stat priority:</strong> Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met.</p>
+<p>Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component. The PvP weapon tokens from Arena and the Sunwell-era Apolyon-style 2H are the targets.</p>`,
+        },
+    };
+
+    function cleanEnchantName(name) {
+        return String(name || '').replace(/^Enchanted:\s*/, '');
+    }
+
+    /** Build the same 5-item FAQ that prerender produces — used both for
+     *  visible runtime FAQ and (if we ever inject) JSON-LD parity. */
+    function buildPvpFaqItemsRuntime(cls, spec, sd) {
+        if (!sd) return [];
+        const items = [];
+        const rr = sd.ratingRange || {};
+        const specName = `${spec} ${cls}`;
+
+        const chest = sd.slots && sd.slots.Chest && sd.slots.Chest[0];
+        if (chest) {
+            items.push({
+                q: `What chest piece do top ${specName} arena players wear?`,
+                a: `${chest.name} is worn by ${chest.popularity}% of the ${sd.playerCount} top-rated ${specName}s analyzed in this snapshot. See alternatives and enchant choices in the live list above.`
+            });
+        }
+        const chestEnchant = chest && chest.topEnchants && chest.topEnchants[0];
+        if (chestEnchant) {
+            items.push({
+                q: `What chest enchant should ${specName} use in PvP?`,
+                a: `${cleanEnchantName(chestEnchant.name)} is used by ${chestEnchant.usage}% of top arena players in this spec, making it the standard PvP chest enchant.`
+            });
+        }
+        const mainHand = sd.slots && sd.slots['Main Hand'] && sd.slots['Main Hand'][0];
+        if (mainHand) {
+            items.push({
+                q: `What weapon do top ${specName} PvP players use?`,
+                a: `${mainHand.name} is the most popular choice at ${mainHand.popularity}% usage. Weapon choice in TBC PvP often comes down to whether you've cleared the relevant rating gate or can afford the gold/honor cost — see alternatives in the live list above.`
+            });
+        }
+        items.push({
+            q: `What rating range does this ${specName} PvP BiS list cover?`,
+            a: `Data is based on ${sd.playerCount} ${specName} arena players rated between ${rr.min} and ${rr.max} (average ${rr.avg}). The list is refreshed weekly from ironforge.pro's arena leaderboard scrape.`
+        });
+        items.push({
+            q: `Should ${specName} use PvE gear in arena?`,
+            a: `Some PvE epics with high stat budgets are worn by top arena players when the slot's PvP option is weak — they're marked "PvE flex" in the live list. However, Resilience-bearing pieces from the Honor and Arena vendors are still the foundation of any PvP gear set.`
+        });
+        return items;
+    }
+
     function injectAbbrev(desc, cls, spec) {
         const abbrev = SPEC_ABBREV[`${cls}-${spec}`];
         if (!abbrev || !desc) return desc;
@@ -864,7 +923,13 @@
         const el = $('seoDescription');
         if (!el) return;
 
-        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+        // PvP route — render the rich PvP intro (mirrors prerender).
+        if (state.isPvP && state.selectedClass && state.selectedSpec) {
+            renderPvpSeoDescription(el);
+            return;
+        }
+
+        if (state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
             el.classList.add('hidden');
             el.innerHTML = '';
             return;
@@ -891,6 +956,36 @@
         el.classList.remove('hidden');
     }
 
+    /** Render the PvP-specific seoDescription block — arena role, playstyle,
+     *  comps, stat priority. Mirrors buildPvpDescriptionBlock in prerender.js. */
+    function renderPvpSeoDescription(el) {
+        const cls  = state.selectedClass;
+        const spec = state.selectedSpec;
+        const ctx  = PVP_SPEC_CONTEXT[`${cls}|${spec}`];
+        const specLabel = specWithAbbrev(cls, spec);
+        const baseDesc = `Live arena snapshot of the best gear for ${specLabel} PvP in TBC Classic, based on what the highest-rated arena players are wearing right now. Includes enchants and gems.`;
+
+        const extra = ctx ? `
+        <div class="pvp-context">
+            <h3>Arena role</h3>
+            <p class="pvp-context-role">${escapeHtmlText(ctx.roleSummary)}</p>
+            ${ctx.playstyleHtml}
+            <h3>Common arena compositions</h3>
+            ${ctx.compsHtml}
+            <h3>Stat priority</h3>
+            ${ctx.statsHtml}
+        </div>` : '';
+
+        el.innerHTML = `<div class="seo-desc-inner">
+            <span class="seo-desc-icon">⚔️</span>
+            <div>
+                <h2 class="seo-desc-heading">${escapeHtmlText(specLabel)} PvP BiS — TBC Classic Arena</h2>
+                <p class="seo-desc-text">${escapeHtmlText(baseDesc)}</p>${extra}
+            </div>
+        </div>`;
+        el.classList.remove('hidden');
+    }
+
     /**
      * Render the visible FAQ block (same Q&A as the JSON-LD FAQPage schema).
      * Only shows on phase pages.
@@ -898,7 +993,11 @@
     function renderSeoFaq() {
         const el = $('seoFaq');
         if (!el) return;
-        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+        if (state.isPvP && state.selectedClass && state.selectedSpec) {
+            renderPvpFaq(el);
+            return;
+        }
+        if (state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
             el.classList.add('hidden');
             el.innerHTML = '';
             return;
@@ -927,6 +1026,23 @@
         el.classList.remove('hidden');
     }
 
+    /** Render the PvP-specific FAQ block using scraped PVP_DATA. Mirrors
+     *  buildPvpFaqBlock in prerender.js. */
+    function renderPvpFaq(el) {
+        const cls  = state.selectedClass;
+        const spec = state.selectedSpec;
+        const sd   = (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) ? PVP_DATA.specs[`${cls}|${spec}`] : null;
+        const items = buildPvpFaqItemsRuntime(cls, spec, sd);
+        if (!items.length) {
+            el.classList.add('hidden');
+            el.innerHTML = '';
+            return;
+        }
+        const dl = items.map(i => `<dt>${escapeHtmlText(i.q)}</dt><dd>${escapeHtmlText(i.a)}</dd>`).join('');
+        el.innerHTML = `<h2 class="seo-faq-heading">Frequently Asked Questions</h2><dl>${dl}</dl>`;
+        el.classList.remove('hidden');
+    }
+
     /**
      * Render the closing summary block: keyword-rich paragraph + cross-links to
      * sibling phases and sibling specs. Strong internal-linking signal.
@@ -934,7 +1050,11 @@
     function renderSeoSummary() {
         const el = $('seoSummary');
         if (!el) return;
-        if (state.isPvP || state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
+        if (state.isPvP && state.selectedClass && state.selectedSpec) {
+            renderPvpSummary(el);
+            return;
+        }
+        if (state.selectedPhase == null || !state.selectedClass || !state.selectedSpec) {
             el.classList.add('hidden');
             el.innerHTML = '';
             return;
@@ -967,6 +1087,33 @@
             html += `<p>Other ${escapeHtmlText(cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
         }
         el.innerHTML = html;
+        el.classList.remove('hidden');
+    }
+
+    /** Render the PvP-specific closing summary: data-refresh note + cross-links
+     *  to PvE BiS and sibling PvP specs. Mirrors buildPvpSummaryBlock. */
+    function renderPvpSummary(el) {
+        const cls  = state.selectedClass;
+        const spec = state.selectedSpec;
+        const sd   = (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) ? PVP_DATA.specs[`${cls}|${spec}`] : null;
+        const analyzedAt = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta && PVP_DATA.meta.analyzedAt)
+            ? PVP_DATA.meta.analyzedAt.slice(0, 10) : null;
+
+        const dataNote = sd
+            ? `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. The snapshot refreshes weekly so the rankings track the live meta.${analyzedAt ? ` Current snapshot analyzed on ${escapeHtmlText(analyzedAt)}.` : ''}</p>`
+            : '';
+
+        const pveLink = `<a href="/${toSlug(cls)}/${toSlug(spec)}"><strong>${escapeHtmlText(spec)} ${escapeHtmlText(cls)} PvE BiS</strong></a>`;
+
+        const otherSpecs = (CLASS_META[cls] ? CLASS_META[cls].specs : [])
+            .filter(s => s !== spec)
+            .map(s => {
+                const a = SPEC_ABBREV[`${cls}-${s}`];
+                const label = a ? `${s} (${a})` : s;
+                return `<a href="/${toSlug(cls)}/${toSlug(s)}/pvp">${escapeHtmlText(label)} PvP</a>`;
+            }).join(' · ');
+
+        el.innerHTML = `${dataNote}<p>Looking for raid gear instead? See ${pveLink} for phase-by-phase PvE Best in Slot.</p>${otherSpecs ? `<p>Other ${escapeHtmlText(cls)} PvP specs: ${otherSpecs}</p>` : ''}`;
         el.classList.remove('hidden');
     }
 

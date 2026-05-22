@@ -125,6 +125,43 @@ function getBisData() {
     return _bisData;
 }
 
+// ─── PvP scraped data (for live arena snapshot, prerendered) ─────────
+// js/pvp-data.js is an auto-generated `const PVP_DATA = {...};` script.
+// We strip the prefix/suffix and parse as JSON so we can load it in Node.
+let _pvpData = null;
+function getPvpData() {
+    if (_pvpData) return _pvpData;
+    const raw = fs.readFileSync(path.join(ROOT, 'js/pvp-data.js'), 'utf8');
+    const json = raw.replace(/^const PVP_DATA = /, '').replace(/;\s*$/, '');
+    _pvpData = JSON.parse(json);
+    return _pvpData;
+}
+
+// Static, hand-written PvP context per spec. Adds unique, evergreen prose that
+// the dynamic scraped data can't provide on its own (arena role, common comps,
+// stat priorities). Roll out one spec at a time after validation.
+//
+// Key format matches PVP_DATA.specs keys: "Class|Spec".
+const PVP_SPEC_CONTEXT = {
+    'Warrior|Arms': {
+        roleSummary: 'Melee DPS with Mortal Strike pressure and target swaps',
+        playstyleHtml: `<p>Arms Warriors are the cornerstone of melee cleave compositions in TBC arena. Their value comes almost entirely from <strong>Mortal Strike</strong>, which applies a 50% healing reduction to the target — turning enemy heals into a finite resource the opposing team has to outlast. Above 2000 rating, Arms is typically played as a swap-and-pressure class: open on a kill target, force defensive cooldowns, then swap to a fresh target while Mortal Strike is still ticking on the original.</p>
+<p>Stance dancing is core to the spec — Battle Stance for damage and Overpower, Berserker Stance for Whirlwind and crit chance, Defensive Stance for Spell Reflect and Disarm. Strong Arms Warriors rotate stances multiple times per opener.</p>`,
+        compsHtml: `<p><strong>Common 2v2 compositions:</strong> Warrior/Druid (Resto) is the dominant pairing — sometimes called "WarDin" or just Warrior cleave — followed by Warrior/Paladin (Holy) and Warrior/Priest (Discipline).</p>
+<p><strong>Common 3v3 compositions:</strong> Warrior/Mage/Druid (WMD) and Warrior/Mage/Priest (WMP) are the textbook setups, with Warrior/Rogue/Druid (WRD) seen as the burst-oriented variant. All three rely on CC chains from the caster to set up Mortal Strike windows.</p>`,
+        statsHtml: `<p><strong>PvP stat priority:</strong> Resilience → Stamina → Strength → Critical Strike Rating → Hit Rating → Expertise. Resilience is non-negotiable in any arena bracket — pieces from the Honor and Arena vendors will outperform raid gear of similar item level once you're being globaled by mages and warlocks. Strength scales Mortal Strike's flat damage, making it the primary offensive stat once Resilience needs are met.</p>
+<p>Two-handed weapons are mandatory — slow, high-damage weapons maximize Mortal Strike's weapon-damage component. The PvP weapon tokens from Arena and the Sunwell-era Apolyon-style 2H are the targets.</p>`,
+    },
+};
+
+// Slot order for the live PvP data summary. PVP_DATA slot keys use "Shoulders"
+// and don't have a Two-Hand entry (it's Main Hand for 2H weapons).
+const PVP_SLOT_ORDER = [
+    'Head', 'Neck', 'Shoulders', 'Back', 'Chest', 'Wrist',
+    'Hands', 'Waist', 'Legs', 'Feet',
+    'Ring', 'Trinket', 'Main Hand', 'Off Hand', 'Ranged'
+];
+
 // Static BiS summary is rendered on all phase pages. Set to a specific URL
 // (e.g. '/druid/balance/phase-5') to limit while testing UX changes.
 const STATIC_BIS_PROTOTYPE_URL = null;
@@ -456,20 +493,140 @@ function buildSpecLandingBlock(route) {
     ${otherSpecs ? `<h3>Other ${escapeHtmlText(cls)} specs</h3>\n    <p>${otherSpecs}</p>` : ''}`;
 }
 
-/** Build the visible #seoDescription content (H2 + paragraph) for PvP landing pages. */
+/** Build the visible #seoDescription content (H2 + paragraph) for PvP landing pages.
+ *  When a spec has a hand-written PVP_SPEC_CONTEXT entry, the intro is enriched
+ *  with arena role, common comps, and stat priority — giving each PvP page unique
+ *  evergreen prose alongside the dynamic scraped data. */
 function buildPvpDescriptionBlock(route, seo) {
     if (route.type !== 'pvp') return null;
     const spec = specWithAbbrev(route.cls, route.spec);
+    const ctx  = PVP_SPEC_CONTEXT[`${route.cls}|${route.spec}`];
+
+    const extra = ctx ? `
+        <div class="pvp-context">
+            <h3>Arena role</h3>
+            <p class="pvp-context-role">${escapeHtmlText(ctx.roleSummary)}</p>
+            ${ctx.playstyleHtml}
+            <h3>Common arena compositions</h3>
+            ${ctx.compsHtml}
+            <h3>Stat priority</h3>
+            ${ctx.statsHtml}
+        </div>` : '';
+
     return `<div class="seo-desc-inner">
         <span class="seo-desc-icon">⚔️</span>
         <div>
             <h2 class="seo-desc-heading">${escapeHtmlText(spec)} PvP BiS — TBC Classic Arena</h2>
-            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
+            <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>${extra}
         </div>
     </div>`;
 }
 
-/** Build the visible PvP summary (cross-links to PvE BiS + sibling PvP specs). */
+/** Return the spec's PvP data block (PVP_DATA.specs[key]) or null if missing.
+ *  PvP-only specs like Druid Feral Combat are keyed by their scraped name, which
+ *  matches route.spec for those (we route them via PVP_SPEC_OVERRIDES). */
+function getPvpSpecData(route) {
+    if (route.type !== 'pvp') return null;
+    const data = getPvpData();
+    return (data.specs || {})[`${route.cls}|${route.spec}`] || null;
+}
+
+/** Build a "live arena snapshot" block: meta line + dl of top-popularity items
+ *  per slot. Reuses the #bisStaticSummary container (same CSS as the PvE block).
+ *  Returns null if PVP_DATA has no entry for this spec. */
+function buildPvpDataSummaryBlock(route) {
+    const sd = getPvpSpecData(route);
+    if (!sd) return null;
+    const rr = sd.ratingRange || {};
+    const rows = PVP_SLOT_ORDER.map(slot => {
+        const items = sd.slots && sd.slots[slot];
+        if (!items || !items.length) return null;
+        const top = items[0];
+        const href = `https://www.wowhead.com/tbc/item=${top.id}`;
+        return `<dt>${escapeHtmlText(slot)}</dt><dd><a href="${href}" rel="external">${escapeHtmlText(top.name)}</a> <span class="bis-static-src">(${top.popularity}% of players)</span></dd>`;
+    }).filter(Boolean).join('\n        ');
+
+    return `<h3>Most-used gear — live arena snapshot</h3>
+    <p>Across <strong>${sd.playerCount}</strong> top-rated ${escapeHtmlText(route.spec)} ${escapeHtmlText(route.cls)}s in this snapshot (rating <strong>${rr.min}–${rr.max}</strong>, average <strong>${rr.avg}</strong>), the most popular pick per slot is shown below. Full alternatives, gem and enchant breakdowns are in the interactive list further down.</p>
+    <dl>
+        ${rows}
+    </dl>`;
+}
+
+/** Build the auto-generated PvP FAQ block (visible) — five Q&A from scraped data
+ *  plus the static spec context if present. Returns null if no PvP data. */
+function buildPvpFaqBlock(route) {
+    const sd = getPvpSpecData(route);
+    if (!sd) return null;
+    const items = buildPvpFaqItems(route, sd);
+    if (!items.length) return null;
+    const dl = items.map(i =>
+        `<dt>${escapeHtmlText(i.q)}</dt><dd>${escapeHtmlText(i.a)}</dd>`
+    ).join('\n        ');
+    return `<h2 class="seo-faq-heading">Frequently Asked Questions</h2>
+    <dl>
+        ${dl}
+    </dl>`;
+}
+
+/** Shared PvP FAQ item list — used both for visible block and FAQPage JSON-LD,
+ *  so the structured data matches exactly what the user sees. */
+function buildPvpFaqItems(route, sd) {
+    if (!sd) return [];
+    const items = [];
+    const rr = sd.ratingRange || {};
+    const specName = `${route.spec} ${route.cls}`;
+
+    // Q1: top chest piece (high-popularity gold/strong tier item)
+    const chest = (sd.slots && sd.slots.Chest && sd.slots.Chest[0]);
+    if (chest) {
+        items.push({
+            q: `What chest piece do top ${specName} arena players wear?`,
+            a: `${chest.name} is worn by ${chest.popularity}% of the ${sd.playerCount} top-rated ${specName}s analyzed in this snapshot. See alternatives and enchant choices in the live list above.`
+        });
+    }
+
+    // Q2: chest enchant — Resilience-or-similar pattern
+    const chestEnchant = chest && chest.topEnchants && chest.topEnchants[0];
+    if (chestEnchant) {
+        items.push({
+            q: `What chest enchant should ${specName} use in PvP?`,
+            a: `${cleanEnchantName(chestEnchant.name)} is used by ${chestEnchant.usage}% of top arena players in this spec, making it the standard PvP chest enchant.`
+        });
+    }
+
+    // Q3: weapon
+    const mainHand = sd.slots && sd.slots['Main Hand'] && sd.slots['Main Hand'][0];
+    if (mainHand) {
+        items.push({
+            q: `What weapon do top ${specName} PvP players use?`,
+            a: `${mainHand.name} is the most popular choice at ${mainHand.popularity}% usage. Weapon choice in TBC PvP often comes down to whether you've cleared the relevant rating gate or can afford the gold/honor cost — see alternatives in the live list above.`
+        });
+    }
+
+    // Q4: rating range / data source
+    items.push({
+        q: `What rating range does this ${specName} PvP BiS list cover?`,
+        a: `Data is based on ${sd.playerCount} ${specName} arena players rated between ${rr.min} and ${rr.max} (average ${rr.avg}). The list is refreshed weekly from ironforge.pro's arena leaderboard scrape.`
+    });
+
+    // Q5: PvE crossover
+    items.push({
+        q: `Should ${specName} use PvE gear in arena?`,
+        a: `Some PvE epics with high stat budgets are worn by top arena players when the slot's PvP option is weak — they're marked "PvE flex" in the live list. However, Resilience-bearing pieces from the Honor and Arena vendors are still the foundation of any PvP gear set.`
+    });
+
+    return items;
+}
+
+/** Strip the "Enchanted: " prefix used in some PVP_DATA enchant names so the
+ *  FAQ reads naturally ("+15 Resilience Rating" instead of "Enchanted: +15..."). */
+function cleanEnchantName(name) {
+    return String(name || '').replace(/^Enchanted:\s*/, '');
+}
+
+/** Build the visible PvP summary (cross-links to PvE BiS + sibling PvP specs +
+ *  data refresh meta). */
 function buildPvpSummaryBlock(route) {
     if (route.type !== 'pvp') return null;
     const cls  = route.cls;
@@ -485,7 +642,16 @@ function buildPvpSummaryBlock(route) {
             return `<a href="/${toSlug(cls)}/${toSlug(s)}/pvp">${escapeHtmlText(label)} PvP</a>`;
         }).join(' · ');
 
-    return `<p>Looking for raid gear instead? See ${pveLink} for phase-by-phase PvE Best in Slot.</p>
+    // Data freshness paragraph — visible E-E-A-T signal explaining methodology.
+    const sd = getPvpSpecData(route);
+    let dataNote = '';
+    if (sd) {
+        const data = getPvpData();
+        const analyzedAt = (data.meta && data.meta.analyzedAt) ? data.meta.analyzedAt.slice(0, 10) : null;
+        dataNote = `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. The snapshot refreshes weekly so the rankings track the live meta.${analyzedAt ? ` Current snapshot analyzed on ${escapeHtmlText(analyzedAt)}.` : ''}</p>`;
+    }
+
+    return `${dataNote}<p>Looking for raid gear instead? See ${pveLink} for phase-by-phase PvE Best in Slot.</p>
     ${otherSpecs ? `<p>Other ${escapeHtmlText(cls)} PvP specs: ${otherSpecs}</p>` : ''}`;
 }
 
@@ -638,6 +804,24 @@ function buildJsonLd(route, seo) {
                 acceptedAnswer: { '@type': 'Answer', text: f.a }
             }))
         });
+    }
+
+    // FAQPage schema for PvP pages — questions/answers must mirror the visible
+    // FAQ block exactly (Google flags mismatched structured data).
+    if (route.type === 'pvp') {
+        const sd = getPvpSpecData(route);
+        const faq = buildPvpFaqItems(route, sd);
+        if (faq.length) {
+            schemas.push({
+                '@context': 'https://schema.org',
+                '@type':    'FAQPage',
+                mainEntity: faq.map(f => ({
+                    '@type': 'Question',
+                    name: f.q,
+                    acceptedAnswer: { '@type': 'Answer', text: f.a }
+                }))
+            });
+        }
     }
 
     return schemas.map(s =>
@@ -873,11 +1057,13 @@ function main() {
         const enableStaticBis = STATIC_BIS_PROTOTYPE_URL === null || urlPath === STATIC_BIS_PROTOTYPE_URL;
         const bodyBlocks = {
             seoDesc:      buildSeoDescriptionBlock(route, seo) || buildPvpDescriptionBlock(route, seo),
-            seoFaq:       buildSeoFaqBlock(route, seo),
+            seoFaq:       buildSeoFaqBlock(route, seo) || buildPvpFaqBlock(route),
             seoSummary:   buildSeoSummaryBlock(route) || buildPvpSummaryBlock(route),
             classLanding: buildClassLandingBlock(route, pvpSpecsByClass),
             specLanding:  buildSpecLandingBlock(route),
-            staticBis:    enableStaticBis ? buildStaticBisBlock(route) : null,
+            staticBis:    enableStaticBis
+                ? (buildStaticBisBlock(route) || buildPvpDataSummaryBlock(route))
+                : null,
         };
         const html = rewriteHtml(template, seo, jsonLd, bodyBlocks);
         const outPath = urlToOutputPath(urlPath);
