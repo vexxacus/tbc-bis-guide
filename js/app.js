@@ -19,9 +19,10 @@
         hideWorldBoss: false,            // hide items that drop from outdoor world bosses
         _worldBossLoaded: false,
         selectedItems: {},              // { "warrior-fury|3": { "Head": 29021 } } — user-chosen item overrides per slot
-        selectedCohort: null,           // null = combined (all parses), or 'early' | 'mid' | 'late' (time-gated within phase)
-        _cohortDataPromise: null,        // memoized promise for lazy-loading wcl-cohorts.js
+        selectedCohort: 'late',         // 'early' | 'mid' | 'late' — time-gated cohort within current phase. Defaults to 'late' (end-of-phase BiS).
     };
+    // NOTE: never store Promises or DOM nodes on `state` — pushState/replaceState
+    // structured-clones it and will throw silently, breaking URL updates.
 
     // ─── Item Selection helpers ──────────────────────────────────────
     /** Key into selectedItems for current spec+phase */
@@ -2601,20 +2602,8 @@
         return spec?.[state.selectedCohort] || null;
     }
 
-    // Lazy-load wcl-cohorts.js on first cohort selection. Memoized.
-    function loadCohortData() {
-        if (typeof window.WCL_COHORTS !== 'undefined') return Promise.resolve();
-        if (state._cohortDataPromise) return state._cohortDataPromise;
-        state._cohortDataPromise = new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = '/js/wcl-cohorts.js?v=20260522a';
-            s.async = true;
-            s.onload = () => resolve();
-            s.onerror = () => reject(new Error('Failed to load wcl-cohorts.js'));
-            document.head.appendChild(s);
-        });
-        return state._cohortDataPromise;
-    }
+    // wcl-cohorts.js is loaded eagerly via a <script> tag in index.html, so
+    // WCL_COHORTS is available by the time renderBisList runs.
 
     function buildPvpItemsList(pvpSpecData) {
         // With very few players, rating gate is just noise — suppress it
@@ -2725,19 +2714,26 @@
         return items;
     }
 
-    // ─── Cohort Filter (time-gated WCL view: Early / Mid / Late) ────
+    // ─── Cohort Filter (time-gated WCL view: Early / Middle / Late) ─
     // Built dynamically and injected before #professionFilter (no HTML change needed).
     function renderCohortFilter(wclSpecData) {
-        // Only available for PvE phase views (not P0, not PvP) where cohort data exists for this spec
         if (!wclSpecData || state.isPvP) return removeCohortFilter();
 
         const phase = state.selectedPhase;
         const appKey = `${state.selectedClass}|${state.selectedSpec}`;
         const wclKey = APP_TO_WCL_SPEC[appKey] || appKey;
 
-        // We may not have cohort data loaded yet — but we still want to show the filter
-        // so the user can opt in. We check the combined data exists; cohort metadata loads on click.
-        // Hide the filter for specs we KNOW have no cohorts (e.g. too few parses): only check after load.
+        // No cohort data ⇒ this spec/phase didn't have enough parses; hide the selector.
+        if (typeof window.WCL_COHORTS === 'undefined') return removeCohortFilter();
+        const specCohorts = window.WCL_COHORTS.phases?.[phase]?.[wclKey];
+        if (!specCohorts) return removeCohortFilter();
+
+        const fmt = (ms) => new Date(ms).toISOString().slice(0, 10);
+        const dateLabels = {};
+        for (const k of ['early', 'mid', 'late']) {
+            const c = specCohorts[k];
+            dateLabels[k] = c?.dateRange ? `${fmt(c.dateRange[0])} → ${fmt(c.dateRange[1])}` : '';
+        }
 
         // Container: create lazily, insert before #professionFilter
         let container = document.getElementById('cohortFilter');
@@ -2749,27 +2745,8 @@
             profEl?.parentNode?.insertBefore(container, profEl);
         }
 
-        // If cohort data is loaded, look up actual date ranges for tooltips
-        let dateLabels = { early: '', mid: '', late: '' };
-        if (typeof window.WCL_COHORTS !== 'undefined') {
-            const specCohorts = window.WCL_COHORTS.phases?.[phase]?.[wclKey];
-            if (specCohorts) {
-                const fmt = (ms) => new Date(ms).toISOString().slice(0, 10);
-                for (const k of ['early', 'mid', 'late']) {
-                    const c = specCohorts[k];
-                    if (c?.dateRange) {
-                        dateLabels[k] = `${fmt(c.dateRange[0])} → ${fmt(c.dateRange[1])}`;
-                    }
-                }
-            } else {
-                // This spec/phase has no cohort data (too few parses) — hide.
-                return removeCohortFilter();
-            }
-        }
-
-        const sel = state.selectedCohort; // null = all, or 'early'|'mid'|'late'
+        const sel = state.selectedCohort || 'late';
         const chips = [
-            { key: null,    label: 'All parses',  title: 'Combined view across the whole phase' },
             { key: 'early', label: 'Early',  title: dateLabels.early || 'First third of top parses' },
             { key: 'mid',   label: 'Middle', title: dateLabels.mid   || 'Middle third of top parses' },
             { key: 'late',  label: 'Late',   title: dateLabels.late  || 'Last third of top parses' },
@@ -2779,16 +2756,15 @@
             <span class="cohort-filter-label">⏱️ Time-gated view</span>
             <span class="cohort-info-icon-wrap">
                 <span class="cohort-info-icon" tabindex="0">ℹ️</span>
-                <span class="cohort-info-tooltip">See what top parsers wore at different points in this phase — gear evolves as new raid drops become common. Cohorts split the top parses by date into three equal-count thirds.</span>
+                <span class="cohort-info-tooltip">Top parses are split by date into three equal-count thirds. Hover a chip to see the exact date range. Defaults to <strong>Late</strong> — the end-of-phase view most useful for current BiS.</span>
             </span>
         </div>
         <p class="cohort-filter-blurb">Compare what top parsers used at the start, middle, and end of this phase as gear progression evolved.</p>
         <div class="cohort-filter-chips">`;
 
         for (const c of chips) {
-            const active = (sel ?? null) === c.key;
-            const dataAttr = c.key === null ? 'all' : c.key;
-            html += `<button class="cohort-chip${active ? ' active' : ''}" data-cohort="${dataAttr}" title="${c.title}">
+            const active = sel === c.key;
+            html += `<button class="cohort-chip${active ? ' active' : ''}" data-cohort="${c.key}" title="${c.title}">
                 <span>${c.label}</span>
             </button>`;
         }
@@ -2798,24 +2774,9 @@
         container.classList.remove('hidden');
 
         container.querySelectorAll('.cohort-chip').forEach(chip => {
-            chip.addEventListener('click', async () => {
-                const v = chip.dataset.cohort;
-                const newCohort = v === 'all' ? null : v;
+            chip.addEventListener('click', () => {
+                const newCohort = chip.dataset.cohort;
                 if (newCohort === state.selectedCohort) return;
-
-                // Lazy-load cohort data on first non-"All" click
-                if (newCohort !== null && typeof window.WCL_COHORTS === 'undefined') {
-                    chip.classList.add('loading');
-                    try {
-                        await loadCohortData();
-                    } catch (e) {
-                        chip.classList.remove('loading');
-                        console.warn('Cohort data failed to load:', e);
-                        return;
-                    }
-                    chip.classList.remove('loading');
-                }
-
                 state.selectedCohort = newCohort;
                 renderBisList();
             });
@@ -3012,7 +2973,7 @@
         // sense within a single phase + spec).
         const cohortContextKey = `${state.selectedClass}|${state.selectedSpec}|${state.selectedPhase}|${state.isPvP}`;
         if (state._lastCohortContext !== cohortContextKey) {
-            state.selectedCohort = null;
+            state.selectedCohort = 'late';
             state._lastCohortContext = cohortContextKey;
         }
 
