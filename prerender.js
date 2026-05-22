@@ -358,7 +358,7 @@ function seoForRoute(route, fullUrl) {
         case 'home':
             title = 'TBC Classic BiS Guide — Best in Slot for Every Class & Spec';
             desc  = 'Complete TBC Classic Best in Slot gear guide for every class and spec — Pre-Raid through Sunwell. Includes enchants, gems, stat priority, and phase-by-phase progression.';
-            h1    = 'TBC Best in Slot';
+            h1    = 'TBC Best in Slot — Top Player Picks';
             break;
         case 'static':
             const titleMap = {

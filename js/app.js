@@ -1991,7 +1991,7 @@
         const prev = state.history.pop();
         if (prev === 'class') {
             state.selectedClass = null; state.isPvP = false; state.pvpKey = null;
-            headerTitle.textContent = 'TBC Best in Slot';
+            headerTitle.textContent = 'TBC Best in Slot — Top Player Picks';
             headerTitle.style.color = '';
             headerSub.textContent = 'Choose your class';
             showStep(stepClass);
@@ -2038,7 +2038,7 @@
             state.isPvP         = false;
             state.pvpKey        = null;
             state.history       = [];
-            headerTitle.textContent = 'TBC Best in Slot';
+            headerTitle.textContent = 'TBC Best in Slot — Top Player Picks';
             headerTitle.style.color = '';
             headerSub.textContent = 'Choose your class';
             if (stepStaticPage) stepStaticPage.classList.add('hidden');
@@ -4412,7 +4412,7 @@
         state.isPvP         = false;
 
         // Update header
-        headerTitle.textContent = 'TBC Best in Slot';
+        headerTitle.textContent = 'TBC Best in Slot — Top Player Picks';
         headerTitle.style.color = '';
         headerSub.textContent = '';
 
@@ -4569,7 +4569,7 @@
         state.history       = [];
         state.excludedProfessions = new Set();
 
-        headerTitle.textContent = 'TBC Best in Slot';
+        headerTitle.textContent = 'TBC Best in Slot — Top Player Picks';
         headerTitle.style.color = '';
         headerSub.textContent = 'Choose your class';
 
