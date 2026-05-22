@@ -397,6 +397,32 @@ async function main() {
 
             const agg = aggregateGear(uniqueRankings);
 
+            // Time-gated cohorts: sort by parse startTime, split into equal-count thirds.
+            // Captures gear progression within a phase (early P2 still using P1 weapons,
+            // late P2 fully geared with current-tier drops).
+            const sortedByTime = uniqueRankings
+                .filter(r => r.startTime)
+                .sort((a, b) => a.startTime - b.startTime);
+            const cohorts = {};
+            if (sortedByTime.length >= 9) { // need ≥3 per cohort to be useful
+                const n = sortedByTime.length;
+                const third = Math.floor(n / 3);
+                const earlyR = sortedByTime.slice(0, third);
+                const midR   = sortedByTime.slice(third, third * 2);
+                const lateR  = sortedByTime.slice(third * 2);
+                const buildCohort = (rows) => {
+                    const a = aggregateGear(rows);
+                    return {
+                        totalPlayers: a.totalPlayers,
+                        dateRange: [rows[0].startTime, rows[rows.length - 1].startTime],
+                        slots: a.slots,
+                    };
+                };
+                cohorts.early = buildCohort(earlyR);
+                cohorts.mid   = buildCohort(midR);
+                cohorts.late  = buildCohort(lateR);
+            }
+
             phaseData.specs[specKey] = {
                 className: spec.className,
                 specName: displaySpec,
@@ -405,10 +431,14 @@ async function main() {
                 totalRankings: allRankings.length,
                 uniquePlayers: uniqueRankings.length,
                 slots: agg.slots,
+                cohorts: Object.keys(cohorts).length ? cohorts : null,
             };
 
             const slotCount = Object.values(agg.slots).reduce((s, items) => s + items.length, 0);
-            process.stdout.write(`  ✅ ${specKey.padEnd(25)} ${agg.totalPlayers} players, ${slotCount} items\n`);
+            const cohortNote = cohorts.early
+                ? ` | cohorts: ${cohorts.early.totalPlayers}/${cohorts.mid.totalPlayers}/${cohorts.late.totalPlayers}`
+                : ' | (no cohorts — too few parses)';
+            process.stdout.write(`  ✅ ${specKey.padEnd(25)} ${agg.totalPlayers} players, ${slotCount} items${cohortNote}\n`);
         }
 
         output.phases[phaseConfig.phase] = phaseData;

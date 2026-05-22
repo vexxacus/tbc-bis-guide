@@ -965,6 +965,117 @@ body {
     display: none;
 }
 
+/* ─── Cohort filter (time-gated WCL view) ────────────────────────────── */
+.cohort-filter {
+    margin-bottom: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+}
+.cohort-filter.hidden { display: none; }
+.cohort-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.cohort-filter-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+.cohort-filter-blurb {
+    margin: 4px 0 8px 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.cohort-info-icon-wrap { position: relative; display: inline-block; }
+.cohort-info-icon {
+    cursor: pointer;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+.cohort-info-icon:hover, .cohort-info-icon:focus { opacity: 1; }
+.cohort-info-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    max-width: 85vw;
+    background: var(--bg-card, #1a1a2e);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+    font-size: 0.68rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #aaa);
+}
+@media (max-width: 480px) {
+    .cohort-info-tooltip {
+        position: fixed;
+        bottom: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 85vw;
+        max-width: 320px;
+    }
+}
+.cohort-info-icon-wrap:hover .cohort-info-tooltip,
+.cohort-info-icon-wrap:focus-within .cohort-info-tooltip { display: block; }
+
+.cohort-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.cohort-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    opacity: 0.7;
+}
+.cohort-chip:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-light);
+    opacity: 1;
+}
+.cohort-chip.active {
+    background: rgba(94, 138, 230, 0.18);
+    border-color: rgba(94, 138, 230, 0.55);
+    color: var(--text-primary);
+    opacity: 1;
+}
+.cohort-chip.active:hover {
+    background: rgba(94, 138, 230, 0.25);
+}
+.cohort-chip.loading {
+    opacity: 0.6;
+    cursor: progress;
+}
+.cohort-chip.loading::after {
+    content: '…';
+    margin-left: 4px;
+}
+
 .prof-filter-header {
     display: flex;
     align-items: center;
