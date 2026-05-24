@@ -68,6 +68,54 @@
     }
     loadSelectedItems();
 
+    // ─── Visual feedback: slot-flash + sim-pending pulse (D9 / D10) ──
+    /** Pulse the gold border on a slot-group that just had its item changed. */
+    function flashSlot(slotName) {
+        if (!slotName) return;
+        const el = document.querySelector(`.slot-group[data-slot="${CSS.escape(slotName)}"]`);
+        if (!el) return;
+        el.classList.remove('slot-just-changed');
+        // Force reflow so the animation can restart on rapid consecutive picks
+        void el.offsetWidth;
+        el.classList.add('slot-just-changed');
+        const cleanup = () => { el.classList.remove('slot-just-changed'); el.removeEventListener('animationend', cleanup); };
+        el.addEventListener('animationend', cleanup);
+    }
+
+    /** Compact signature of the current item selection — used to detect "sim out of date". */
+    let _lastSimmedSignature = null;
+    function currentBuildSignature() {
+        const key = selectionKey();
+        const overrides = state.selectedItems[key] || {};
+        const entries = Object.entries(overrides).sort(([a],[b]) => a.localeCompare(b));
+        return `${key}#${entries.map(([s,i])=>`${s}=${i}`).join('|')}`;
+    }
+
+    /** Toggle .has-pending on the sim button when current build differs from last simmed. */
+    function updateSimPendingState() {
+        const btn = document.getElementById('simDpsBtn');
+        if (!btn || btn.disabled) return;
+        // Only pulse if we've already simmed at least once for this spec/phase
+        if (_lastSimmedSignature == null) { btn.classList.remove('has-pending'); return; }
+        const sig = currentBuildSignature();
+        if (sig !== _lastSimmedSignature) btn.classList.add('has-pending');
+        else btn.classList.remove('has-pending');
+    }
+
+    /** Called when a sim run completes successfully — captures the simmed build. */
+    function markSimComplete() {
+        _lastSimmedSignature = currentBuildSignature();
+        const btn = document.getElementById('simDpsBtn');
+        if (btn) btn.classList.remove('has-pending');
+    }
+
+    /** Reset sim-pending tracking when leaving a spec/phase. */
+    function resetSimPendingTracking() {
+        _lastSimmedSignature = null;
+        const btn = document.getElementById('simDpsBtn');
+        if (btn) btn.classList.remove('has-pending');
+    }
+
     // ─── Share Build helpers ─────────────────────────────────────────
 
     /** Slot name → short code for compact URL encoding */
@@ -2007,10 +2055,20 @@
     }
 
     // ─── Navigation ──────────────────────────────────────────────────
+    /** Reflect current class onto <body data-class="..."> for atmospheric styling. */
+    function syncBodyClassAttribute() {
+        if (state.selectedClass) {
+            document.body.setAttribute('data-class', state.selectedClass);
+        } else {
+            document.body.removeAttribute('data-class');
+        }
+    }
+
     function showStep(el) {
         [stepClass, stepSpec, stepPhase, stepBis, stepStaticPage].forEach(s => { if (s) s.classList.add('hidden'); });
         el.classList.remove('hidden');
         backBtn.classList.toggle('hidden', state.history.length === 0);
+        syncBodyClassAttribute();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -2363,7 +2421,7 @@
         // Guide meta (Wowhead original rank)
         const bisGuideHtml = guideMetaHtml(bis);
 
-        let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}">
+        let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}" data-quality="${bisQuality.replace('q-','')}">
             <div class="slot-header" data-item-id="${bis.itemId}">
                 <div class="slot-icon">${bisIconHtml}</div>
                 <div class="slot-content">
@@ -2995,6 +3053,8 @@
         if (state._lastCohortContext !== cohortContextKey) {
             state.selectedCohort = 'late';
             state._lastCohortContext = cohortContextKey;
+            // Same context-change boundary also invalidates any prior sim result
+            resetSimPendingTracking();
         }
 
         // Render inline phase tabs
@@ -3846,9 +3906,14 @@
             btn.addEventListener('click', e => {
                 e.stopPropagation();
                 const scrollY = window.scrollY;
-                setSelectedItem(btn.dataset.slot, btn.dataset.itemId);
+                const changedSlot = btn.dataset.slot;
+                setSelectedItem(changedSlot, btn.dataset.itemId);
                 renderBisList();
-                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: scrollY, behavior: 'instant' });
+                    flashSlot(changedSlot);
+                    updateSimPendingState();
+                });
             });
         });
 
@@ -3857,9 +3922,14 @@
             btn.addEventListener('click', e => {
                 e.stopPropagation();
                 const scrollY = window.scrollY;
-                setSelectedItem(btn.dataset.slot, null);
+                const changedSlot = btn.dataset.slot;
+                setSelectedItem(changedSlot, null);
                 renderBisList();
-                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: scrollY, behavior: 'instant' });
+                    flashSlot(changedSlot);
+                    updateSimPendingState();
+                });
             });
         });
 
@@ -4139,6 +4209,7 @@
                 simDpsStdev.textContent  = `±${Math.round(result.stdev)} stdev`;
                 simDpsResult.style.display = 'flex';
                 simDpsProgress.style.display = 'none';
+                markSimComplete();
             } catch (e) {
                 simDpsStatus.textContent = 'Error: ' + e.message.split('\n')[0];
             }

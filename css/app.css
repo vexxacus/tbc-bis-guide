@@ -22,26 +22,67 @@
     --quality-epic: #a335ee;
     --quality-legendary: #ff8000;
 
-    /* UI Colors */
-    --bg-primary: #0d1117;
-    --bg-secondary: #161b22;
-    --bg-card: #1c2333;
-    --bg-card-hover: #242d3d;
-    --bg-modal: #1c2333;
-    --border: #30363d;
-    --border-light: #3d444d;
+    /* UI Colors — warm-dark, less GitHub more atmosphere */
+    --bg-primary: #0c0e14;
+    --bg-secondary: #141822;
+    --bg-card: #1a1f2c;
+    --bg-card-hover: #232938;
+    --bg-modal: #1a1f2c;
+    --border: #2a2f3d;
+    --border-light: #3a3f4d;
     --text-primary: #e6edf3;
     --text-secondary: #8b949e;
     --text-muted: #656d76;
-    --accent: #f0b232;
-    --accent-dim: rgba(240, 178, 50, 0.15);
+
+    /* Semantic accents — each role gets its own */
+    --accent-gold:    #e8b04a;  /* primary brand, BiS, gear */
+    --accent-arcane:  #7c5cff;  /* sim, experimentation */
+    --accent-parse:   #ff8c42;  /* WCL, top players */
+    --accent-success: #4cd97b;  /* progress, owned, "done" */
+    --accent-danger:  #ef4d4d;
+
+    /* Legacy alias — keep existing usages working */
+    --accent: var(--accent-gold);
+    --accent-dim: rgba(232, 176, 74, 0.15);
     --bis-badge: #2ea043;
     --alt-badge: #6e7681;
     --danger: #f85149;
+
+    /* Surface tiers — depth via gradient, not borders */
+    --surface-elev-1: linear-gradient(180deg, #1a1f2c 0%, #161a25 100%);
+    --surface-elev-2: linear-gradient(180deg, #232938 0%, #1c2230 100%);
+    --surface-inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+    /* Glow tokens — used sparingly, on hover/active only */
+    --glow-gold:   0 0 18px rgba(232, 176, 74, 0.22);
+    --glow-arcane: 0 0 18px rgba(124, 92, 255, 0.28);
+    --glow-epic:   0 0 10px rgba(163, 53, 238, 0.35);
+
     --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.30);
+    --shadow-lift: 0 8px 24px rgba(0, 0, 0, 0.40);
+
     --radius: 12px;
     --radius-sm: 8px;
-    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Easing — spring for interactive, smooth for layout */
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: 0.2s var(--ease-smooth);
+    --transition-spring: 0.22s var(--ease-spring);
+}
+
+/* Honor reduced-motion: kill spring, atmospherics, animations */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --ease-spring: var(--ease-smooth);
+        --transition-spring: var(--transition);
+    }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 * {
@@ -58,11 +99,42 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-primary);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100dvh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    /* Class-page atmosphere — two radials so the tint is felt above AND below the fold */
+    background-image:
+        radial-gradient(ellipse 120% 60% at 50% 0%, var(--class-tint, transparent), transparent 60%),
+        radial-gradient(ellipse 120% 50% at 50% 100%, var(--class-tint-deep, transparent), transparent 65%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    transition: background-color 0.4s var(--ease-smooth);
+}
+
+/* ─── Class atmosphere — class-color radial tint when a class is active ─ */
+/* --class-tint paints from the top; --class-tint-deep paints from the bottom
+   (slightly darker/deeper for an underlit feel). Set both per data-class. */
+body[data-class="Warrior"]  { --class-tint: rgba(199, 156, 110, 0.14); --class-tint-deep: rgba(143, 100,  55, 0.10); --class-rgb: 199, 156, 110; }
+body[data-class="Paladin"]  { --class-tint: rgba(245, 140, 186, 0.12); --class-tint-deep: rgba(180,  80, 130, 0.10); --class-rgb: 245, 140, 186; }
+body[data-class="Hunter"]   { --class-tint: rgba(171, 212, 115, 0.13); --class-tint-deep: rgba(110, 160,  60, 0.10); --class-rgb: 171, 212, 115; }
+body[data-class="Rogue"]    { --class-tint: rgba(255, 245, 105, 0.10); --class-tint-deep: rgba(190, 180,  60, 0.08); --class-rgb: 255, 245, 105; }
+body[data-class="Priest"]   { --class-tint: rgba(220, 225, 240, 0.08); --class-tint-deep: rgba(150, 160, 190, 0.06); --class-rgb: 220, 225, 240; }
+body[data-class="Shaman"]   { --class-tint: rgba(0,   112, 222, 0.14); --class-tint-deep: rgba(0,    70, 160, 0.12); --class-rgb: 0,   112, 222; }
+body[data-class="Mage"]     { --class-tint: rgba(105, 204, 240, 0.13); --class-tint-deep: rgba(40,  140, 180, 0.10); --class-rgb: 105, 204, 240; }
+body[data-class="Warlock"]  { --class-tint: rgba(148, 130, 201, 0.14); --class-tint-deep: rgba(95,   75, 150, 0.11); --class-rgb: 148, 130, 201; }
+body[data-class="Druid"]    { --class-tint: rgba(255, 125,  10, 0.13); --class-tint-deep: rgba(180,  80,   0, 0.10); --class-rgb: 255, 125,  10; }
+
+/* ─── Display font — used sparingly on hero elements ──────────────── */
+.header-title h1,
+.spec-name,
+.phase-btn .phase-num,
+.phase-switcher .ps-tab .ps-num,
+.sim-dps-number,
+.gs-value {
+    font-family: 'Cinzel', 'Inter', Georgia, serif;
+    letter-spacing: 0.015em;
 }
 
 #app {
@@ -80,9 +152,15 @@ body {
     align-items: center;
     gap: 12px;
     padding: 16px;
-    background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(13,17,23,0.95) 100%);
+    /* Mixes the active class tint into the header so the atmosphere reads
+       even when the user has scrolled past the radial-gradient on body. */
+    background:
+        linear-gradient(180deg, rgba(var(--class-rgb, 232, 176, 74), 0.08), transparent),
+        linear-gradient(180deg, rgba(12, 14, 20, 0.92) 0%, rgba(12, 14, 20, 0.78) 100%);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(var(--class-rgb, 255, 255, 255), 0.15);
+    transition: border-color 0.3s var(--ease-smooth), background 0.3s var(--ease-smooth);
 }
 
 .back-btn {
@@ -163,12 +241,12 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 12px;
     margin-bottom: 14px;
-    background: rgba(240, 178, 50, 0.06);
-    border: 1px solid rgba(240, 178, 50, 0.15);
+    background: rgba(232, 176, 74, 0.04);
+    border: 1px solid rgba(232, 176, 74, 0.10);
     border-radius: var(--radius);
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     line-height: 1.45;
     color: var(--text-secondary);
     animation: fadeIn 0.3s ease;
@@ -221,25 +299,31 @@ body {
     align-items: center;
     gap: 8px;
     padding: 20px 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--surface-elev-1);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
     cursor: pointer;
-    transition: var(--transition);
+    transition: transform var(--transition-spring),
+                box-shadow var(--transition),
+                border-color var(--transition),
+                background var(--transition);
     color: var(--text-primary);
     font-size: 0.85rem;
     font-weight: 600;
     font-family: inherit;
     text-decoration: none;
+    box-shadow: var(--shadow-soft), var(--surface-inset-hi);
 }
 
 .class-card:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 .class-card:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--border-light);
+    background: var(--surface-elev-2);
+    border-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift), var(--surface-inset-hi);
 }
 
 .class-icon {
@@ -294,19 +378,28 @@ body {
     align-items: center;
     gap: 14px;
     padding: 18px 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--surface-elev-1);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
     cursor: pointer;
-    transition: var(--transition);
+    transition: transform var(--transition-spring),
+                box-shadow var(--transition),
+                border-color var(--transition),
+                background var(--transition);
     color: var(--text-primary);
     font-family: inherit;
     text-align: left;
     text-decoration: none;
+    box-shadow: var(--shadow-soft), var(--surface-inset-hi);
 }
 
-.spec-card:active { transform: scale(0.97); }
-.spec-card:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+.spec-card:active { transform: scale(0.98); }
+.spec-card:hover {
+    background: var(--surface-elev-2);
+    border-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift), var(--surface-inset-hi);
+}
 
 .spec-emoji {
     font-size: 1.6rem;
@@ -351,25 +444,35 @@ body {
 
 .phase-btn {
     padding: 16px 8px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--surface-elev-1);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
     cursor: pointer;
-    transition: var(--transition);
+    transition: transform var(--transition-spring),
+                box-shadow var(--transition),
+                border-color var(--transition),
+                background var(--transition);
     color: var(--text-primary);
     font-family: inherit;
     text-align: center;
     text-decoration: none;
+    box-shadow: var(--shadow-soft), var(--surface-inset-hi);
 }
 
-.phase-btn:active { transform: scale(0.95); }
-.phase-btn:hover { background: var(--bg-card-hover); }
+.phase-btn:active { transform: scale(0.96); }
+.phase-btn:hover {
+    background: var(--surface-elev-2);
+    border-color: rgba(232, 176, 74, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift), var(--surface-inset-hi);
+}
 
 .phase-btn .phase-num {
     display: block;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--accent);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-shadow: 0 0 12px rgba(232, 176, 74, 0.15);
 }
 
 .phase-btn .phase-label {
@@ -792,14 +895,32 @@ body {
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: auto auto;
     gap: 4px;
-    padding: 10px 6px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    padding: 14px 8px 10px;
+    /* Atmosphere: warm gold center → fade to surface */
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232, 176, 74, 0.06), transparent 70%),
+        var(--surface-elev-1);
+    border: 1px solid var(--class-color, rgba(255, 255, 255, 0.06));
     border-radius: var(--radius);
     margin-bottom: 12px;
     overflow-x: auto;
     min-width: 0;
+    box-shadow:
+        inset 0 0 24px rgba(0, 0, 0, 0.25),
+        var(--shadow-soft),
+        var(--surface-inset-hi);
 }
+
+/* Class-color ring on paperdoll — driven by data-class on body */
+body[data-class="Warrior"]  .paperdoll { --class-color: rgba(199, 156, 110, 0.30); }
+body[data-class="Paladin"]  .paperdoll { --class-color: rgba(245, 140, 186, 0.30); }
+body[data-class="Hunter"]   .paperdoll { --class-color: rgba(171, 212, 115, 0.30); }
+body[data-class="Rogue"]    .paperdoll { --class-color: rgba(255, 245, 105, 0.30); }
+body[data-class="Priest"]   .paperdoll { --class-color: rgba(220, 220, 230, 0.22); }
+body[data-class="Shaman"]   .paperdoll { --class-color: rgba(0,   112, 222, 0.32); }
+body[data-class="Mage"]     .paperdoll { --class-color: rgba(105, 204, 240, 0.32); }
+body[data-class="Warlock"]  .paperdoll { --class-color: rgba(148, 130, 201, 0.32); }
+body[data-class="Druid"]    .paperdoll { --class-color: rgba(255, 125,  10, 0.30); }
 @media (max-width: 420px) {
     .paperdoll {
         grid-template-columns: repeat(8, minmax(38px, 1fr));
@@ -971,11 +1092,11 @@ body {
 
 /* ─── Profession Filter ───────────────────────────────────────────── */
 .profession-filter {
-    margin-bottom: 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
-    padding: 10px 12px;
+    padding: 8px 12px;
 }
 
 .profession-filter.hidden {
@@ -984,11 +1105,11 @@ body {
 
 /* ─── Cohort filter (time-gated WCL view) ────────────────────────────── */
 .cohort-filter {
-    margin-bottom: 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
-    padding: 10px 12px;
+    padding: 8px 12px;
 }
 .cohort-filter.hidden { display: none; }
 .cohort-filter-header {
@@ -1223,11 +1344,51 @@ body {
 }
 
 .slot-group {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--surface-elev-1);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: var(--radius);
     overflow: hidden;
     position: relative;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition-spring);
+}
+
+/* Slot flash — runs once when user picks a different item in the slot */
+.slot-group.slot-just-changed {
+    animation: slot-flash 0.55s var(--ease-smooth);
+}
+@keyframes slot-flash {
+    0%   { box-shadow: 0 0 0 0 rgba(232, 176, 74, 0), var(--shadow-soft); }
+    25%  { box-shadow: 0 0 0 2px rgba(232, 176, 74, 0.55), 0 0 18px rgba(232, 176, 74, 0.20), var(--shadow-soft); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 176, 74, 0), var(--shadow-soft); }
+}
+
+/* Item-quality tinting — subtle radial wash from the left edge */
+.slot-group[data-quality="epic"]      { background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(163, 53, 238, 0.07), transparent 70%), var(--surface-elev-1); }
+.slot-group[data-quality="rare"]      { background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(0, 112, 221, 0.06), transparent 70%), var(--surface-elev-1); }
+.slot-group[data-quality="uncommon"]  { background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(30, 255, 0, 0.05), transparent 70%), var(--surface-elev-1); }
+.slot-group[data-quality="legendary"] { background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(255, 128, 0, 0.08), transparent 70%), var(--surface-elev-1); }
+
+.slot-group[data-quality="epic"]:hover      { box-shadow: var(--glow-epic), var(--shadow-soft); border-color: rgba(163, 53, 238, 0.20); }
+.slot-group[data-quality="rare"]:hover      { box-shadow: 0 0 10px rgba(0, 112, 221, 0.30), var(--shadow-soft); border-color: rgba(0, 112, 221, 0.20); }
+.slot-group[data-quality="legendary"]:hover { box-shadow: 0 0 14px rgba(255, 128, 0, 0.40), var(--shadow-soft); border-color: rgba(255, 128, 0, 0.30); }
+
+/* Legendary gets a slow shimmer — kept off when reduced-motion is set */
+.slot-group[data-quality="legendary"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(110deg,
+        transparent 30%,
+        rgba(255, 200, 80, 0.05) 50%,
+        transparent 70%);
+    background-size: 250% 100%;
+    animation: legendary-shimmer 6s linear infinite;
+}
+@keyframes legendary-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -50% 0; }
 }
 
 .slot-header {
@@ -1238,9 +1399,11 @@ body {
     cursor: pointer;
     transition: var(--transition);
     user-select: none;
+    position: relative;
+    z-index: 1;
 }
 
-.slot-header:active { background: var(--bg-card-hover); }
+.slot-header:active { background: rgba(255, 255, 255, 0.02); }
 
 .slot-icon {
     min-width: 36px;
@@ -1505,14 +1668,18 @@ body {
     margin-top: 1px;
 }
 
-/* ─── Sim Stats Panel ─────────────────────────────────────────────── */
+/* ─── Sim Stats Panel — "magisk arbetsbänk" (arcane treatment) ────── */
 .sim-panel {
     margin-top: 16px;
     margin-bottom: 16px;
-    background: var(--bg-card);
-    border: 1px solid rgba(255,255,255,0.08);
+    background:
+        radial-gradient(ellipse 70% 60% at 100% 0%, rgba(124, 92, 255, 0.06), transparent 60%),
+        var(--surface-elev-1);
+    border: 1px solid rgba(124, 92, 255, 0.12);
     border-radius: var(--radius);
     padding: 14px 16px;
+    position: relative;
+    box-shadow: var(--shadow-soft), var(--surface-inset-hi);
 }
 
 .sim-panel-title {
@@ -1520,7 +1687,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: var(--accent);
+    color: var(--accent-arcane);
     margin-bottom: 12px;
 }
 
@@ -1630,32 +1797,62 @@ body {
 
 .sim-dps-btn {
     width: 100%;
-    background: #238636;
+    background: linear-gradient(135deg, #5a3fc7, #7c5cff);
     color: #fff;
-    border: none;
+    border: 1px solid rgba(124, 92, 255, 0.5);
     border-radius: var(--radius);
     padding: 11px 0;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: transform var(--transition-spring),
+                box-shadow var(--transition),
+                filter var(--transition);
+    box-shadow: 0 4px 14px rgba(124, 92, 255, 0.25), var(--surface-inset-hi);
+    letter-spacing: 0.02em;
 }
-.sim-dps-btn:hover:not(:disabled) { background: #2ea043; }
-.sim-dps-btn:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+.sim-dps-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(124, 92, 255, 0.40), var(--glow-arcane), var(--surface-inset-hi);
+    filter: brightness(1.08);
+}
+.sim-dps-btn:active:not(:disabled) { transform: scale(0.98); }
+.sim-dps-btn:disabled {
+    background: #21262d;
+    color: #484f58;
+    cursor: not-allowed;
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+/* Pulse when current items differ from last simmed build */
+.sim-dps-btn.has-pending {
+    animation: sim-pulse 1.8s ease-in-out infinite;
+}
+@keyframes sim-pulse {
+    0%, 100% { box-shadow: 0 4px 14px rgba(124, 92, 255, 0.25), 0 0 0 0 rgba(124, 92, 255, 0.45); }
+    50%      { box-shadow: 0 4px 14px rgba(124, 92, 255, 0.30), 0 0 0 8px rgba(124, 92, 255, 0); }
+}
 
 .sim-dps-bar {
-    height: 4px;
+    height: 5px;
     background: rgba(255,255,255,0.08);
-    border-radius: 2px;
+    border-radius: 3px;
     margin-top: 10px;
     overflow: hidden;
 }
 .sim-dps-fill {
     height: 100%;
-    background: #238636;
+    background: linear-gradient(90deg, #5a3fc7, #9b86ff, #5a3fc7);
+    background-size: 200% 100%;
+    animation: arcane-sweep 1.6s linear infinite;
     width: 0%;
     transition: width 0.2s;
-    border-radius: 2px;
+    border-radius: 3px;
+}
+@keyframes arcane-sweep {
+    from { background-position: 200% 0; }
+    to   { background-position: 0% 0; }
 }
 .sim-dps-status {
     font-size: 0.72rem;
@@ -1672,11 +1869,12 @@ body {
     margin-top: 12px;
 }
 .sim-dps-number {
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: var(--accent);
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--accent-arcane);
     font-variant-numeric: tabular-nums;
     line-height: 1;
+    text-shadow: 0 0 18px rgba(124, 92, 255, 0.35);
 }
 .sim-dps-label {
     font-size: 1rem;
@@ -2233,14 +2431,19 @@ a[data-wh-item]:hover {
     display: none; /* Hidden until AdSense code is added */
 }
 
-.ad-placeholder {
-    background: var(--bg-card);
-    border: 1px dashed var(--border);
+/* Only show the dashed placeholder when ad-slot is explicitly opted in via
+   .ad-slot.show-placeholder (e.g. during local dev). Avoids a visible empty
+   box in production before AdSense fills it. */
+.ad-placeholder { display: none; }
+.ad-slot.show-placeholder .ad-placeholder {
+    display: block;
+    background: var(--surface-elev-1);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
     border-radius: var(--radius);
     padding: 20px;
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -2551,32 +2754,32 @@ a[data-wh-item]:hover {
    Footer
    ═══════════════════════════════════════════════════════════════════════ */
 .site-footer {
-    margin-top: 40px;
-    padding: 20px 16px 24px;
-    border-top: 1px solid rgba(255,255,255,.08);
+    margin-top: 56px;
+    padding: 28px 16px 32px;
+    border-top: 1px solid rgba(255,255,255,.05);
     text-align: center;
-    font-size: .78rem;
-    color: rgba(255,255,255,.4);
-    line-height: 1.6;
+    font-size: .76rem;
+    color: rgba(255,255,255,.35);
+    line-height: 1.7;
 }
 .footer-inner { max-width: 600px; margin: 0 auto; }
-.footer-links { margin-bottom: 6px; }
+.footer-links { margin-bottom: 10px; }
 .footer-link {
-    color: rgba(255,255,255,.55);
+    color: rgba(255,255,255,.5);
     text-decoration: none;
     transition: color .15s;
 }
-.footer-link:hover { color: var(--accent, #e8b827); }
-.footer-sep { margin: 0 6px; opacity: .4; }
-.footer-credits { margin-bottom: 4px; }
+.footer-link:hover { color: var(--accent-gold); }
+.footer-sep { margin: 0 8px; opacity: .3; }
+.footer-credits { margin-bottom: 8px; color: rgba(255,255,255,.35); }
 .footer-credits a {
-    color: rgba(255,255,255,.55);
+    color: rgba(255,255,255,.45);
     text-decoration: underline;
-    text-decoration-color: rgba(255,255,255,.2);
+    text-decoration-color: rgba(255,255,255,.15);
     transition: color .15s;
 }
-.footer-credits a:hover { color: var(--accent, #e8b827); }
-.footer-copy { opacity: .6; }
+.footer-credits a:hover { color: var(--accent-gold); }
+.footer-copy { opacity: .5; font-size: .72rem; }
 
 /* ═══════════════════════════════════════════════════════════════════════
    Static Pages (About / Privacy)
