@@ -412,7 +412,7 @@
         'phase-1': 1, 'phase-2': 2,
         'phase-3': 3, 'phase-4': 4, 'phase-5': 5
     };
-    const PHASE_TO_SLUG = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
+    const PHASE_TO_SLUG = { 0:'phase-0', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
 
     // Populated after CLASS_META is defined (see below)
     function buildSlugMaps() {
@@ -426,7 +426,7 @@
 
     /**
      * Build the canonical path for the current state.
-     * /warrior/fury/phase-2  |  /warrior/fury/pre-bis  |  /warrior/fury  |  /warrior  |  /
+     * /warrior/fury/phase-2  |  /warrior/fury/phase-0  |  /warrior/fury  |  /warrior  |  /
      */
     function buildPath() {
         if (!state.selectedClass) return '/';

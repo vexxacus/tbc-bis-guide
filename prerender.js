@@ -464,7 +464,7 @@ const PHASE_RAID_SHORT = {
     5: 'Sunwell'
 };
 
-const PHASE_TO_SLUG_REV = { 0:'pre-bis', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
+const PHASE_TO_SLUG_REV = { 0:'phase-0', 1:'phase-1', 2:'phase-2', 3:'phase-3', 4:'phase-4', 5:'phase-5' };
 
 // Lightweight role hint for class-landing spec lists.
 const SPEC_ROLE = {
@@ -995,15 +995,15 @@ function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
         `<meta id="metaDescription" name="description" content="${escapeHtmlAttr(seo.desc)}">`
     );
 
-    // <link rel="canonical">  +  drop the inline JS that overwrites it
+    // <link rel="canonical">
     html = html.replace(
-        /<link id="canonicalLink"[^>]*>\s*<script>document\.getElementById\('canonicalLink'\)[^<]*<\/script>/,
+        /<link id="canonicalLink"[^>]*>/,
         `<link id="canonicalLink" rel="canonical" href="${escapeHtmlAttr(seo.url)}">`
     );
 
-    // OG URL  +  drop its inline JS overwrite
+    // OG URL
     html = html.replace(
-        /<meta id="ogUrl"[^>]*>\s*<script>document\.getElementById\('ogUrl'\)[^<]*<\/script>/,
+        /<meta id="ogUrl"[^>]*>/,
         `<meta id="ogUrl" property="og:url" content="${escapeHtmlAttr(seo.url)}">`
     );
 

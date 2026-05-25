@@ -73,7 +73,7 @@
       {
         "source": "**/*.html",
         "headers": [
-          { "key": "Cache-Control", "value": "no-store" }
+          { "key": "Cache-Control", "value": "no-cache" }
         ]
       },
       {
@@ -96,6 +96,13 @@
           { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
           { "key": "Cache-Control", "value": "public, max-age=3600" }
         ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/:class/:spec/pre-bis",
+        "destination": "/:class/:spec/phase-0",
+        "type": 301
       }
     ],
     "rewrites": [
