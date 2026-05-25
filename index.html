@@ -25,7 +25,7 @@
             // Skip cache-bust for bots to avoid infinite reload loop
             var ua = navigator.userAgent || '';
             if (/Googlebot|bingbot|Baiduspider|yandex|facebookexternalhit|Twitterbot|rogerbot|linkedinbot|embedly|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator/i.test(ua)) return;
-            var BUILD = '20260524b';
+            var BUILD = '20260525a';
             var stored = sessionStorage.getItem('bis-build');
             if (stored !== BUILD) {
                 sessionStorage.setItem('bis-build', BUILD);
@@ -67,7 +67,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://wow.zamimg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css?v=20260524b">
+    <link rel="stylesheet" href="/css/app.css?v=20260525a">
     <!-- Wowhead Tooltip Script (TBC Classic) -->
     <script>const whTooltips = {colorLinks: false, iconizeLinks: false, iconSize: 'small', renameLinks: false};</script>
     <script src="https://wow.zamimg.com/js/tooltips.js"></script>
@@ -120,6 +120,14 @@
 
         <!-- Step 1: Class Select -->
         <section class="step" id="stepClass">
+            <a class="resume-banner hidden" id="resumeBanner" href="#">
+                <span class="resume-icon" aria-hidden="true">↩</span>
+                <div class="resume-text">
+                    <span class="resume-label">Continue where you left off</span>
+                    <span class="resume-target" id="resumeTarget">—</span>
+                </div>
+                <span class="resume-arrow" aria-hidden="true">›</span>
+            </a>
             <div class="ctx-hint" data-hint="class-pick" id="hintClass">
                 <span class="ctx-hint-icon">💡</span>
                 <div class="ctx-hint-body">Pick your <strong>class</strong> to see Best in Slot gear for every spec and content phase — from Pre-BiS dungeon gear all the way to Sunwell.</div>
@@ -293,6 +301,6 @@
     <script src="/js/wowhead-guide-data.js?v=20260428a"></script>
     <script src="/js/sim-bridge.js?v=20260423f"></script>
     <script src="/js/sim.js?v=20260424a"></script>
-    <script src="/js/app.js?v=20260524a"></script>
+    <script src="/js/app.js?v=20260525a"></script>
 </body>
 </html>

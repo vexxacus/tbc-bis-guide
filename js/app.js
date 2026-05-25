@@ -68,6 +68,54 @@
     }
     loadSelectedItems();
 
+    // ─── Resume where you left off (UX #2) ───────────────────────────
+    const RESUME_KEY = 'tbc-bis-last-visited';
+    const RESUME_MAX_AGE_DAYS = 30;
+
+    /** Capture the current spec+phase context so the user can resume from /. */
+    function saveLastVisited() {
+        // Only persist content views (skip transient class/spec/static pages)
+        if (!state.selectedClass || !state.selectedSpec) return;
+        if (state.selectedPhase == null && !state.isPvP) return;
+
+        const label = state.isPvP
+            ? `${state.selectedSpec} ${state.selectedClass} — PvP`
+            : `${state.selectedSpec} ${state.selectedClass} — Phase ${state.selectedPhase + 1}`;
+
+        try {
+            localStorage.setItem(RESUME_KEY, JSON.stringify({
+                url: buildPath(),
+                label,
+                timestamp: Date.now(),
+            }));
+        } catch (_) {}
+    }
+
+    /** Show the resume banner above the class grid if there's recent history. */
+    function renderResumeBanner() {
+        const banner = document.getElementById('resumeBanner');
+        if (!banner) return;
+        const target = document.getElementById('resumeTarget');
+
+        let data = null;
+        try {
+            const raw = localStorage.getItem(RESUME_KEY);
+            if (raw) data = JSON.parse(raw);
+        } catch (_) {}
+
+        if (!data || !data.url || !data.label) { banner.classList.add('hidden'); return; }
+
+        const ageDays = (Date.now() - (data.timestamp || 0)) / 86400000;
+        if (ageDays > RESUME_MAX_AGE_DAYS) { banner.classList.add('hidden'); return; }
+
+        // Don't show if the user is already on that URL (e.g. refreshed there)
+        if (location.pathname === data.url) { banner.classList.add('hidden'); return; }
+
+        if (target) target.textContent = data.label;
+        banner.setAttribute('href', data.url);
+        banner.classList.remove('hidden');
+    }
+
     // ─── Visual feedback: slot-flash + sim-pending pulse (D9 / D10) ──
     /** Pulse the gold border on a slot-group that just had its item changed. */
     function flashSlot(slotName) {
@@ -387,7 +435,7 @@
         const phInfo = PHASE_NAMES[phase] || { label: `Phase ${phase}`, desc: '' };
         headerTitle.innerHTML = `${specEntry.spec} — ${phInfo.label}`;
         headerTitle.style.color = CLASS_META[cls].color;
-        headerSub.textContent = phInfo.desc;
+        headerSub.innerHTML = `<span class="header-sub-tag">BiS</span> · ${phInfo.desc}`;
         renderSpecGrid(cls);         // spec grid must exist for other flows
         renderBisList();
         state.history.push('class', 'spec', 'phase');
@@ -2069,6 +2117,7 @@
         el.classList.remove('hidden');
         backBtn.classList.toggle('hidden', state.history.length === 0);
         syncBodyClassAttribute();
+        if (el === stepClass) renderResumeBanner();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -2130,6 +2179,30 @@
             if (stepStaticPage) stepStaticPage.classList.add('hidden');
             showStep(stepClass);
             history.pushState({}, '', '/');
+            updateSeoMeta();
+        });
+    }
+
+    // ─── Resume banner click (UX #2) ─────────────────────────────────
+    // Reset nav state, push the saved URL into history, let restoreFromUrl()
+    // rebuild everything from scratch — mirrors the popstate path so deep
+    // PvP / phase / spec URLs all work.
+    const resumeBanner = document.getElementById('resumeBanner');
+    if (resumeBanner) {
+        resumeBanner.addEventListener('click', (e) => {
+            const url = resumeBanner.getAttribute('href');
+            if (!url || url === '#') return;
+            e.preventDefault();
+            state.selectedClass = null;
+            state.selectedSpec  = null;
+            state.selectedPhase = null;
+            state.isPvP         = false;
+            state.pvpKey        = null;
+            state.history       = [];
+            if (stepStaticPage) stepStaticPage.classList.add('hidden');
+            history.pushState({}, '', url);
+            const restored = restoreFromUrl();
+            if (!restored) showStep(stepClass);
             updateSeoMeta();
         });
     }
@@ -2299,7 +2372,7 @@
                 const pvpTag = state.isPvP ? ' <span class="pvp-tag">PvP</span>' : '';
                 const lbl = state.isPvP ? `${state.selectedSpec} PvP` : state.selectedSpec;
                 headerTitle.innerHTML = `${lbl} — ${info.label}${pvpTag}`;
-                headerSub.textContent = info.desc;
+                headerSub.innerHTML = `<span class="header-sub-tag">BiS</span> · ${info.desc}`;
                 renderBisList();
                 state.history.push('phase');
                 showStep(stepBis);
@@ -2895,11 +2968,22 @@
             state._profsLoaded = true;
         }
 
-        let html = '<div class="prof-filter-header"><span class="prof-filter-label">🔨 Professions &amp; PvP</span>';
-        html += `<span class="prof-info-icon-wrap">
-            <span class="prof-info-icon" tabindex="0">ℹ️</span>
-            <span class="prof-info-tooltip">Some BiS items require a specific <strong>profession</strong> to equip (e.g. Tailoring BoP robes), a <strong>PvP arena rating</strong> to purchase, or drop from <strong>outdoor world bosses</strong> (weekly respawn). Toggle off to show the next-best alternative.</span>
-        </span></div>`;
+        // UX #8 — Filters live behind a "Filters ▾" toggle to keep
+        // above-the-fold calm. Active filter count is shown as a badge so
+        // users notice when something is filtered out.
+        const activeCount =
+            state.excludedProfessions.size +
+            (state.hidePvpRating ? 1 : 0) +
+            (state.hideWorldBoss ? 1 : 0);
+        const isExpanded = localStorage.getItem('tbc-bis-filters-expanded') === '1';
+
+        let html = `<button class="prof-filter-toggle${isExpanded ? ' expanded' : ''}" id="profFilterToggle" type="button" aria-expanded="${isExpanded ? 'true' : 'false'}" aria-controls="profFilterBody">
+            <span class="prof-filter-label">🔨 Filters</span>
+            ${activeCount ? `<span class="prof-filter-badge" title="${activeCount} active filter${activeCount === 1 ? '' : 's'}">${activeCount}</span>` : ''}
+            <span class="prof-filter-caret" aria-hidden="true">▾</span>
+        </button>`;
+        html += `<div class="prof-filter-body${isExpanded ? '' : ' collapsed'}" id="profFilterBody">`;
+        html += `<p class="prof-filter-blurb">Some BiS items require a specific <strong>profession</strong> to equip, a <strong>PvP arena rating</strong> to purchase, or drop from <strong>outdoor world bosses</strong> (weekly respawn). Toggle off to show the next-best alternative.</p>`;
         html += '<div class="prof-filter-chips">';
 
         // Profession chips
@@ -2930,10 +3014,23 @@
             </button>`;
         }
 
-        html += '</div>';
+        html += '</div></div>';
         professionFilter.innerHTML = html;
         professionFilter.classList.remove('hidden');
         bindHintDismiss(professionFilter);
+
+        // Wire the collapse toggle (UX #8)
+        const toggleBtn = professionFilter.querySelector('#profFilterToggle');
+        const body = professionFilter.querySelector('#profFilterBody');
+        if (toggleBtn && body) {
+            toggleBtn.addEventListener('click', () => {
+                const willExpand = body.classList.contains('collapsed');
+                body.classList.toggle('collapsed', !willExpand);
+                toggleBtn.classList.toggle('expanded', willExpand);
+                toggleBtn.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+                localStorage.setItem('tbc-bis-filters-expanded', willExpand ? '1' : '0');
+            });
+        }
 
         professionFilter.querySelectorAll('.prof-chip').forEach(chip => {
             if (chip.id === 'pvpRatingToggle') {
@@ -3056,6 +3153,9 @@
             // Same context-change boundary also invalidates any prior sim result
             resetSimPendingTracking();
         }
+
+        // Persist the current spec+phase as the "resume" target
+        saveLastVisited();
 
         // Render inline phase tabs
         renderPhaseSwitcher();
