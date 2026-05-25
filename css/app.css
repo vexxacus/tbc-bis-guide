@@ -1502,6 +1502,385 @@ body[data-class="Druid"]    .paperdoll { --class-color: rgba(255, 125,  10, 0.30
     transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition-spring);
 }
 
+/* ─── Track progress (UX #1) ───────────────────────────────────── */
+
+/* "I have this" toggle — leftmost in each slot row */
+.slot-own-toggle {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin-top: 6px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition-spring),
+                background var(--transition),
+                border-color var(--transition),
+                color var(--transition),
+                box-shadow var(--transition);
+    padding: 0;
+    font-family: inherit;
+}
+.slot-own-toggle:hover {
+    border-color: var(--accent-success);
+    background: rgba(76, 217, 123, 0.10);
+    transform: scale(1.08);
+}
+.slot-own-toggle:active { transform: scale(0.92); }
+.slot-own-toggle.is-owned {
+    background: var(--accent-success);
+    border-color: var(--accent-success);
+    color: #0c0e14;
+    box-shadow: 0 0 10px rgba(76, 217, 123, 0.40);
+}
+
+/* Alt-item variant — alt-item uses align-items: center so no margin-top is needed */
+.slot-own-toggle--alt {
+    margin-top: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+}
+
+/* Owned slot — subtle dim, still readable */
+.slot-group.slot-owned {
+    opacity: 0.55;
+    filter: saturate(0.7);
+    transition: opacity 0.2s var(--ease-smooth), filter 0.2s var(--ease-smooth);
+}
+.slot-group.slot-owned:hover {
+    opacity: 0.85;
+    filter: saturate(0.9);
+}
+.slot-group.slot-owned .slot-bis-name {
+    text-decoration: line-through;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Progress tracker widget — collapsible (default collapsed) ──── */
+.progress-tracker {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background:
+        radial-gradient(ellipse 60% 100% at 100% 0%, rgba(76, 217, 123, 0.05), transparent 60%),
+        var(--surface-elev-1);
+    border: 1px solid rgba(76, 217, 123, 0.16);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft), var(--surface-inset-hi);
+    transition: border-color var(--transition);
+}
+
+/* Shared-progress mode — different border tint so it's visually distinct */
+.progress-tracker.pt-shared {
+    border-color: rgba(124, 92, 255, 0.32);
+    background:
+        radial-gradient(ellipse 60% 100% at 100% 0%, rgba(124, 92, 255, 0.07), transparent 60%),
+        var(--surface-elev-1);
+}
+.progress-tracker.pt-shared .pt-percent {
+    color: var(--accent-arcane);
+    text-shadow: 0 0 14px rgba(124, 92, 255, 0.28);
+}
+.progress-tracker.pt-shared .pt-fill {
+    background: linear-gradient(90deg, #5a3fc7, #7c5cff);
+    box-shadow: 0 0 10px rgba(124, 92, 255, 0.40);
+}
+
+/* The shared-mode banner (only rendered when ?owned=... in URL) */
+.pt-shared-mode {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, rgba(124, 92, 255, 0.14), rgba(124, 92, 255, 0.04));
+    border: 1px solid rgba(124, 92, 255, 0.30);
+    border-radius: 8px;
+}
+.pt-shared-icon { font-size: 1.1rem; line-height: 1.2; flex-shrink: 0; }
+.pt-shared-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+.pt-shared-text strong {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 1px;
+}
+.pt-shared-dismiss {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    background: rgba(124, 92, 255, 0.18);
+    border: 1px solid rgba(124, 92, 255, 0.40);
+    border-radius: 6px;
+    color: #c8bdff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.pt-shared-dismiss:hover {
+    background: rgba(124, 92, 255, 0.30);
+    border-color: rgba(124, 92, 255, 0.60);
+    color: #fff;
+}
+
+/* Header acts as the toggle button — slim, single-line, always visible */
+.pt-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 4px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    transition: opacity var(--transition);
+}
+.pt-header:hover { opacity: 0.92; }
+
+.pt-percent {
+    font-family: 'Cinzel', 'Inter', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-success);
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(76, 217, 123, 0.28);
+    min-width: 3.4ch;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+.pt-meta {
+    flex: 1;
+    min-width: 0;
+}
+.pt-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    color: var(--text-muted);
+    line-height: 1.2;
+}
+.pt-count {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pt-caret {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform var(--transition-spring), color var(--transition);
+}
+.pt-header:hover .pt-caret { color: var(--text-primary); }
+.pt-header[aria-expanded="true"] .pt-caret { transform: rotate(180deg); }
+
+/* Collapsible body — bar + farm + empty/done + reset */
+.pt-body {
+    overflow: hidden;
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 10px;
+    transition: max-height 0.28s var(--ease-smooth),
+                opacity 0.2s var(--ease-smooth),
+                margin-top 0.2s var(--ease-smooth);
+}
+.pt-body.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    pointer-events: none;
+}
+
+.pt-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.pt-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2da050, #4cd97b);
+    border-radius: 3px;
+    transition: width 0.4s var(--ease-smooth);
+    box-shadow: 0 0 10px rgba(76, 217, 123, 0.35);
+}
+
+.pt-empty {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+.pt-empty-icon { margin-right: 4px; }
+
+.pt-done {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(76, 217, 123, 0.15), rgba(76, 217, 123, 0.05));
+    border: 1px solid rgba(76, 217, 123, 0.35);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--accent-success);
+    text-align: center;
+}
+.pt-done strong { color: #b8f0c8; }
+
+.pt-actions {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pt-wishlist {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(76, 217, 123, 0.20), rgba(76, 217, 123, 0.06));
+    border: 1px solid rgba(76, 217, 123, 0.32);
+    border-radius: 6px;
+    color: #a3e8bd;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-right: auto;
+    transition: transform var(--transition-spring),
+                background var(--transition),
+                border-color var(--transition),
+                box-shadow var(--transition);
+}
+.pt-wishlist:hover {
+    background: linear-gradient(135deg, rgba(76, 217, 123, 0.32), rgba(76, 217, 123, 0.12));
+    border-color: rgba(76, 217, 123, 0.55);
+    color: #c8f0d6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(76, 217, 123, 0.22);
+}
+.pt-wishlist:active { transform: scale(0.97); }
+
+.pt-reset {
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--transition);
+}
+.pt-reset:hover {
+    background: rgba(239, 77, 77, 0.10);
+    border-color: rgba(239, 77, 77, 0.30);
+    color: var(--accent-danger);
+}
+
+/* Farm priority — "next to farm" list */
+.pt-farm {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.pt-farm-head {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.pt-farm-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.pt-farm-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition-spring);
+}
+.pt-farm-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(2px);
+}
+.pt-farm-source {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.pt-farm-text {
+    flex: 1;
+    min-width: 0;
+}
+.pt-farm-slot {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.pt-farm-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pt-farm-where {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pt-farm-arrow {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    transition: transform var(--transition-spring), color var(--transition);
+}
+.pt-farm-item:hover .pt-farm-arrow {
+    color: var(--accent-success);
+    transform: translateX(2px);
+}
+
 /* Slot flash — runs once when user picks a different item in the slot */
 .slot-group.slot-just-changed {
     animation: slot-flash 0.55s var(--ease-smooth);
@@ -2803,6 +3182,39 @@ a[data-wh-item]:hover {
     border: 1px solid rgba(110, 118, 129, 0.2);
 }
 
+/* UX #4 — Meta evolution strip (cohort popularity trend) */
+.wcl-cohort-evo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    font-size: 0.6rem;
+    line-height: 1.2;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.wce-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.wcl-cohort-evo.wce-up   .wce-trend { color: var(--accent-success); background: rgba(76, 217, 123, 0.12); border: 1px solid rgba(76, 217, 123, 0.30); }
+.wcl-cohort-evo.wce-down .wce-trend { color: var(--accent-parse);   background: rgba(255, 140, 66, 0.10); border: 1px solid rgba(255, 140, 66, 0.30); }
+.wcl-cohort-evo.wce-flat .wce-trend { color: var(--text-muted);     background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+.wce-strip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.wce-cell { font-weight: 600; }
+.wce-sep { opacity: 0.4; }
+
 /* ─── PvP Popularity Badge (existing) ─────────────────────────────── */
 .pvp-pop-badge {
     display: inline-flex;
@@ -3034,6 +3446,24 @@ a[data-wh-item]:hover {
     background: rgba(255,80,80,.15);
     border-color: rgba(255,80,80,.3);
     color: #ff9090;
+}
+
+/* "Send to your raid lead for sign-off →" hint — visible until first share */
+.share-hint {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+    opacity: 0.85;
+}
+.share-hint.hidden { display: none; }
+@media (max-width: 420px) {
+    .share-hint { display: none; }
 }
 
 /* Toast notification */

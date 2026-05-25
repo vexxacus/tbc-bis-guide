@@ -25,7 +25,7 @@
             // Skip cache-bust for bots to avoid infinite reload loop
             var ua = navigator.userAgent || '';
             if (/Googlebot|bingbot|Baiduspider|yandex|facebookexternalhit|Twitterbot|rogerbot|linkedinbot|embedly|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator/i.test(ua)) return;
-            var BUILD = '20260525a';
+            var BUILD = '20260525f';
             var stored = sessionStorage.getItem('bis-build');
             if (stored !== BUILD) {
                 sessionStorage.setItem('bis-build', BUILD);
@@ -67,7 +67,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://wow.zamimg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css?v=20260525a">
+    <link rel="stylesheet" href="/css/app.css?v=20260525f">
     <!-- Wowhead Tooltip Script (TBC Classic) -->
     <script>const whTooltips = {colorLinks: false, iconizeLinks: false, iconSize: 'small', renameLinks: false};</script>
     <script src="https://wow.zamimg.com/js/tooltips.js"></script>
@@ -193,16 +193,19 @@
             <div class="phase-switcher hidden" id="phaseSwitcher"></div>
             <!-- 1b. Share Build bar -->
             <div class="share-build-bar hidden" id="shareBuildBar">
-                <button class="share-build-btn" id="shareBuildBtn" title="Copy shareable link with your item choices">
+                <button class="share-build-btn" id="shareBuildBtn" title="Copy a link to your build — share with your raid lead so they know which drops to reserve for you">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                     <span>Share Build</span>
                 </button>
                 <button class="share-reset-btn hidden" id="shareResetBtn" title="Reset all slots back to default BiS">
                     ↺ Reset to BiS
                 </button>
+                <span class="share-hint" id="shareHint" aria-hidden="true">Send your raid lead what to reserve for you →</span>
             </div>
             <!-- Share toast -->
             <div class="share-toast hidden" id="shareToast">✓ Link copied to clipboard!</div>
+            <!-- 1c. Track progress (UX #1) -->
+            <div class="progress-tracker hidden" id="progressTracker"></div>
             <!-- 2. SEO / build description -->
             <div class="seo-description hidden" id="seoDescription"></div>
             <!-- 6. Profession & PvP toggle (moved up near description) -->
@@ -301,6 +304,6 @@
     <script src="/js/wowhead-guide-data.js?v=20260428a"></script>
     <script src="/js/sim-bridge.js?v=20260423f"></script>
     <script src="/js/sim.js?v=20260424a"></script>
-    <script src="/js/app.js?v=20260525a"></script>
+    <script src="/js/app.js?v=20260525f"></script>
 </body>
 </html>

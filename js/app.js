@@ -68,6 +68,89 @@
     }
     loadSelectedItems();
 
+    // ─── Track my progress (UX #1) ───────────────────────────────────
+    // "Do I own this slot's BiS?" stored per spec+phase. The user ticks slots
+    // as they acquire items — gives them a reason to come back every raid week.
+    const OWNED_KEY = 'tbc-bis-owned-slots';
+    state.ownedSlots = {};  // { [selectionKey]: { [slot]: true } }
+    try {
+        const raw = localStorage.getItem(OWNED_KEY);
+        if (raw) state.ownedSlots = JSON.parse(raw);
+    } catch (_) {}
+
+    // Shared progress: transient set decoded from ?owned=... param on URL load.
+    // While non-null, isSlotOwned reflects the SHARER's tracking, not the
+    // recipient's localStorage. Recipient's own tracking is never overwritten.
+    state.sharedOwnedSlots = null;  // Set<string> | null
+
+    /** Paired slots: Rings + Trinkets are shown as a single merged row but the
+     *  user wears TWO of each. Ownership is tracked per item ID so they can
+     *  tick "I have Mithril Band" and "I have Ring of a Thousand Marks"
+     *  independently. Composite storage key: "Rings:<itemId>". */
+    function isPairedSlot(slot) {
+        return slot === 'Rings' || slot === 'Trinkets';
+    }
+
+    function ownershipKey(slot, itemId) {
+        return isPairedSlot(slot) ? `${slot}:${itemId}` : slot;
+    }
+
+    function isSlotOwned(slot, itemId) {
+        const k = ownershipKey(slot, itemId);
+        if (state.sharedOwnedSlots) return state.sharedOwnedSlots.has(k);
+        const sk = selectionKey();
+        return !!(state.ownedSlots[sk] && state.ownedSlots[sk][k]);
+    }
+
+    /** First own-toggle by the recipient dismisses the shared view and
+     *  hands control back to their own localStorage tracking. */
+    function dismissSharedProgress() {
+        if (!state.sharedOwnedSlots) return;
+        state.sharedOwnedSlots = null;
+        try {
+            const url = new URL(location.href);
+            url.searchParams.delete('owned');
+            history.replaceState(history.state, '', url.pathname + (url.search || '') + url.hash);
+        } catch (_) {}
+    }
+
+    function setSlotOwned(slot, itemId, owned) {
+        dismissSharedProgress();
+        const sk = selectionKey();
+        if (!state.ownedSlots[sk]) state.ownedSlots[sk] = {};
+        const k = ownershipKey(slot, itemId);
+        if (owned) state.ownedSlots[sk][k] = true;
+        else delete state.ownedSlots[sk][k];
+        // Clean up empty buckets
+        if (state.ownedSlots[sk] && !Object.keys(state.ownedSlots[sk]).length) {
+            delete state.ownedSlots[sk];
+        }
+        try { localStorage.setItem(OWNED_KEY, JSON.stringify(state.ownedSlots)); } catch (_) {}
+    }
+
+    function clearOwnedForCurrentSpec() {
+        const key = selectionKey();
+        delete state.ownedSlots[key];
+        try { localStorage.setItem(OWNED_KEY, JSON.stringify(state.ownedSlots)); } catch (_) {}
+    }
+
+    /** Rough accessibility tier — lower = easier to acquire. Used to sort
+     *  "next to farm" so casual players see badge/dungeon items first. */
+    const SOURCE_TIER = {
+        'Vendor': 1,
+        'Quest': 1,
+        'Badge': 2,
+        'Dungeon Token': 2,
+        'Reputation': 3,
+        'Profession': 3,
+        'Crafted': 3,
+        'Drop': 4,
+        'PvP': 5,
+    };
+    function sourceTierFor(sourceType) {
+        return SOURCE_TIER[sourceType] || 4;
+    }
+
     // ─── Resume where you left off (UX #2) ───────────────────────────
     const RESUME_KEY = 'tbc-bis-last-visited';
     const RESUME_MAX_AGE_DAYS = 30;
@@ -247,14 +330,62 @@
         return params.get('build');
     }
 
+    /** Encode owned-slot tracking into a short comma-separated codes string.
+     *  Paired slots use `Code:ItemId` form so each ring/trinket is tracked individually. */
+    function encodeOwnedSlots() {
+        const key = selectionKey();
+        const owned = state.ownedSlots[key];
+        if (!owned) return null;
+        const tokens = [];
+        for (const k of Object.keys(owned)) {
+            if (!owned[k]) continue;
+            if (k.includes(':')) {
+                // Composite key: "Rings:28730" → "Ri:28730"
+                const idx = k.indexOf(':');
+                const slot = k.slice(0, idx);
+                const itemId = k.slice(idx + 1);
+                const code = SLOT_CODES[slot] || slot.replace(/\s+/g, '');
+                tokens.push(`${code}:${itemId}`);
+            } else {
+                tokens.push(SLOT_CODES[k] || k.replace(/\s+/g, ''));
+            }
+        }
+        return tokens.length ? tokens.join(',') : null;
+    }
+
+    /** Decode owned-slot codes back to a Set of ownership keys
+     *  (slot for single, "slot:itemId" for paired). */
+    function decodeOwnedSlots(param) {
+        if (!param) return null;
+        const set = new Set();
+        param.split(',').forEach(token => {
+            if (token.includes(':')) {
+                const idx = token.indexOf(':');
+                const code = token.slice(0, idx);
+                const itemId = token.slice(idx + 1);
+                const slot = CODE_TO_SLOT[code] || code;
+                if (slot) set.add(`${slot}:${itemId}`);
+            } else {
+                const slot = CODE_TO_SLOT[token] || token;
+                if (slot) set.add(slot);
+            }
+        });
+        return set.size ? set : null;
+    }
+
     /** Build the full shareable URL including build overrides and filter state */
-    function buildShareUrl() {
+    function buildShareUrl(opts) {
+        const includeOwned = !!(opts && opts.includeOwned);
         const base = location.origin + buildPath();
         const parts = [];
         const build = encodeBuild();
         if (build) parts.push(`build=${build}`);
         const filters = encodeFilters();
         if (filters) parts.push(filters);
+        if (includeOwned) {
+            const owned = encodeOwnedSlots();
+            if (owned) parts.push(`owned=${owned}`);
+        }
         return parts.length ? `${base}?${parts.join('&')}` : base;
     }
 
@@ -432,6 +563,8 @@
         const buildParam = urlParams.get('build');
         if (buildParam) decodeBuild(buildParam);
         decodeFilters(urlParams);
+        // ?owned=... = someone shared their progress with us (view-only)
+        state.sharedOwnedSlots = decodeOwnedSlots(urlParams.get('owned'));
         const phInfo = PHASE_NAMES[phase] || { label: `Phase ${phase}`, desc: '' };
         headerTitle.innerHTML = `${specEntry.spec} — ${phInfo.label}`;
         headerTitle.style.color = CLASS_META[cls].color;
@@ -2494,8 +2627,23 @@
         // Guide meta (Wowhead original rank)
         const bisGuideHtml = guideMetaHtml(bis);
 
+        // UX #1 — "I have this" toggle: skip in PvP mode (snapshot view) and
+        // for cloned-from-MH OH slots (ownership tracked on Main Hand instead).
+        // Paired slots (Rings, Trinkets) track ownership per itemId so each
+        // ring can be ticked independently.
+        const showOwnToggle = !isPvPMode && !bis._clonedFromMH;
+        const isPaired = isPairedSlot(slot);
+        const owned = showOwnToggle && isSlotOwned(slot, bis.itemId);
+        const ownTogglehtml = showOwnToggle
+            ? `<button class="slot-own-toggle${owned ? ' is-owned' : ''}" data-slot="${slot}" data-item-id="${bis.itemId}" type="button" aria-pressed="${owned ? 'true' : 'false'}" title="${owned ? 'Marked as owned — click to undo' : 'Mark this slot as owned'}" aria-label="${owned ? 'Owned' : 'Mark as owned'}">${owned ? '✓' : ''}</button>`
+            : '';
+
+        // For paired slots, also count ownership of the second BIS so we can
+        // dim the whole slot-group only when both rings/trinkets are owned.
+        // Done after rendering — see the slot-owned class logic below.
         let html = `<div class="slot-group${isOverridden ? ' slot-overridden' : ''}" data-slot="${slot}" data-quality="${bisQuality.replace('q-','')}">
             <div class="slot-header" data-item-id="${bis.itemId}">
+                ${ownTogglehtml}
                 <div class="slot-icon">${bisIconHtml}</div>
                 <div class="slot-content">
                     <h2 class="slot-name">${slotDisplayName}${isOverridden ? ' <span class="slot-custom-tag">Custom</span>' : ''}</h2>
@@ -2545,7 +2693,18 @@
                 const selectBtn = showSelectUI
                     ? `<button class="alt-select-btn${isActive ? ' active' : ''}" data-slot="${slot}" data-item-id="${alt.itemId}" title="${isActive ? 'Selected' : 'Use this item'}">${isActive ? '✓' : 'Use'}</button>`
                     : '';
+                // Paired slots: render an own-toggle on each BIS-ranked alt so the
+                // user can tick "I have THIS specific ring" — but only when it's not
+                // already shown in the slot-header above (isActive means it's the
+                // currently displayed BiS).
+                const altRank = (alt.rank || '');
+                const showAltToggle = showOwnToggle && isPaired && altRank.toUpperCase().startsWith('BIS') && !isActive;
+                const altOwned = showAltToggle && isSlotOwned(slot, alt.itemId);
+                const altToggleHtml = showAltToggle
+                    ? `<button class="slot-own-toggle slot-own-toggle--alt${altOwned ? ' is-owned' : ''}" data-slot="${slot}" data-item-id="${alt.itemId}" type="button" aria-pressed="${altOwned ? 'true' : 'false'}" title="${altOwned ? 'Marked as owned — click to undo' : 'Mark this item as owned'}" aria-label="${altOwned ? 'Owned' : 'Mark as owned'}">${altOwned ? '✓' : ''}</button>`
+                    : '';
                 html += `<div class="alt-item${isActive ? ' alt-item-active' : ''}" data-item-id="${alt.itemId}">
+                    ${altToggleHtml}
                     ${altIconHtml}
                     <div class="slot-content">
                         <span class="alt-name ${altQuality}">${whItem(alt.itemId, alt.name || 'Item #'+alt.itemId, altQuality)}${bisLabel}</span>
@@ -2652,6 +2811,7 @@
         const shieldOnly = WCL_SHIELD_ONLY_SPECS.has(appKey);
         const has2HSet = typeof ITEM_TWO_HAND_WEAPON !== 'undefined';
         const hasShieldSet = typeof ITEM_SHIELD !== 'undefined';
+        const phase = state.selectedPhase;
 
         const items = [];
         for (const [wclSlot, slotItems] of Object.entries(wclSpecData.slots)) {
@@ -2682,11 +2842,45 @@
                         popularity: wi.popularity,
                         tier,
                         quality: wi.quality,
-                    }
+                    },
+                    // UX #4 — look up per-cohort popularity so wclMetaHtml can
+                    // render the early/mid/late trend below the badge
+                    _cohortPops: getItemCohortPops(String(wi.id), wclSlot, phase, appKey),
                 });
             }
         }
         return items;
+    }
+
+    /**
+     * Look up an item's popularity across the three time-gated cohorts in the
+     * current spec+phase. Returns null when the item only appears in 0 or 1
+     * cohort (no story to tell). Used by wclMetaHtml to draw a meta-evolution
+     * mini-strip below the popularity badge.
+     */
+    function getItemCohortPops(itemId, wclSlot, phase, wclKey) {
+        if (typeof window.WCL_COHORTS === 'undefined') return null;
+        const phaseCohorts = window.WCL_COHORTS.phases?.[phase];
+        if (!phaseCohorts || !phaseCohorts[wclKey]) return null;
+
+        const result = {};
+        let foundCount = 0;
+        for (const c of ['early', 'mid', 'late']) {
+            const cohort = phaseCohorts[wclKey][c];
+            if (!cohort || !cohort.slots) continue;
+            const slotItems = cohort.slots[wclSlot];
+            if (!slotItems) continue;
+            const found = slotItems.find(i => String(i.id) === String(itemId));
+            if (found) {
+                result[c] = found.popularity;
+                foundCount++;
+            } else {
+                // Present in other cohorts but not this one → 0% (fell out)
+                result[c] = 0;
+            }
+        }
+        if (foundCount < 2) return null; // need at least 2 cohorts for a trend
+        return result;
     }
 
     // ─── WCL popularity badge HTML ───────────────────────────────────
@@ -2694,7 +2888,35 @@
         if (!item._wclMeta) return '';
         const m = item._wclMeta;
         const tierMeta = WCL_TIER_META[m.tier] || {};
-        return `<div class="wcl-meta-row"><span class="wcl-pop-badge ${tierMeta.cls || ''}">${tierMeta.badge || ''} ${m.popularity}% used</span></div>`;
+        let html = `<div class="wcl-meta-row"><span class="wcl-pop-badge ${tierMeta.cls || ''}">${tierMeta.badge || ''} ${m.popularity}% used</span>`;
+        // UX #4 — meta evolution strip (show only when spread is meaningful)
+        if (item._cohortPops) {
+            const e = item._cohortPops.early ?? null;
+            const mid = item._cohortPops.mid ?? null;
+            const l = item._cohortPops.late ?? null;
+            const present = [e, mid, l].filter(v => v != null);
+            const max = Math.max(...present);
+            const min = Math.min(...present);
+            // Only show evolution when spread >= 12 percentage points
+            if (present.length >= 2 && (max - min) >= 12) {
+                // Trend direction (compare first to last available)
+                const first = present[0];
+                const last = present[present.length - 1];
+                const trend = last > first ? 'up' : last < first ? 'down' : 'flat';
+                const trendIcon = trend === 'up' ? '↗' : trend === 'down' ? '↘' : '→';
+                const trendLabel = trend === 'up' ? 'Rising' : trend === 'down' ? 'Falling' : 'Stable';
+                const parts = [];
+                if (e  != null) parts.push(`<span class="wce-cell">E&nbsp;${e}%</span>`);
+                if (mid != null) parts.push(`<span class="wce-cell">M&nbsp;${mid}%</span>`);
+                if (l  != null) parts.push(`<span class="wce-cell">L&nbsp;${l}%</span>`);
+                html += `<span class="wcl-cohort-evo wce-${trend}" title="Popularity across Early/Mid/Late ${PHASE_NAMES[state.selectedPhase]?.label || 'phase'}: ${trendLabel}">
+                    <span class="wce-trend">${trendIcon}&nbsp;${trendLabel}</span>
+                    <span class="wce-strip">${parts.join('<span class="wce-sep">·</span>')}</span>
+                </span>`;
+            }
+        }
+        html += `</div>`;
+        return html;
     }
 
     // ─── Guide meta HTML (Wowhead original rank) ────────────────────
@@ -3088,6 +3310,14 @@
         if (btnLabel) {
             btnLabel.textContent = (hasOverrides || hasFilters) ? 'Share Custom Build' : 'Share Build';
         }
+
+        // Hide the "Send to your raid lead" hint once the user has shared
+        const shareHint = document.getElementById('shareHint');
+        if (shareHint) {
+            let hasShared = false;
+            try { hasShared = localStorage.getItem('tbc-bis-has-shared') === '1'; } catch (_) {}
+            shareHint.classList.toggle('hidden', hasShared);
+        }
     }
 
     function showShareToast(msg) {
@@ -3105,8 +3335,10 @@
     if (shareBuildBtn) {
         shareBuildBtn.addEventListener('click', () => {
             const url = buildShareUrl();
+            const successMsg = '✓ Link copied — share with your raid lead to reserve loot drops';
             navigator.clipboard.writeText(url).then(() => {
-                showShareToast('✓ Link copied to clipboard!');
+                showShareToast(successMsg);
+                markBuildShared();
             }).catch(() => {
                 // Fallback
                 const input = document.createElement('input');
@@ -3115,9 +3347,18 @@
                 input.select();
                 document.execCommand('copy');
                 document.body.removeChild(input);
-                showShareToast('✓ Link copied to clipboard!');
+                showShareToast(successMsg);
+                markBuildShared();
             });
         });
+    }
+
+    /** Persist a flag once the user has shared at least once — so we can hide
+     *  the "Send to your raid lead" hint after they've discovered the feature. */
+    function markBuildShared() {
+        try { localStorage.setItem('tbc-bis-has-shared', '1'); } catch (_) {}
+        const hint = document.getElementById('shareHint');
+        if (hint) hint.classList.add('hidden');
     }
 
     // Wire up reset button
@@ -3142,8 +3383,303 @@
         });
     }
 
+    // ─── Track Progress widget (UX #1) ────────────────────────────────
+    // Renders the "X% BiS complete" bar + the "next to farm" list.
+    // Reads from the current slot DOM so it stays in sync with what's actually
+    // displayed (respects PvP mode skip, weapon mode dim, etc.).
+    function renderProgressTracker() {
+        const tracker = document.getElementById('progressTracker');
+        if (!tracker) return;
+
+        // Tracker only makes sense in PvE view (PvP is a snapshot, no "I own this")
+        if (state.isPvP || state.selectedPhase == null) {
+            tracker.classList.add('hidden');
+            tracker.innerHTML = '';
+            return;
+        }
+
+        // Default collapsed — same calm-above-the-fold pattern as the filters.
+        // Header acts as the toggle; full bar + farm list live in the body.
+        // Auto-expand when viewing someone's shared progress so the banner + farm
+        // list are immediately visible.
+        const isShared = !!state.sharedOwnedSlots;
+        const isExpanded = isShared || localStorage.getItem('tbc-bis-progress-expanded') === '1';
+
+        const labelText = isShared ? 'Shared progress' : 'Your BiS progress';
+
+        let html = `<button class="pt-header" id="ptHeader" type="button" aria-expanded="${isExpanded ? 'true' : 'false'}" aria-controls="ptBody" title="${isExpanded ? 'Collapse progress' : 'Expand progress'}">
+            <span class="pt-percent" id="ptPercent">0%</span>
+            <div class="pt-meta">
+                <div class="pt-label">${labelText}</div>
+                <div class="pt-count" id="ptCount">0 of 0 slots owned</div>
+            </div>
+            <span class="pt-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="pt-body${isExpanded ? '' : ' collapsed'}" id="ptBody">
+            ${isShared ? `<div class="pt-shared-mode" id="ptSharedMode">
+                <span class="pt-shared-icon" aria-hidden="true">👀</span>
+                <div class="pt-shared-text">
+                    <strong>Viewing someone's progress</strong>
+                    Dimmed slots are what they already own. Click any circle to start your own tracking.
+                </div>
+                <button class="pt-shared-dismiss" id="ptSharedDismiss" type="button" title="Switch to your own tracking">My tracking</button>
+            </div>` : ''}
+            <div class="pt-bar"><div class="pt-fill" id="ptFill" style="width:0%"></div></div>
+            ${isShared ? '' : `<div class="pt-empty" id="ptEmpty">
+                <span class="pt-empty-icon">✅</span>
+                Tap the circle next to a slot to mark it as owned. Come back every raid week to see your progress climb.
+            </div>`}
+            <div class="pt-farm hidden" id="ptFarm">
+                <div class="pt-farm-head">${isShared ? 'They still need' : 'Next to farm'}</div>
+                <ul class="pt-farm-list" id="ptFarmList"></ul>
+            </div>
+            ${isShared ? '' : `<div class="pt-done hidden" id="ptDone">
+                🎉 <strong>BiS complete!</strong> Ready for the next phase?
+            </div>`}
+            ${isShared ? '' : `<div class="pt-actions hidden" id="ptActions">
+                <button class="pt-wishlist" id="ptWishlist" type="button" title="Copy your wishlist (slots + item names + sources) — paste it to your raid lead so they know what to reserve for you">📋 Copy wishlist</button>
+                <button class="pt-reset" id="ptReset" type="button" title="Reset tracking for this spec+phase">↺ Reset tracking</button>
+            </div>`}
+        </div>`;
+        tracker.innerHTML = html;
+        tracker.classList.toggle('pt-shared', isShared);
+        tracker.classList.remove('hidden');
+
+        // Wire header toggle
+        const header = tracker.querySelector('#ptHeader');
+        const body   = tracker.querySelector('#ptBody');
+        if (header && body) {
+            header.addEventListener('click', () => {
+                const willExpand = body.classList.contains('collapsed');
+                body.classList.toggle('collapsed', !willExpand);
+                header.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+                header.title = willExpand ? 'Collapse progress' : 'Expand progress';
+                try { localStorage.setItem('tbc-bis-progress-expanded', willExpand ? '1' : '0'); } catch (_) {}
+            });
+        }
+
+        // Wire reset
+        const resetBtn = tracker.querySelector('#ptReset');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!confirm('Reset BiS-tracking for this spec & phase?')) return;
+                clearOwnedForCurrentSpec();
+                // Re-render the whole BiS list so slots reset visually
+                renderBisList();
+            });
+        }
+
+        // Wire shared-mode dismiss (UX #1 — shared progress)
+        const sharedDismiss = tracker.querySelector('#ptSharedDismiss');
+        if (sharedDismiss) {
+            sharedDismiss.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dismissSharedProgress();
+                renderBisList();
+            });
+        }
+
+        // Wire wishlist copy
+        const wishlistBtn = tracker.querySelector('#ptWishlist');
+        if (wishlistBtn) {
+            wishlistBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = buildWishlistText();
+                const onCopied = () => {
+                    showShareToast('✓ Wishlist copied — paste it to your raid lead');
+                    markBuildShared();
+                };
+                navigator.clipboard.writeText(text).then(onCopied).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    onCopied();
+                });
+            });
+        }
+
+        updateProgressTracker();
+    }
+
+    /** Generate a plain-text wishlist for clipboard — itemized list of unowned slots
+     *  + the build URL. Sorted by source-tier so casuals see badge/dungeon items first.
+     *  Iterates per-toggle so paired slots list each ring/trinket separately. */
+    function buildWishlistText() {
+        const phLabel = (PHASE_NAMES[state.selectedPhase]?.label) || `Phase ${state.selectedPhase}`;
+        const classSpec = `${state.selectedSpec} ${state.selectedClass}`;
+
+        const toggles = document.querySelectorAll('#slotList .slot-own-toggle');
+        const wanted = [];
+        let total = 0;
+        let owned = 0;
+        toggles.forEach(t => {
+            total++;
+            if (t.classList.contains('is-owned')) { owned++; return; }
+            const slot = t.dataset.slot;
+            const itemId = t.dataset.itemId;
+            if (!itemId) return;
+            const src = getItemSource(itemId);
+            const sourceText = src?.source || src?.sourceType || 'Unknown';
+            const row = t.closest('.slot-header') || t.closest('.alt-item');
+            const nameEl = row?.querySelector('.slot-bis-name, .alt-name');
+            const itemName = nameEl?.textContent?.trim() || `Item #${itemId}`;
+            wanted.push({
+                slot,
+                itemName,
+                sourceText,
+                tier: sourceTierFor(src?.sourceType || 'Unknown'),
+            });
+        });
+
+        wanted.sort((a, b) => a.tier - b.tier);
+        const pct = total > 0 ? Math.round(owned / total * 100) : 0;
+
+        const lines = [];
+        lines.push(`🎯 My ${phLabel} wishlist — ${classSpec} (${pct}% complete)`);
+        lines.push('');
+        if (wanted.length) {
+            lines.push(`Still need ${wanted.length} of ${total} slots:`);
+            wanted.forEach(w => {
+                lines.push(`• ${w.slot}: ${w.itemName} (${w.sourceText})`);
+            });
+            lines.push('');
+        }
+        // Include owned-state in the URL so the recipient sees the wishlist
+        // visually (your owned slots dimmed, theirs untouched).
+        lines.push(`Full build: ${buildShareUrl({ includeOwned: true })}`);
+        return lines.join('\n');
+    }
+
+    /** Toggle .slot-owned class on the slot-group only when ALL toggles in
+     *  the group are ticked. Paired slots (Rings/Trinkets) have two toggles. */
+    function updateSlotOwnedClass(group) {
+        const toggles = group.querySelectorAll('.slot-own-toggle');
+        const allOwned = toggles.length > 0 && Array.from(toggles).every(t => t.classList.contains('is-owned'));
+        group.classList.toggle('slot-owned', allOwned);
+        if (allOwned) group.setAttribute('data-owned', '1');
+        else group.removeAttribute('data-owned');
+    }
+
+    /** In-place update of the tracker (no DOM rebuild). Called on toggle. */
+    function updateProgressTracker() {
+        const tracker = document.getElementById('progressTracker');
+        if (!tracker || tracker.classList.contains('hidden')) return;
+
+        // Count individual toggles, not slot-groups — paired slots have two toggles each
+        const toggles = document.querySelectorAll('#slotList .slot-own-toggle');
+        const total = toggles.length;
+        const owned = Array.from(toggles).filter(t => t.classList.contains('is-owned')).length;
+        const pct   = total > 0 ? Math.round(owned / total * 100) : 0;
+
+        tracker.querySelector('#ptPercent').textContent = `${pct}%`;
+        tracker.querySelector('#ptCount').textContent   = `${owned} of ${total} slots owned`;
+        const fill = tracker.querySelector('#ptFill');
+        if (fill) fill.style.width = `${pct}%`;
+
+        // Toggle actions block — visible when user has marked at least one slot
+        const actions = tracker.querySelector('#ptActions');
+        if (actions) actions.classList.toggle('hidden', owned === 0);
+
+        // Wishlist button — only meaningful when there are unowned slots to share
+        const wishlist = tracker.querySelector('#ptWishlist');
+        if (wishlist) wishlist.classList.toggle('hidden', owned === 0 || owned === total);
+
+        // Empty / done banner
+        const empty = tracker.querySelector('#ptEmpty');
+        const done  = tracker.querySelector('#ptDone');
+        if (empty) empty.classList.toggle('hidden', owned > 0);
+        if (done)  done.classList.toggle('hidden',  !(total > 0 && owned === total));
+
+        // Farm priority — top 3 unowned toggles, sorted by source-tier
+        renderFarmPriority(toggles);
+    }
+
+    /** Build the "next to farm" list from unowned slots, sorted by accessibility.
+     *  Iterates own-toggles so paired slots (Rings/Trinkets) list each item separately. */
+    function renderFarmPriority(toggles) {
+        const farmWrap = document.getElementById('ptFarm');
+        const list = document.getElementById('ptFarmList');
+        if (!farmWrap || !list) return;
+
+        const unowned = [];
+        toggles.forEach(t => {
+            if (t.classList.contains('is-owned')) return;
+            const slot = t.dataset.slot;
+            const itemId = t.dataset.itemId;
+            if (!itemId) return;
+            const src = getItemSource(itemId);
+            const sourceType = src?.sourceType || 'Unknown';
+            const sourceText = src?.source || sourceType;
+            // Look up the item name from the row this toggle lives in (slot-header or alt-item)
+            const row = t.closest('.slot-header') || t.closest('.alt-item');
+            const nameEl = row?.querySelector('.slot-bis-name, .alt-name');
+            const itemName = nameEl?.textContent?.trim() || `Item #${itemId}`;
+            // For paired slots, append a "(1 of 2)" hint so the user knows which one
+            const slotLabel = isPairedSlot(slot)
+                ? `${slot.replace(/s$/, '')} option`  // "Ring option" / "Trinket option"
+                : slot;
+            unowned.push({
+                slot,
+                slotLabel,
+                itemId,
+                itemName,
+                sourceType,
+                sourceText,
+                tier: sourceTierFor(sourceType),
+                emoji: srcEmoji(sourceType),
+            });
+        });
+
+        if (!unowned.length) {
+            farmWrap.classList.add('hidden');
+            list.innerHTML = '';
+            return;
+        }
+
+        unowned.sort((a, b) => a.tier - b.tier);
+        const top = unowned.slice(0, 3);
+        list.innerHTML = top.map(u => `
+            <li class="pt-farm-item" data-target-slot="${u.slot}">
+                <span class="pt-farm-source" aria-hidden="true">${u.emoji}</span>
+                <div class="pt-farm-text">
+                    <div class="pt-farm-slot">${u.slotLabel}</div>
+                    <div class="pt-farm-name">${u.itemName}</div>
+                    <div class="pt-farm-where">${u.sourceText}</div>
+                </div>
+                <span class="pt-farm-arrow" aria-hidden="true">›</span>
+            </li>
+        `).join('');
+        farmWrap.classList.remove('hidden');
+
+        // Clicking a farm-item scrolls to the matching slot
+        list.querySelectorAll('.pt-farm-item').forEach(li => {
+            li.addEventListener('click', () => {
+                const target = document.querySelector(`#slotList .slot-group[data-slot="${CSS.escape(li.dataset.targetSlot)}"]`);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    flashSlot(li.dataset.targetSlot);
+                }
+            });
+        });
+    }
+
     // ─── Step 4: BiS List ────────────────────────────────────────────
     function renderBisList() {
+        // Sync shared-progress state with URL — URL is source of truth.
+        // Catches the case where the user navigated away from a shared URL
+        // (e.g. clicked a different phase tab) without going through restoreFromUrl.
+        const urlParams = new URLSearchParams(location.search);
+        const ownedParam = urlParams.get('owned');
+        if (ownedParam) {
+            state.sharedOwnedSlots = decodeOwnedSlots(ownedParam);
+        } else if (state.sharedOwnedSlots) {
+            state.sharedOwnedSlots = null;
+        }
+
         // Reset cohort selection when spec/phase context changes (cohort only makes
         // sense within a single phase + spec).
         const cohortContextKey = `${state.selectedClass}|${state.selectedSpec}|${state.selectedPhase}|${state.isPvP}`;
@@ -3985,8 +4521,43 @@
             hdr.addEventListener('click', e => {
                 const whEl = e.target.closest('[data-wh-item]');
                 if (whEl) return; // handled by delegation below
+                // Own-toggle clicks shouldn't also expand the slot
+                if (e.target.closest('.slot-own-toggle')) return;
                 const grp = hdr.closest('.slot-group');
                 if (grp.querySelector('.slot-alts')) grp.classList.toggle('open');
+            });
+        });
+
+        // ── "I have this" toggle (UX #1 Track progress) ──
+        slotList.querySelectorAll('.slot-own-toggle').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                e.preventDefault();
+                // When viewing someone's shared progress, the first slot click
+                // just exits the shared view — don't also flip the toggle, since
+                // the user is reacting to someone else's state.
+                if (state.sharedOwnedSlots) {
+                    dismissSharedProgress();
+                    renderBisList();
+                    return;
+                }
+                const slot = btn.dataset.slot;
+                const itemId = btn.dataset.itemId;
+                if (!slot) return;
+                const willOwn = !isSlotOwned(slot, itemId);
+                setSlotOwned(slot, itemId, willOwn);
+                // Update the button in place — avoid re-rendering the whole list
+                // so the user keeps their scroll position and any open alts
+                btn.classList.toggle('is-owned', willOwn);
+                btn.setAttribute('aria-pressed', willOwn ? 'true' : 'false');
+                btn.textContent = willOwn ? '✓' : '';
+                btn.title = willOwn ? 'Marked as owned — click to undo' : 'Mark this slot as owned';
+                btn.setAttribute('aria-label', willOwn ? 'Owned' : 'Mark as owned');
+                // For paired slots, only dim the whole row when BOTH toggles in
+                // the group are ticked. updateSlotOwnedClass walks the toggles.
+                const group = btn.closest('.slot-group');
+                if (group) updateSlotOwnedClass(group);
+                updateProgressTracker();
             });
         });
 
@@ -4065,6 +4636,13 @@
         });
 
         refreshWH();
+
+        // UX #1 — apply the slot-owned dim class to slot-groups whose toggles
+        // are all ticked (paired slots need 2/2; single slots need 1/1).
+        document.querySelectorAll('#slotList .slot-group').forEach(g => updateSlotOwnedClass(g));
+
+        // UX #1 — Track progress widget reads from the rendered slot DOM
+        renderProgressTracker();
 
         // Uppdatera stats-panel om spec har sim-stöd
         scheduleSimStats(slotGroups, enchantLookup, gemsForSim);
