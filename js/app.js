@@ -4219,10 +4219,10 @@
         });
     }
 
-    // Trigger WASM init early (before user gets to the BiS list)
-    if (typeof WowSimBridge !== 'undefined') {
-        onSimReady(() => {}); // just warms up the worker
-    }
+    // WASM is now lazy — loaded on demand when the user first reaches a
+    // sim-supported BiS view (scheduleSimStats → computeStatsForBis →
+    // onSimReady). Crawlers, class-grid visits, and PvP-only specs never
+    // trigger the 2.3 MB wasm download.
     function srcEmoji(t) {
         return { Drop:'💀', Quest:'❗', Profession:'🔨', PvP:'⚔️', Vendor:'🏪', Reputation:'⭐',
                  Badge:'🎖️', 'Dungeon Token':'🎖️', Crafted:'🔨' }[t] || '📦';
