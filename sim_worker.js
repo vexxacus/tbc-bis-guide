@@ -641,7 +641,9 @@ function wasmready() {
 const go = new Go();
 let mod, inst;
 
-WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then(
+// Hosted on statically.io (Cloudflare-backed CDN proxying our public GitHub repo)
+// to keep this 25 MB file off Firebase Hosting's bandwidth quota.
+WebAssembly.instantiateStreaming(fetch("https://cdn.statically.io/gh/vexxacus/tbc-bis-guide@main/lib.wasm"), go.importObject).then(
 	async result => {
 		mod = result.module;
 		inst = result.instance;
