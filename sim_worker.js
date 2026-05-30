@@ -641,16 +641,32 @@ function wasmready() {
 const go = new Go();
 let mod, inst;
 
-// Hosted on statically.io (Cloudflare-backed CDN proxying our public GitHub repo)
-// to keep this 25 MB file off Firebase Hosting's bandwidth quota.
-WebAssembly.instantiateStreaming(fetch("https://cdn.statically.io/gh/vexxacus/tbc-bis-guide@main/lib.wasm"), go.importObject).then(
-	async result => {
-		mod = result.module;
-		inst = result.instance;
-		// console.log("loading wasm...")
-		await go.run(inst);
+// lib.wasm is served from jsDelivr (free, unlimited-bandwidth CDN, brotli-compressed)
+// via the tbc-bis-wasm npm package to keep the ~2.2 MB binary off Firebase Hosting's
+// egress quota. The URL is pinned to a package version so jsDelivr caches it immutably
+// — bump the version here AND publish a new tbc-bis-wasm release whenever lib.wasm is
+// rebuilt so returning visitors pick up the new binary (see tbc-bis-wasm-pkg/README.md).
+// Falls back to the local copy on Firebase if the CDN is unreachable.
+const WASM_CDN_URL   = "https://cdn.jsdelivr.net/npm/tbc-bis-wasm@1.0.0/lib.wasm";
+const WASM_LOCAL_URL = "lib.wasm";
+
+async function loadWasm() {
+	for (const url of [WASM_CDN_URL, WASM_LOCAL_URL]) {
+		try {
+			return await WebAssembly.instantiateStreaming(fetch(url), go.importObject);
+		} catch (err) {
+			console.warn("[sim] wasm load failed from", url, "—", err.message);
+		}
 	}
-);
+	throw new Error("[sim] could not load lib.wasm from CDN or local fallback");
+}
+
+loadWasm().then(async result => {
+	mod = result.module;
+	inst = result.instance;
+	// console.log("loading wasm...")
+	await go.run(inst);
+});
 
 var workerID = "";
 
