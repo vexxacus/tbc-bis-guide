@@ -70,6 +70,28 @@ function collectUniqueItemIds() {
         console.log(`  📡 Added PvP item & gem IDs from scraped data`);
     }
 
+    // Also read the generated client PvP data (js/pvp-data.js) — it's the source
+    // of truth for what's actually rendered and can be fresher than the local
+    // scraper output (the CI workflow regenerates it), so it catches items the
+    // stale scraper/output may miss (e.g. the Veteran's PvP pieces).
+    const PVP_JS_PATH = path.join(__dirname, 'js', 'pvp-data.js');
+    if (fs.existsSync(PVP_JS_PATH)) {
+        try {
+            const sandbox = {};
+            const src = fs.readFileSync(PVP_JS_PATH, 'utf8').replace('const PVP_DATA', 'sandbox.PVP_DATA');
+            (new Function('sandbox', src))(sandbox);
+            for (const spec of Object.values((sandbox.PVP_DATA || {}).specs || {})) {
+                for (const items of Object.values(spec.slots || {})) {
+                    for (const item of items) {
+                        ids.add(String(item.id));
+                        for (const g of (item.topGems || [])) ids.add(String(g.id));
+                    }
+                }
+            }
+            console.log(`  📡 Added PvP item & gem IDs from js/pvp-data.js`);
+        } catch (e) { console.warn(`  ⚠ could not parse js/pvp-data.js: ${e.message}`); }
+    }
+
     return [...ids].sort((a, b) => parseInt(a) - parseInt(b));
 }
 
@@ -171,23 +193,39 @@ async function main() {
     }
     for (const id of Object.keys(data.gemSources)) usedIds.add(id);
 
-    // Also include PvP item and gem IDs
-    if (fs.existsSync(PVP_DATA_PATH)) {
-        const pvp = JSON.parse(fs.readFileSync(PVP_DATA_PATH, 'utf8'));
-        for (const spec of Object.values(pvp.specs || {})) {
+    // Also include PvP item and gem IDs — from both the scraper output and the
+    // generated client data (js/pvp-data.js), which can be fresher.
+    const addPvpIds = pvp => {
+        for (const spec of Object.values((pvp || {}).specs || {})) {
             for (const items of Object.values(spec.slots || {})) {
                 for (const item of items) {
                     usedIds.add(String(item.id));
-                    for (const g of (item.topGems || [])) {
-                        usedIds.add(String(g.id));
-                    }
+                    for (const g of (item.topGems || [])) usedIds.add(String(g.id));
                 }
             }
         }
+    };
+    if (fs.existsSync(PVP_DATA_PATH)) addPvpIds(JSON.parse(fs.readFileSync(PVP_DATA_PATH, 'utf8')));
+    const PVP_JS_PATH = path.join(__dirname, 'js', 'pvp-data.js');
+    if (fs.existsSync(PVP_JS_PATH)) {
+        try {
+            const sandbox = {};
+            (new Function('sandbox', fs.readFileSync(PVP_JS_PATH, 'utf8').replace('const PVP_DATA', 'sandbox.PVP_DATA')))(sandbox);
+            addPvpIds(sandbox.PVP_DATA);
+        } catch (e) { console.warn(`  ⚠ could not parse js/pvp-data.js: ${e.message}`); }
     }
 
-    // Filter cache to only needed icons
+    // Build the icon map NON-DESTRUCTIVELY: start from the existing icons.js so
+    // icons added by other scripts (e.g. fetch-missing-icons.js for WCL items)
+    // are preserved, then overlay cached icons for the IDs we collected.
     const iconMap = {};
+    if (fs.existsSync(OUT_PATH)) {
+        try {
+            const sandbox = {};
+            (new Function('sandbox', fs.readFileSync(OUT_PATH, 'utf8').replace('const ICONS', 'sandbox.ICONS')))(sandbox);
+            Object.assign(iconMap, sandbox.ICONS || {});
+        } catch (e) { console.warn(`  ⚠ could not parse existing icons.js: ${e.message}`); }
+    }
     for (const id of usedIds) {
         if (cache[id]) iconMap[id] = cache[id];
     }

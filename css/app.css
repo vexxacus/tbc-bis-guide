@@ -3067,6 +3067,24 @@ a[data-wh-item]:hover {
     margin-bottom: 12px;
 }
 
+/* ── PvP meta-evolution slider ── */
+.pvp-meta-slider {
+    padding: 11px 14px;
+    background: rgba(90, 169, 255, 0.06);
+    border: 1px solid rgba(90, 169, 255, 0.22);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+}
+.pms-head { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+.pms-range { width: 100%; accent-color: #5aa9ff; cursor: pointer; margin: 2px 0 6px; }
+.pms-label { font-size: 0.82rem; color: var(--text-secondary); }
+.pms-label .pms-date { color: #fff; }
+.pms-latest { color: #5aa9ff; font-weight: 600; }
+.pvp-new-badge {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    color: #1a2e12; background: #6fd47f; border-radius: 5px; padding: 1px 6px;
+}
+
 .pvp-banner-title {
     font-size: 0.82rem;
     color: #c41e3a;
@@ -3372,6 +3390,142 @@ a[data-wh-item]:hover {
     text-decoration-color: rgba(232,184,39,.3);
 }
 .static-page a:hover { text-decoration-color: var(--accent, #e8b827); }
+
+/* ── Guide pages (gems, enchants, …) ── */
+.static-page .guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 16px;
+    font-size: .9rem;
+}
+.static-page .guide-table th,
+.static-page .guide-table td {
+    text-align: left;
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    vertical-align: top;
+}
+.static-page .guide-table th {
+    color: rgba(255,255,255,.6);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: .72rem;
+    letter-spacing: .04em;
+}
+.static-page .guide-table td:first-child { font-weight: 600; color: #fff; white-space: nowrap; }
+.static-page .guide-links { list-style: none; margin-left: 0; }
+.static-page .guide-links li { margin-bottom: 6px; }
+.static-page .gem-red    { color: #ff6b6b; font-weight: 600; }
+.static-page .gem-yellow { color: #ffd452; font-weight: 600; }
+.static-page .gem-blue   { color: #5aa9ff; font-weight: 600; }
+.static-page .gem-orange { color: #ff9d3c; font-weight: 600; }
+.static-page .gem-purple { color: #c98bff; font-weight: 600; }
+.static-page .gem-green  { color: #6fd47f; font-weight: 600; }
+
+/* ── Interactive gem browser (/gems) ── */
+.static-page .gem-browser { margin: 12px 0 8px; }
+.gem-filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.gem-mode { display: flex; gap: 6px; }
+.gem-modebtn {
+    background: rgba(255,255,255,.05); color: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.12); border-radius: 7px;
+    padding: 7px 14px; font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.gem-modebtn.active { background: var(--accent, #e8b827); color: #1a1208; border-color: var(--accent, #e8b827); }
+.gem-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.gem-filter-label {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+    color: rgba(255,255,255,.45); width: 56px; flex-shrink: 0;
+}
+.gem-chip {
+    background: rgba(255,255,255,.05); color: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.1); border-radius: 999px;
+    padding: 4px 11px; font-size: .8rem; cursor: pointer; transition: all .12s;
+}
+.gem-chip:hover { background: rgba(255,255,255,.1); }
+.gem-chip.active { background: var(--accent, #e8b827); color: #1a1208; border-color: var(--accent, #e8b827); font-weight: 600; }
+.gem-select {
+    background: rgba(255,255,255,.06); color: #fff; border: 1px solid rgba(255,255,255,.15);
+    border-radius: 7px; padding: 6px 10px; font-size: .85rem;
+}
+.gem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.gem-count, .gem-loading { grid-column: 1 / -1; color: rgba(255,255,255,.5); font-size: .82rem; margin: 0 0 2px; }
+.gem-group { grid-column: 1 / -1; font-size: .95rem; color: rgba(255,255,255,.85); margin: 12px 0 2px; }
+.gem-card {
+    display: flex; align-items: center; gap: 9px; padding: 7px 9px;
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+    border-left-width: 3px; border-radius: 8px; text-decoration: none; position: relative;
+}
+.gem-card:hover { background: rgba(255,255,255,.07); }
+.gem-card-icon { width: 34px; height: 34px; border-radius: 5px; flex-shrink: 0; }
+.gem-card-body { display: flex; flex-direction: column; min-width: 0; }
+.gem-card-name { font-size: .85rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gem-card-stat { font-size: .76rem; color: rgba(255,255,255,.6); }
+.gem-card-badge {
+    margin-left: auto; font-size: .78rem; font-weight: 700; color: var(--accent, #e8b827);
+    background: rgba(232,184,39,.12); border-radius: 6px; padding: 2px 7px; flex-shrink: 0;
+}
+.gem-q-epic     { border-left-color: #a335ee; }
+.gem-q-rare     { border-left-color: #0070dd; }
+.gem-q-uncommon { border-left-color: #1eff00; }
+.gem-q-meta     { border-left-color: #e8b827; }
+/* Enchant cards: no quality tier — neutral accent + source/slot tags */
+.ench-card { border-left-color: rgba(255,255,255,.2); }
+.ench-source {
+    display: inline-block; font-size: .68rem; color: rgba(255,255,255,.5);
+    background: rgba(255,255,255,.06); border-radius: 5px; padding: 1px 6px; margin-left: 4px;
+}
+.ench-slot {
+    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+    color: var(--accent, #e8b827); margin-right: 5px;
+}
+
+/* ── Browser polish (search, sticky, jump-nav, sockets, mobile) ── */
+.gem-filters {
+    position: sticky; top: 0; z-index: 5;
+    background: rgba(18,18,28,.92); backdrop-filter: blur(6px);
+    padding: 8px 0; margin: 0 -4px 14px; padding-left: 4px; padding-right: 4px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.gem-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gem-search {
+    flex: 1 1 180px; min-width: 140px;
+    background: rgba(255,255,255,.06); color: #fff;
+    border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+    padding: 7px 11px; font-size: .85rem;
+}
+.gem-search::placeholder { color: rgba(255,255,255,.4); }
+.gem-clear {
+    background: none; border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.7);
+    border-radius: 7px; padding: 6px 10px; font-size: .8rem; cursor: pointer;
+}
+.gem-clear:hover { background: rgba(255,255,255,.08); color: #fff; }
+.gem-jumpnav { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 10px; grid-column: 1 / -1; }
+.gem-jumpnav a { font-size: .78rem; color: rgba(255,255,255,.55); text-decoration: none; }
+.gem-jumpnav a:hover { color: var(--accent, #e8b827); }
+.gem-usage-note { grid-column: 1 / -1; font-size: .8rem; color: rgba(255,255,255,.6); margin: 0 0 6px; }
+.gem-group { scroll-margin-top: 70px; }
+/* socket-color dot on gem cards */
+.gem-socket { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,.4) inset; }
+.gem-socket-red { background: #ff6b6b; } .gem-socket-yellow { background: #ffd452; }
+.gem-socket-blue { background: #5aa9ff; } .gem-socket-orange { background: #ff9d3c; }
+.gem-socket-purple { background: #c98bff; } .gem-socket-green { background: #6fd47f; }
+.gem-socket-meta { background: linear-gradient(135deg,#e8b827,#fff,#5aa9ff); }
+/* usage share bar */
+.gem-card-badge { display: inline-flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.gem-card-share { font-size: .62rem; font-weight: 500; color: rgba(255,255,255,.5); }
+/* stronger hover + keyboard focus */
+.gem-card { transition: background .12s, border-color .12s, transform .12s; }
+.gem-card:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.25); }
+.gem-card:focus-visible { outline: 2px solid var(--accent, #e8b827); outline-offset: 2px; }
+.gem-card-stat { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+@media (max-width: 480px) {
+    .gem-grid { grid-template-columns: 1fr; }
+    .gem-chip { padding: 8px 12px; }
+    .gem-filter-label { width: 100%; }
+    .gem-usage-row { flex-direction: column; align-items: stretch; }
+    .gem-usage-row .gem-select { width: 100%; }
+}
 .static-page ul {
     margin: 0 0 12px 20px;
     padding: 0;

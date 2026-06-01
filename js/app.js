@@ -458,8 +458,8 @@
         const parts = location.pathname.replace(/^\//, '').split('/').filter(Boolean);
         if (!parts.length) return false;
 
-        // Static pages: /about, /privacy, /feedback
-        if (parts[0] === 'about' || parts[0] === 'privacy' || parts[0] === 'feedback') {
+        // Static pages: /about, /privacy, /feedback, and guide pages (/gems, …)
+        if (STATIC_PAGES[parts[0]]) {
             showStaticPage(parts[0]);
             return true;
         }
@@ -1335,6 +1335,7 @@
             <div>
                 <h2 class="seo-desc-heading">${escapeHtmlText(specLabel)} PvP BiS — TBC Classic Arena</h2>
                 <p class="seo-desc-text">${escapeHtmlText(baseDesc)}</p>
+                <p class="seo-desc-text">Drag the <strong>Meta Evolution</strong> slider below to see how this spec's arena gear has shifted week by week.</p>
             </div>
         </div>`;
         el.classList.remove('hidden');
@@ -1440,6 +1441,7 @@
         if (otherSpecs) {
             html += `<p>Other ${escapeHtmlText(cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
         }
+        html += `<p>Guides: <a href="/gems">Gems</a> · <a href="/enchants">Enchants</a> · <a href="/stat-priority">Stat Priority</a> · <a href="/attunements">Attunements</a></p>`;
         el.innerHTML = html;
         el.classList.remove('hidden');
     }
@@ -2754,6 +2756,11 @@
         // Popularity badge with tier color
         parts.push(`<span class="pvp-pop-badge ${tierMeta.cls || ''}">${tierMeta.badge || ''} ${m.popularity}%</span>`);
 
+        // "New this week" indicator (set when a meta-evolution week is shown)
+        if (m.isNew) {
+            parts.push(`<span class="pvp-new-badge" title="New in this week's snapshot vs the previous week">✨ New</span>`);
+        }
+
         // PvE Flex indicator
         if (m.isPvEFlex) {
             parts.push(`<span class="pvp-pve-flex-badge" title="PvE item commonly used in PvP">⚔️ PvE</span>`);
@@ -2978,7 +2985,47 @@
     // wcl-cohorts.js is loaded eagerly via a <script> tag in index.html, so
     // WCL_COHORTS is available by the time renderBisList runs.
 
-    function buildPvpItemsList(pvpSpecData) {
+    // ─── PvP meta-evolution history (lazy weekly snapshots for the slider) ──
+    let _pvpHistory = null;       // { dates:[asc], snapshots:{ date:{ "Class|Spec":{slots,...} } } }
+    let _pvpHistoryDate = null;   // selected week (null = latest / live)
+    let _pvpHistoryPromise = null;
+    function loadPvpHistory() {
+        if (_pvpHistoryPromise) return _pvpHistoryPromise;
+        // Served from jsDelivr (free CDN, brotli, off Firebase's egress quota); the
+        // weekly CI commit updates @main automatically. Falls back to the local copy.
+        const CDN = 'https://cdn.jsdelivr.net/gh/vexxacus/tbc-bis-guide@main/pvp-history.json';
+        const fetchJson = url => fetch(url).then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
+        _pvpHistoryPromise = fetchJson(CDN)
+            .catch(() => fetchJson('/pvp-history.json'))
+            .then(h => { _pvpHistory = h; return h; })
+            .catch(() => { _pvpHistory = { dates: [], snapshots: {} }; return _pvpHistory; });
+        return _pvpHistoryPromise;
+    }
+    // Previous week's slots for a spec, for "new this week" diffing.
+    // `date` = the week being shown, or null for the live/latest snapshot.
+    function pvpPrevSlots(pvpKey, date) {
+        if (!_pvpHistory || !_pvpHistory.dates.length) return null;
+        const dates = _pvpHistory.dates;
+        const cur = date || dates[dates.length - 1];   // live ≈ newest history date
+        const idx = dates.indexOf(cur);
+        if (idx <= 0) return null;                      // oldest week → nothing to diff against
+        const prev = _pvpHistory.snapshots[dates[idx - 1]];
+        return (prev && prev[pvpKey]) ? prev[pvpKey].slots : null;
+    }
+    function pvpMetaSliderHtml() {
+        if (!_pvpHistory || _pvpHistory.dates.length < 2) return '';
+        const dates = _pvpHistory.dates;
+        const cur = _pvpHistoryDate || dates[dates.length - 1];
+        const idx = dates.indexOf(cur);
+        const isLatest = idx === dates.length - 1;
+        return `<div class="pvp-meta-slider">
+            <div class="pms-head">📈 <strong>PvP Meta Evolution</strong> — drag to see how the meta shifted week by week</div>
+            <input type="range" class="pms-range" min="0" max="${dates.length - 1}" value="${idx}" step="1" aria-label="Snapshot week">
+            <div class="pms-label">Showing <strong class="pms-date">${cur}</strong><span class="pms-latest">${isLatest ? ' (latest)' : ''}</span></div>
+        </div>`;
+    }
+
+    function buildPvpItemsList(pvpSpecData, prevSlots) {
         // With very few players, rating gate is just noise — suppress it
         const suppressRatingGate = (pvpSpecData.playerCount || 0) < 10;
         const has2HSet = typeof ITEM_TWO_HAND_WEAPON !== 'undefined';
@@ -2986,6 +3033,8 @@
         const items = [];
         for (const [pvpSlot, slotItems] of Object.entries(pvpSpecData.slots)) {
             let appSlot = PVP_SLOT_MAP[pvpSlot] || pvpSlot;
+            // Item ids used in this slot last week (for "new this week" flagging).
+            const prevIds = prevSlots ? new Set((prevSlots[pvpSlot] || []).map(x => String(x.id))) : null;
             for (let i = 0; i < slotItems.length; i++) {
                 const pi = slotItems[i];
                 let finalSlot = appSlot;
@@ -3016,6 +3065,7 @@
                         topGems: pi.topGems || [],
                         topEnchants: pi.topEnchants || [],
                         quality: pi.quality,
+                        isNew: prevIds ? !prevIds.has(String(pi.id)) : false,
                     }
                 });
             }
@@ -3721,10 +3771,18 @@
         let pvpSpecData = null;
         if (state.isPvP) {
             const pvpKey = state.pvpKey || `${state.selectedClass}|${state.selectedSpec}`;
-            if (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs && PVP_DATA.specs[pvpKey]) {
+            // Lazy-load the weekly history once per session (powers the meta slider).
+            if (!_pvpHistoryPromise) loadPvpHistory().then(() => { if (state.isPvP) renderBisList(); });
+            // A historical week chosen via the slider overrides the live snapshot.
+            const histSpec = _pvpHistoryDate && _pvpHistory && _pvpHistory.snapshots[_pvpHistoryDate]
+                ? _pvpHistory.snapshots[_pvpHistoryDate][pvpKey] : null;
+            if (histSpec) {
+                pvpSpecData = histSpec;
+                items = buildPvpItemsList(pvpSpecData, pvpPrevSlots(pvpKey, _pvpHistoryDate));
+            } else if (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs && PVP_DATA.specs[pvpKey]) {
                 pvpSpecData = PVP_DATA.specs[pvpKey];
                 // In scraped PvP mode, items come ONLY from scraped data
-                items = buildPvpItemsList(pvpSpecData);
+                items = buildPvpItemsList(pvpSpecData, pvpPrevSlots(pvpKey, null));
             } else if (phaseData) {
                 // Legacy fallback (needs phase data)
                 const pvpData = PVP_ITEMS[state.selectedClass];
@@ -4347,17 +4405,18 @@
             if (pvpSpecData) {
                 const rr = pvpSpecData.ratingRange;
                 const ratingInfo = rr ? `${rr.min}–${rr.max} rating (avg ${rr.avg})` : '';
-                const meta = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta) || {};
-                const dateStr = meta.analyzedAt
-                    ? new Date(meta.analyzedAt).toLocaleDateString('sv-SE')
-                    : '';
-                const flexCount = pvpSpecData.flexSlots ? Object.keys(pvpSpecData.flexSlots).length : 0;
+                const isHist = !!_pvpHistoryDate;
+                const dateStr = isHist
+                    ? _pvpHistoryDate
+                    : ((typeof PVP_DATA !== 'undefined' && PVP_DATA.meta && PVP_DATA.meta.analyzedAt)
+                        ? new Date(PVP_DATA.meta.analyzedAt).toLocaleDateString('sv-SE') : '');
+                const specName = pvpSpecData.spec || state.selectedSpec;
                 html += `<div class="pvp-info-banner">
-                    <div class="pvp-banner-title">⚔️ <strong>Arena BiS — Live Snapshot</strong></div>
+                    <div class="pvp-banner-title">⚔️ <strong>Arena BiS — ${isHist ? 'Snapshot ' + escapeHtmlText(dateStr) : 'Live Snapshot'}</strong></div>
                     <div class="pvp-banner-meta">
-                        What the top ${pvpSpecData.playerCount} ${pvpSpecData.spec} players are wearing right now.
+                        What the top ${pvpSpecData.playerCount} ${escapeHtmlText(specName)} players ${isHist ? 'were wearing that week' : 'are wearing right now'}.
                         ${ratingInfo ? '<br>' + ratingInfo : ''}
-                        ${dateStr ? '<br>📅 Last updated: ' + dateStr : ''}
+                        ${dateStr ? '<br>📅 ' + (isHist ? 'Snapshot' : 'Last updated') + ': ' + escapeHtmlText(dateStr) : ''}
                     </div>
                     <div class="pvp-banner-legend">
                         <span class="pvp-legend-item"><span class="pvp-pop-badge pvp-tier-gold">🥇 70%+</span> Gold</span>
@@ -4366,6 +4425,7 @@
                         <span class="pvp-legend-item"><span class="pvp-pve-flex-badge">⚔️ PvE</span> Flex slot</span>
                     </div>
                 </div>`;
+                html += pvpMetaSliderHtml();
             } else {
                 html += `<div style="padding:10px 14px;background:rgba(196,30,58,0.08);border:1px solid rgba(196,30,58,0.25);border-radius:var(--radius);margin-bottom:10px;font-size:0.78rem;color:var(--text-secondary);">
                     ⚔️ <strong style="color:#c41e3a">PvP Mode</strong> — Gladiator & Honor items prioritized.
@@ -4515,6 +4575,29 @@
                 requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
             });
         });
+
+        // ── PvP meta-evolution slider ──
+        const pmsRange = slotList.querySelector('.pms-range');
+        if (pmsRange && _pvpHistory) {
+            const dates = _pvpHistory.dates;
+            const lastIdx = dates.length - 1;
+            const dateEl = slotList.querySelector('.pms-date');
+            const latestEl = slotList.querySelector('.pms-latest');
+            // Live label feedback while dragging (no re-render → drag stays smooth).
+            pmsRange.addEventListener('input', () => {
+                const i = +pmsRange.value;
+                if (dateEl) dateEl.textContent = dates[i] || '';
+                if (latestEl) latestEl.textContent = (i === lastIdx) ? ' (latest)' : '';
+            });
+            // Commit on release → re-render the gear list for that week.
+            pmsRange.addEventListener('change', () => {
+                const i = +pmsRange.value;
+                _pvpHistoryDate = (i === lastIdx) ? null : dates[i];
+                const scrollY = window.scrollY;
+                renderBisList();
+                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+            });
+        }
 
         // Events — expand/collapse slot-header (but open modal if icon/name clicked)
         slotList.querySelectorAll('.slot-header').forEach(hdr => {
@@ -5290,6 +5373,21 @@
         }
     };
 
+    // Guide pages (gems, …) share their content with the prerenderer via
+    // js/guides.js so the visible page and the crawled HTML stay identical.
+    const GUIDES = (typeof window !== 'undefined' && window.GUIDES) || {};
+    for (const slug of Object.keys(GUIDES)) {
+        STATIC_PAGES[slug] = {
+            title:       GUIDES[slug].title,
+            description: GUIDES[slug].description,
+            html:        GUIDES[slug].bodyHtml
+        };
+    }
+    // The gems guide hosts the interactive gem browser (initialized after its
+    // static HTML is injected, same onLoad pattern as the feedback board).
+    if (STATIC_PAGES.gems) STATIC_PAGES.gems.onLoad = function () { initGemBrowser(); };
+    if (STATIC_PAGES.enchants) STATIC_PAGES.enchants.onLoad = function () { initEnchantBrowser(); };
+
     function showStaticPage(page) {
         const data = STATIC_PAGES[page];
         if (!data) return;
@@ -5433,6 +5531,381 @@
                 });
             });
         }, 100);
+    }
+
+    // ─── Interactive Gem Browser (/gems guide) ───────────────────────
+    let _gemCatalog = null;   // { itemId: {name,color,quality,isMeta,statText,statTags,icon} }
+    let _gemUsage   = null;   // { "Class|Spec": { phase: [{itemId,count}] } }
+    const _gemUI = { mode: 'browse', q: '', quality: 'all', color: 'all', stat: 'all',
+                     usageClass: 'Warrior', usageSpec: 'Fury', usagePhase: '5' };
+    const GEM_QUALITY_NAME = { 2: 'uncommon', 3: 'rare', 4: 'epic' };
+    const GEM_COLOR_ORDER = ['red', 'yellow', 'blue', 'orange', 'purple', 'green', 'meta'];
+    const _cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+    function readGemURL() {
+        const p = new URLSearchParams(location.search);
+        if (p.get('mode') === 'usage') _gemUI.mode = 'usage';
+        ['q', 'quality', 'color', 'stat'].forEach(k => { if (p.get(k)) _gemUI[k] = p.get(k); });
+        if (p.get('class')) _gemUI.usageClass = p.get('class');
+        if (p.get('spec'))  _gemUI.usageSpec  = p.get('spec');
+        if (p.get('phase')) _gemUI.usagePhase = p.get('phase');
+    }
+    function syncGemURL() {
+        const p = new URLSearchParams();
+        if (_gemUI.mode !== 'browse') p.set('mode', _gemUI.mode);
+        if (_gemUI.q) p.set('q', _gemUI.q);
+        if (_gemUI.mode === 'browse') {
+            ['quality', 'color', 'stat'].forEach(k => { if (_gemUI[k] !== 'all') p.set(k, _gemUI[k]); });
+        } else {
+            p.set('class', _gemUI.usageClass); p.set('spec', _gemUI.usageSpec); p.set('phase', _gemUI.usagePhase);
+        }
+        const qs = p.toString();
+        history.replaceState(history.state, '', '/gems' + (qs ? '?' + qs : ''));
+    }
+
+    function initGemBrowser() {
+        const grid = document.getElementById('gemGrid');
+        if (!grid) return;
+        readGemURL();
+        if (_gemCatalog) { renderGemFilters(); renderGemGrid(); return; }
+        grid.innerHTML = '<p class="gem-loading">Loading gems…</p>';
+        Promise.all([
+            fetch('/gem-catalog.json').then(r => r.json()),
+            fetch('/gem-usage.json').then(r => r.json()).catch(() => ({}))
+        ]).then(([cat, usage]) => {
+            _gemCatalog = cat; _gemUsage = usage || {};
+            renderGemFilters();
+            renderGemGrid();
+        }).catch(() => { grid.innerHTML = '<p class="gem-loading">Could not load gem data.</p>'; });
+    }
+
+    function _gemStatList() {
+        const set = new Set();
+        for (const id in _gemCatalog) for (const t of _gemCatalog[id].statTags) set.add(t);
+        return [...set].sort();
+    }
+
+    function renderGemFilters() {
+        const filters = document.getElementById('gemFilters');
+        if (!filters) return;
+        const chip = (group, val, label, active) =>
+            `<button class="gem-chip${active ? ' active' : ''}" data-group="${group}" data-val="${escapeHtmlText(val)}">${escapeHtmlText(label)}</button>`;
+
+        let html = `<div class="gem-toolbar">
+            <div class="gem-mode">
+                <button class="gem-modebtn${_gemUI.mode === 'browse' ? ' active' : ''}" data-mode="browse">Browse all</button>
+                <button class="gem-modebtn${_gemUI.mode === 'usage' ? ' active' : ''}" data-mode="usage">Top-used by spec</button>
+            </div>
+            <input class="gem-search" type="search" placeholder="Search gems…" value="${escapeHtmlText(_gemUI.q || '')}" aria-label="Search gems by name">
+            <button class="gem-clear" data-action="clear">Clear</button>
+        </div>`;
+
+        if (_gemUI.mode === 'browse') {
+            const quals = [['all','All'],['epic','Epic'],['rare','Rare'],['uncommon','Uncommon'],['meta','Meta']];
+            const colors = [['all','All'],['red','Red'],['yellow','Yellow'],['blue','Blue'],['orange','Orange'],['purple','Purple'],['green','Green'],['meta','Meta']];
+            html += `<div class="gem-filter-row"><span class="gem-filter-label">Quality</span>${quals.map(([v,l]) => chip('quality', v, l, _gemUI.quality === v)).join('')}</div>`;
+            html += `<div class="gem-filter-row"><span class="gem-filter-label">Color</span>${colors.map(([v,l]) => chip('color', v, l, _gemUI.color === v)).join('')}</div>`;
+            const stats = ['all', ..._gemStatList()];
+            html += `<div class="gem-filter-row"><span class="gem-filter-label">Stat</span>${stats.map(v => chip('stat', v, v === 'all' ? 'All' : v, _gemUI.stat === v)).join('')}</div>`;
+        } else {
+            const classes = Object.keys(CLASS_META);
+            const specs = (CLASS_META[_gemUI.usageClass] || { specs: [] }).specs;
+            if (!specs.includes(_gemUI.usageSpec)) _gemUI.usageSpec = specs[0];
+            const phaseOpts = [0,1,2,3,4,5].map(p =>
+                `<option value="${p}"${String(p) === String(_gemUI.usagePhase) ? ' selected' : ''}>${p === 0 ? 'Pre-Raid' : ((PHASE_NAMES[p] || {}).label || ('Phase ' + p))}</option>`).join('');
+            html += `<div class="gem-filter-row gem-usage-row">
+                <select class="gem-select" id="gemUsageClass">${classes.map(c => `<option${c === _gemUI.usageClass ? ' selected' : ''}>${c}</option>`).join('')}</select>
+                <select class="gem-select" id="gemUsageSpec">${specs.map(s => `<option${s === _gemUI.usageSpec ? ' selected' : ''}>${escapeHtmlText(s)}</option>`).join('')}</select>
+                <select class="gem-select" id="gemUsagePhase">${phaseOpts}</select>
+            </div>`;
+        }
+        filters.innerHTML = html;
+
+        filters.querySelectorAll('.gem-chip').forEach(btn => btn.addEventListener('click', () => {
+            _gemUI[btn.dataset.group] = btn.dataset.val;
+            renderGemFilters(); renderGemGrid(); syncGemURL();
+        }));
+        filters.querySelectorAll('.gem-modebtn').forEach(btn => btn.addEventListener('click', () => {
+            _gemUI.mode = btn.dataset.mode; renderGemFilters(); renderGemGrid(); syncGemURL();
+        }));
+        const search = filters.querySelector('.gem-search');
+        if (search) search.addEventListener('input', () => { _gemUI.q = search.value; renderGemGrid(); syncGemURL(); });
+        const clear = filters.querySelector('[data-action="clear"]');
+        if (clear) clear.addEventListener('click', () => {
+            _gemUI.q = ''; _gemUI.quality = 'all'; _gemUI.color = 'all'; _gemUI.stat = 'all';
+            renderGemFilters(); renderGemGrid(); syncGemURL();
+        });
+        const cSel = document.getElementById('gemUsageClass');
+        const sSel = document.getElementById('gemUsageSpec');
+        const pSel = document.getElementById('gemUsagePhase');
+        if (cSel) cSel.addEventListener('change', () => {
+            _gemUI.usageClass = cSel.value;
+            _gemUI.usageSpec = (CLASS_META[cSel.value] || { specs: [] }).specs[0];
+            renderGemFilters(); renderGemGrid(); syncGemURL();
+        });
+        if (sSel) sSel.addEventListener('change', () => { _gemUI.usageSpec = sSel.value; renderGemGrid(); syncGemURL(); });
+        if (pSel) pSel.addEventListener('change', () => { _gemUI.usagePhase = pSel.value; renderGemGrid(); syncGemURL(); });
+    }
+
+    function gemCard(id, badgeHtml) {
+        const g = _gemCatalog[id];
+        if (!g) return '';
+        const q = g.isMeta ? 'meta' : (GEM_QUALITY_NAME[g.quality] || 'epic');
+        const icon = g.icon || 'inv_misc_gem_01';
+        return `<a class="gem-card gem-q-${q}" href="https://www.wowhead.com/${WH}/item=${id}" data-wowhead="item=${id}&domain=${WH}" rel="external">
+            <span class="gem-socket gem-socket-${g.color}" title="${_cap(g.color)} socket"></span>
+            <img class="gem-card-icon" src="${WH_ICON_CDN}/medium/${icon}.jpg" alt="${escapeHtmlText(g.name)}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/medium/inv_misc_gem_01.jpg'">
+            <span class="gem-card-body">
+                <span class="gem-card-name">${escapeHtmlText(g.name)}</span>
+                <span class="gem-card-stat">${escapeHtmlText(g.statText)}</span>
+            </span>
+            ${badgeHtml || ''}
+        </a>`;
+    }
+
+    function _gemMatchesFilters(g) {
+        if (_gemUI.quality !== 'all') {
+            if (_gemUI.quality === 'meta') { if (!g.isMeta) return false; }
+            else if ((GEM_QUALITY_NAME[g.quality] || '') !== _gemUI.quality) return false;
+        }
+        if (_gemUI.color !== 'all' && g.color !== _gemUI.color) return false;
+        if (_gemUI.stat !== 'all' && !g.statTags.includes(_gemUI.stat)) return false;
+        if (_gemUI.q) {
+            const q = _gemUI.q.toLowerCase();
+            if (!(g.name.toLowerCase().includes(q) || (g.statText || '').toLowerCase().includes(q))) return false;
+        }
+        return true;
+    }
+
+    function renderGemGrid() {
+        const grid = document.getElementById('gemGrid');
+        if (!grid || !_gemCatalog) return;
+        let html = '';
+        if (_gemUI.mode === 'usage') {
+            const key = `${_gemUI.usageClass}|${_gemUI.usageSpec}`;
+            let list = (_gemUsage[key] && _gemUsage[key][_gemUI.usagePhase]) || [];
+            if (_gemUI.q) { const q = _gemUI.q.toLowerCase(); list = list.filter(u => (_gemCatalog[u.itemId] || {}).name && _gemCatalog[u.itemId].name.toLowerCase().includes(q)); }
+            if (!list.length) {
+                grid.innerHTML = `<p class="gem-loading">No gem-usage data for this spec / phase yet. <button class="gem-clear" data-action="clear">Clear search</button></p>`;
+                _wireGemClear(grid);
+                return;
+            }
+            const sorted = list.slice().sort((a, b) => b.count - a.count);
+            const max = sorted[0].count || 1;
+            const phLabel = _gemUI.usagePhase === '0' ? 'Pre-Raid' : ((PHASE_NAMES[+_gemUI.usagePhase] || {}).label || ('Phase ' + _gemUI.usagePhase));
+            html = `<p class="gem-usage-note">Most-used gems for <strong>${escapeHtmlText(_gemUI.usageSpec)} ${escapeHtmlText(_gemUI.usageClass)}</strong> in ${escapeHtmlText(phLabel)}, ranked by how often they appear in top players' setups (× = times used).</p>`;
+            html += sorted.map(u => {
+                const badge = `<span class="gem-card-badge">×${u.count}<span class="gem-card-share">${Math.round((u.count / max) * 100)}%</span></span>`;
+                return gemCard(String(u.itemId), badge);
+            }).join('');
+        } else {
+            const ids = Object.keys(_gemCatalog).filter(id => _gemMatchesFilters(_gemCatalog[id]));
+            const groups = {};
+            for (const id of ids) (groups[_gemCatalog[id].color] = groups[_gemCatalog[id].color] || []).push(id);
+            const present = GEM_COLOR_ORDER.filter(c => (groups[c] || []).length);
+            html = `<p class="gem-count">${ids.length} gem${ids.length === 1 ? '' : 's'}</p>`;
+            if (present.length > 1) {
+                html += `<nav class="gem-jumpnav" aria-label="Jump to color">${present.map(c => `<a href="#${c}-gems">${_cap(c)}</a>`).join('')}</nav>`;
+            }
+            for (const c of present) {
+                const list = groups[c].sort((a, b) => (_gemCatalog[b].quality - _gemCatalog[a].quality) || _gemCatalog[a].name.localeCompare(_gemCatalog[b].name));
+                html += `<h3 class="gem-group" id="${c}-gems">${_cap(c)} gems</h3>` + list.map(id => gemCard(id)).join('');
+            }
+            if (!ids.length) html = `<p class="gem-loading">No gems match these filters. <button class="gem-clear" data-action="clear">Clear filters</button></p>`;
+        }
+        grid.innerHTML = html;
+        _wireGemClear(grid);
+        refreshWH();
+    }
+
+    function _wireGemClear(scope) {
+        const btn = scope.querySelector('[data-action="clear"]');
+        if (btn) btn.addEventListener('click', () => {
+            _gemUI.q = ''; _gemUI.quality = 'all'; _gemUI.color = 'all'; _gemUI.stat = 'all';
+            renderGemFilters(); renderGemGrid(); syncGemURL();
+        });
+    }
+
+    // ─── Interactive Enchant Browser (/enchants guide) ───────────────
+    let _enchCatalog = null;   // { spellId: {name,slot,effect,statTags,icon,source,sourceLocation} }
+    let _enchUsage   = null;   // { "Class|Spec": { phase: { slot: spellId } } }
+    const _enchUI = { mode: 'browse', q: '', slot: 'all', stat: 'all',
+                      recClass: 'Warrior', recSpec: 'Fury' };
+    const ENCH_SLOT_ORDER = ['Head', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands',
+        'Legs', 'Feet', 'Main Hand', 'Off Hand', 'Two Hand', 'Ring', 'Ranged/Relic'];
+    const _enchSlotId = s => 'ench-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    // Map a CLASS_META spec to its enchant-usage data key (data merges all rogues
+    // into "Rogue|Dps" and has no Discipline → copy Holy).
+    function enchUsageKey(cls, spec) {
+        if (cls === 'Rogue') return 'Rogue|Dps';
+        if (cls === 'Priest' && spec === 'Discipline') return 'Priest|Holy';
+        return `${cls}|${spec}`;
+    }
+
+    function readEnchURL() {
+        const p = new URLSearchParams(location.search);
+        if (p.get('mode') === 'rec') _enchUI.mode = 'rec';
+        ['q', 'slot', 'stat'].forEach(k => { if (p.get(k)) _enchUI[k] = p.get(k); });
+        if (p.get('class')) _enchUI.recClass = p.get('class');
+        if (p.get('spec'))  _enchUI.recSpec  = p.get('spec');
+    }
+    function syncEnchURL() {
+        const p = new URLSearchParams();
+        if (_enchUI.mode !== 'browse') p.set('mode', _enchUI.mode);
+        if (_enchUI.q) p.set('q', _enchUI.q);
+        if (_enchUI.mode === 'browse') {
+            if (_enchUI.slot !== 'all') p.set('slot', _enchUI.slot);
+            if (_enchUI.stat !== 'all') p.set('stat', _enchUI.stat);
+        } else {
+            p.set('class', _enchUI.recClass); p.set('spec', _enchUI.recSpec);
+        }
+        const qs = p.toString();
+        history.replaceState(history.state, '', '/enchants' + (qs ? '?' + qs : ''));
+    }
+
+    function initEnchantBrowser() {
+        const grid = document.getElementById('enchGrid');
+        if (!grid) return;
+        readEnchURL();
+        if (_enchCatalog) { renderEnchFilters(); renderEnchGrid(); return; }
+        grid.innerHTML = '<p class="gem-loading">Loading enchants…</p>';
+        Promise.all([
+            fetch('/enchant-catalog.json').then(r => r.json()),
+            fetch('/enchant-usage.json').then(r => r.json()).catch(() => ({}))
+        ]).then(([cat, usage]) => {
+            _enchCatalog = cat; _enchUsage = usage || {};
+            renderEnchFilters();
+            renderEnchGrid();
+        }).catch(() => { grid.innerHTML = '<p class="gem-loading">Could not load enchant data.</p>'; });
+    }
+
+    function _enchStatList() {
+        const set = new Set();
+        for (const id in _enchCatalog) for (const t of _enchCatalog[id].statTags) set.add(t);
+        return [...set].sort();
+    }
+    function _enchSlotsPresent() {
+        const present = new Set(Object.values(_enchCatalog).map(e => e.slot));
+        return ENCH_SLOT_ORDER.filter(s => present.has(s));
+    }
+
+    function renderEnchFilters() {
+        const filters = document.getElementById('enchFilters');
+        if (!filters) return;
+        const chip = (group, val, label, active) =>
+            `<button class="gem-chip${active ? ' active' : ''}" data-group="${group}" data-val="${escapeHtmlText(val)}">${escapeHtmlText(label)}</button>`;
+
+        let html = `<div class="gem-toolbar">
+            <div class="gem-mode">
+                <button class="gem-modebtn${_enchUI.mode === 'browse' ? ' active' : ''}" data-mode="browse">Browse all</button>
+                <button class="gem-modebtn${_enchUI.mode === 'rec' ? ' active' : ''}" data-mode="rec">Recommended by spec</button>
+            </div>
+            <input class="gem-search" type="search" placeholder="Search enchants…" value="${escapeHtmlText(_enchUI.q || '')}" aria-label="Search enchants by name">
+            <button class="gem-clear" data-action="clear">Clear</button>
+        </div>`;
+
+        if (_enchUI.mode === 'browse') {
+            const slots = ['all', ..._enchSlotsPresent()];
+            html += `<div class="gem-filter-row"><span class="gem-filter-label">Slot</span>${slots.map(v => chip('slot', v, v === 'all' ? 'All' : v, _enchUI.slot === v)).join('')}</div>`;
+            const stats = ['all', ..._enchStatList()];
+            html += `<div class="gem-filter-row"><span class="gem-filter-label">Stat</span>${stats.map(v => chip('stat', v, v === 'all' ? 'All' : v, _enchUI.stat === v)).join('')}</div>`;
+        } else {
+            const classes = Object.keys(CLASS_META);
+            const specs = (CLASS_META[_enchUI.recClass] || { specs: [] }).specs;
+            if (!specs.includes(_enchUI.recSpec)) _enchUI.recSpec = specs[0];
+            html += `<div class="gem-filter-row gem-usage-row">
+                <select class="gem-select" id="enchRecClass">${classes.map(c => `<option${c === _enchUI.recClass ? ' selected' : ''}>${c}</option>`).join('')}</select>
+                <select class="gem-select" id="enchRecSpec">${specs.map(s => `<option${s === _enchUI.recSpec ? ' selected' : ''}>${escapeHtmlText(s)}</option>`).join('')}</select>
+            </div>`;
+        }
+        filters.innerHTML = html;
+
+        filters.querySelectorAll('.gem-chip').forEach(btn => btn.addEventListener('click', () => {
+            _enchUI[btn.dataset.group] = btn.dataset.val;
+            renderEnchFilters(); renderEnchGrid(); syncEnchURL();
+        }));
+        filters.querySelectorAll('.gem-modebtn').forEach(btn => btn.addEventListener('click', () => {
+            _enchUI.mode = btn.dataset.mode; renderEnchFilters(); renderEnchGrid(); syncEnchURL();
+        }));
+        const search = filters.querySelector('.gem-search');
+        if (search) search.addEventListener('input', () => { _enchUI.q = search.value; renderEnchGrid(); syncEnchURL(); });
+        const clear = filters.querySelector('[data-action="clear"]');
+        if (clear) clear.addEventListener('click', _enchClear);
+        const cSel = document.getElementById('enchRecClass');
+        const sSel = document.getElementById('enchRecSpec');
+        if (cSel) cSel.addEventListener('change', () => {
+            _enchUI.recClass = cSel.value;
+            _enchUI.recSpec = (CLASS_META[cSel.value] || { specs: [] }).specs[0];
+            renderEnchFilters(); renderEnchGrid(); syncEnchURL();
+        });
+        if (sSel) sSel.addEventListener('change', () => { _enchUI.recSpec = sSel.value; renderEnchGrid(); syncEnchURL(); });
+    }
+
+    function _enchClear() {
+        _enchUI.q = ''; _enchUI.slot = 'all'; _enchUI.stat = 'all';
+        renderEnchFilters(); renderEnchGrid(); syncEnchURL();
+    }
+
+    function enchCard(id, slotLabel) {
+        const e = _enchCatalog[id];
+        if (!e) return '';
+        const icon = e.icon || 'inv_misc_note_01';
+        const statLine = e.statTags.length ? e.statTags.join(' · ') : (e.effect || '');
+        const src = e.source ? `<span class="ench-source">${escapeHtmlText(e.source)}</span>` : '';
+        const slotTag = slotLabel ? `<span class="ench-slot">${escapeHtmlText(slotLabel)}</span> ` : '';
+        return `<a class="gem-card ench-card" href="https://www.wowhead.com/${WH}/spell=${id}" data-wowhead="spell=${id}&domain=${WH}" rel="external">
+            <img class="gem-card-icon" src="${WH_ICON_CDN}/medium/${icon}.jpg" alt="${escapeHtmlText(e.name)}" loading="lazy" onerror="this.src='${WH_ICON_CDN}/medium/inv_misc_note_01.jpg'">
+            <span class="gem-card-body">
+                <span class="gem-card-name">${slotTag}${escapeHtmlText(e.name)}</span>
+                <span class="gem-card-stat">${escapeHtmlText(statLine)} ${src}</span>
+            </span>
+        </a>`;
+    }
+
+    function renderEnchGrid() {
+        const grid = document.getElementById('enchGrid');
+        if (!grid || !_enchCatalog) return;
+        const q = (_enchUI.q || '').toLowerCase();
+        const matchQ = e => !q || e.name.toLowerCase().includes(q) || (e.effect || '').toLowerCase().includes(q);
+        let html = '';
+        if (_enchUI.mode === 'rec') {
+            const rec = _enchUsage[enchUsageKey(_enchUI.recClass, _enchUI.recSpec)] || {};
+            const slots = ENCH_SLOT_ORDER.filter(s => rec[s] && matchQ(_enchCatalog[rec[s]] || {}));
+            if (!slots.length) {
+                grid.innerHTML = `<p class="gem-loading">No enchant data for this spec yet. <button class="gem-clear" data-action="clear">Clear search</button></p>`;
+                _wireEnchClear(grid);
+                return;
+            }
+            html = `<p class="gem-usage-note">Recommended enchants for <strong>${escapeHtmlText(_enchUI.recSpec)} ${escapeHtmlText(_enchUI.recClass)}</strong>, one per slot.</p>`;
+            html += slots.map(s => enchCard(String(rec[s]), s)).join('');
+        } else {
+            const ids = Object.keys(_enchCatalog).filter(id => {
+                const e = _enchCatalog[id];
+                if (_enchUI.slot !== 'all' && e.slot !== _enchUI.slot) return false;
+                if (_enchUI.stat !== 'all' && !e.statTags.includes(_enchUI.stat)) return false;
+                return matchQ(e);
+            });
+            const bySlot = {};
+            for (const id of ids) (bySlot[_enchCatalog[id].slot] = bySlot[_enchCatalog[id].slot] || []).push(id);
+            const slotsToShow = ((_enchUI.slot === 'all') ? _enchSlotsPresent() : [_enchUI.slot]).filter(s => (bySlot[s] || []).length);
+            html = `<p class="gem-count">${ids.length} enchant${ids.length === 1 ? '' : 's'}</p>`;
+            if (slotsToShow.length > 1) {
+                html += `<nav class="gem-jumpnav" aria-label="Jump to slot">${slotsToShow.map(s => `<a href="#${_enchSlotId(s)}">${escapeHtmlText(s)}</a>`).join('')}</nav>`;
+            }
+            for (const s of slotsToShow) {
+                const list = bySlot[s].sort((a, b) => _enchCatalog[a].name.localeCompare(_enchCatalog[b].name));
+                html += `<h3 class="gem-group" id="${_enchSlotId(s)}">${escapeHtmlText(s)}</h3>` + list.map(id => enchCard(id)).join('');
+            }
+            if (!ids.length) html = `<p class="gem-loading">No enchants match these filters. <button class="gem-clear" data-action="clear">Clear filters</button></p>`;
+        }
+        grid.innerHTML = html;
+        _wireEnchClear(grid);
+        refreshWH();
+    }
+
+    function _wireEnchClear(scope) {
+        const btn = scope.querySelector('[data-action="clear"]');
+        if (btn) btn.addEventListener('click', _enchClear);
     }
 
     // Footer link clicks — SPA navigation

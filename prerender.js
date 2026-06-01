@@ -82,6 +82,10 @@ const PHASE_SLUG_MAP = {
     'phase-1': 1, 'phase-2': 2, 'phase-3': 3, 'phase-4': 4, 'phase-5': 5
 };
 
+// Static / guide pages (mirror STATIC_PAGES keys in js/app.js). Each needs a
+// title + description entry in seoForRoute's 'static' case and a sitemap entry.
+const STATIC_SLUGS = ['about', 'privacy', 'feedback', 'gems', 'enchants', 'attunements', 'stat-priority'];
+
 function toSlug(str) {
     return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
@@ -146,6 +150,16 @@ function injectAbbrev(desc, cls, spec) {
 // ─── Per-spec phase descriptions (extracted from app.js) ─────────────
 // Only the ones we need for prerendering. Full set lives in app.js.
 const SPEC_PHASE_DESCRIPTIONS = require('./prerender-descriptions.js');
+// Shared guide-page content (mirrors what js/app.js renders for users).
+const GUIDES = require('./js/guides.js');
+// Full gem catalog (built by fetch-gem-catalog.js) — used to prerender the
+// crawlable static gem list inside the /gems interactive browser.
+let GEM_CATALOG = {};
+try { GEM_CATALOG = require('./gem-catalog.json'); }
+catch { console.warn('  ⚠ gem-catalog.json missing — run `node fetch-gem-catalog.js`'); }
+let ENCHANT_CATALOG = {};
+try { ENCHANT_CATALOG = require('./enchant-catalog.json'); }
+catch { console.warn('  ⚠ enchant-catalog.json missing — run `node fetch-enchant-catalog.js`'); }
 
 // ─── BiS item data (for static BiS summary, prerendered into pages) ──
 // Lazy-loaded on first use to keep prerender startup fast.
@@ -346,6 +360,104 @@ function buildStaticBisBlock(route) {
     <p class="bis-static-note">Interactive view with alternatives, enchants, gems &amp; sim loads below.</p>`;
 }
 
+/** Build Schema.org ItemList `itemListElement` entries for a phase or PvP page.
+ *  Reuses the same data + Wowhead links as the visible summary blocks so the
+ *  structured data matches what's on the page. Returns [] if no data. */
+function buildItemListElements(route) {
+    const out = [];
+    if (route.type === 'phase') {
+        const data = getBisData();
+        const spec = data.specs.find(s => s.className === route.cls && s.specName === route.spec);
+        const phase = spec && spec.phases && spec.phases[route.phase];
+        if (!phase) return out;
+        for (const it of pickTopBisItems(phase.items || [])) {
+            out.push({
+                '@type': 'ListItem',
+                position: out.length + 1,
+                name: it.name,
+                url: `https://www.wowhead.com/tbc/item=${it.itemId}`
+            });
+        }
+    } else if (route.type === 'pvp') {
+        const sd = getPvpSpecData(route);
+        if (!sd || !sd.slots) return out;
+        for (const slot of PVP_SLOT_ORDER) {
+            const items = sd.slots[slot];
+            if (!items || !items.length) continue;
+            out.push({
+                '@type': 'ListItem',
+                position: out.length + 1,
+                name: items[0].name,
+                url: `https://www.wowhead.com/tbc/item=${items[0].id}`
+            });
+        }
+    }
+    return out;
+}
+
+/** Prerender the full gem list (all gems grouped by color, as Wowhead links)
+ *  into the /gems browser's #gemGrid mount, so crawlers see every gem even
+ *  though the interactive filtering is JS-only. Mirrors gemCard() in app.js. */
+function buildGemGridStatic() {
+    const ids = Object.keys(GEM_CATALOG);
+    if (!ids.length) return null;
+    const order = ['red', 'yellow', 'blue', 'orange', 'purple', 'green', 'meta'];
+    const byColor = {};
+    for (const id of ids) {
+        const g = GEM_CATALOG[id];
+        (byColor[g.color] = byColor[g.color] || []).push(Object.assign({ id }, g));
+    }
+    const present = order.filter(c => (byColor[c] || []).length);
+    let html = present.length > 1
+        ? `<nav class="gem-jumpnav" aria-label="Jump to color">${present.map(c => `<a href="#${c}-gems">${c.charAt(0).toUpperCase() + c.slice(1)}</a>`).join('')}</nav>`
+        : '';
+    for (const color of present) {
+        const list = byColor[color].sort((a, b) => (b.quality - a.quality) || a.name.localeCompare(b.name));
+        html += `<h3 class="gem-group" id="${color}-gems">${color.charAt(0).toUpperCase() + color.slice(1)} gems</h3>`;
+        for (const g of list) {
+            const q = g.isMeta ? 'meta' : (g.quality === 4 ? 'epic' : g.quality === 3 ? 'rare' : 'uncommon');
+            html += `<a class="gem-card gem-q-${q}" href="https://www.wowhead.com/tbc/item=${g.id}" data-wowhead="item=${g.id}&domain=tbc" rel="external">` +
+                `<span class="gem-socket gem-socket-${g.color}"></span>` +
+                `<img class="gem-card-icon" src="https://wow.zamimg.com/images/wow/icons/medium/${g.icon}.jpg" alt="${escapeHtmlAttr(g.name)}" loading="lazy">` +
+                `<span class="gem-card-body"><span class="gem-card-name">${escapeHtmlText(g.name)}</span>` +
+                `<span class="gem-card-stat">${escapeHtmlText(g.statText)}</span></span></a>`;
+        }
+    }
+    return html;
+}
+
+/** Prerender the full enchant list (grouped by slot, as Wowhead spell links)
+ *  into the /enchants browser's #enchGrid mount. Mirrors enchCard() in app.js. */
+function buildEnchantGridStatic() {
+    const ids = Object.keys(ENCHANT_CATALOG);
+    if (!ids.length) return null;
+    const order = ['Head', 'Shoulder', 'Back', 'Chest', 'Wrist', 'Hands', 'Legs',
+        'Feet', 'Main Hand', 'Off Hand', 'Two Hand', 'Ring', 'Ranged/Relic'];
+    const bySlot = {};
+    for (const id of ids) {
+        const e = ENCHANT_CATALOG[id];
+        (bySlot[e.slot] = bySlot[e.slot] || []).push(Object.assign({ id }, e));
+    }
+    const slotId = s => 'ench-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const present = order.filter(s => (bySlot[s] || []).length);
+    let html = present.length > 1
+        ? `<nav class="gem-jumpnav" aria-label="Jump to slot">${present.map(s => `<a href="#${slotId(s)}">${escapeHtmlText(s)}</a>`).join('')}</nav>`
+        : '';
+    for (const slot of present) {
+        const list = bySlot[slot].sort((a, b) => a.name.localeCompare(b.name));
+        html += `<h3 class="gem-group" id="${slotId(slot)}">${escapeHtmlText(slot)}</h3>`;
+        for (const e of list) {
+            const statLine = (e.statTags && e.statTags.length) ? e.statTags.join(' · ') : (e.effect || '');
+            const src = e.source ? `<span class="ench-source">${escapeHtmlText(e.source)}</span>` : '';
+            html += `<a class="gem-card ench-card" href="https://www.wowhead.com/tbc/spell=${e.id}" data-wowhead="spell=${e.id}&domain=tbc" rel="external">` +
+                `<img class="gem-card-icon" src="https://wow.zamimg.com/images/wow/icons/medium/${e.icon}.jpg" alt="${escapeHtmlAttr(e.name)}" loading="lazy">` +
+                `<span class="gem-card-body"><span class="gem-card-name">${escapeHtmlText(e.name)}</span>` +
+                `<span class="gem-card-stat">${escapeHtmlText(statLine)} ${src}</span></span></a>`;
+        }
+    }
+    return html;
+}
+
 // ─── Route parser ────────────────────────────────────────────────────
 
 function parseRoute(urlPath) {
@@ -353,7 +465,7 @@ function parseRoute(urlPath) {
 
     if (!parts.length) return { type: 'home' };
 
-    if (['about', 'privacy', 'feedback'].includes(parts[0])) {
+    if (STATIC_SLUGS.includes(parts[0])) {
         return { type: 'static', page: parts[0] };
     }
 
@@ -402,9 +514,11 @@ function seoForRoute(route, fullUrl) {
                 privacy:  'Privacy policy for tbc-bis-guide.com.',
                 feedback: 'Send feedback, request new features, or view the public roadmap for TBC BiS Guide.'
             };
-            title = titleMap[route.page];
-            desc  = descMap[route.page];
-            h1    = titleMap[route.page].split(' — ')[0];
+            // Guide pages (gems, …) source title/desc from the shared GUIDES module.
+            const guide = GUIDES[route.page];
+            title = guide ? guide.title       : titleMap[route.page];
+            desc  = guide ? guide.description  : descMap[route.page];
+            h1    = title.split(' — ')[0];
             break;
         case 'class':
             title = `${route.cls} BiS Guide — TBC Classic`;
@@ -515,10 +629,13 @@ function buildMethodologyLine(cls, spec, phase) {
 }
 
 /** Build the visible #seoFaq content (3 Q&A items in a <dl>). */
-function buildSeoFaqBlock(route, seo) {
-    if (route.type !== 'phase') return null;
+/** Canonical phase FAQ Q&A. Single source of truth shared by the visible FAQ
+ *  block (buildSeoFaqBlock) and the FAQPage JSON-LD (buildJsonLd) so the two
+ *  can never drift apart — Google flags mismatched structured data. Mirrors
+ *  renderSeoFaq in js/app.js (keep in sync). */
+function phaseFaqItems(route, seo) {
     const phLabel = PHASE_NAMES[route.phase].label;
-    const items = [
+    return [
         {
             q: `What is BiS for ${route.spec} ${route.cls} in ${phLabel}?`,
             a: seo.desc
@@ -534,6 +651,11 @@ function buildSeoFaqBlock(route, seo) {
             a: `Each slot has a recommended enchant and gem shown next to the item. Enchants and gems are chosen based on the stat priority for ${route.spec} ${route.cls} in TBC Classic.`
         }
     ];
+}
+
+function buildSeoFaqBlock(route, seo) {
+    if (route.type !== 'phase') return null;
+    const items = phaseFaqItems(route, seo);
     const dl = items.map(i =>
         `<dt>${escapeHtmlText(i.q)}</dt><dd>${escapeHtmlText(i.a)}</dd>`
     ).join('\n        ');
@@ -630,6 +752,7 @@ function buildPvpDescriptionBlock(route, seo) {
         <div>
             <h2 class="seo-desc-heading">${escapeHtmlText(spec)} PvP BiS — TBC Classic Arena</h2>
             <p class="seo-desc-text">${escapeHtmlText(seo.desc)}</p>
+            <p class="seo-desc-text">Drag the <strong>Meta Evolution</strong> slider below to see how this spec's arena gear has shifted week by week.</p>
         </div>
     </div>`;
 }
@@ -829,6 +952,7 @@ function buildSeoSummaryBlock(route) {
     if (otherSpecs) {
         html += `\n    <p>Other ${escapeHtmlText(route.cls)} specs (${escapeHtmlText(seoPhLabel)}): ${otherSpecs}</p>`;
     }
+    html += `\n    <p>Guides: <a href="/gems">Gems</a> · <a href="/enchants">Enchants</a> · <a href="/stat-priority">Stat Priority</a> · <a href="/attunements">Attunements</a></p>`;
     return html;
 }
 
@@ -872,14 +996,63 @@ function buildJsonLd(route, seo) {
         schemas.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items });
     }
 
-    if (route.type === 'phase' || route.type === 'pvp') {
+    // Guide pages (gems, …): Home → guide breadcrumb + Article for rich results.
+    if (route.type === 'static' && GUIDES[route.page]) {
         schemas.push({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL + '/' },
+                { '@type': 'ListItem', position: 2, name: seo.h1, item: seo.url }
+            ]
+        });
+        schemas.push({
+            '@context': 'https://schema.org',
+            '@type':    'Article',
+            headline:    seo.title,
+            description: seo.desc,
+            url:         seo.url,
+            datePublished: '2026-05-31',
+            dateModified:  new Date().toISOString().slice(0, 10),
+            image:        BASE_URL + '/og-image.png',
+            author:    { '@type': 'Organization', name: 'TBC BiS Guide', url: BASE_URL + '/' },
+            publisher: {
+                '@type': 'Organization', name: 'TBC BiS Guide', url: BASE_URL + '/',
+                logo: { '@type': 'ImageObject', url: BASE_URL + '/android-chrome-192x192.png' }
+            },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': seo.url }
+        });
+
+        // ItemList of every gem/enchant on the page (matches the visible list).
+        const catalog = route.page === 'gems' ? GEM_CATALOG
+                      : route.page === 'enchants' ? ENCHANT_CATALOG : null;
+        if (catalog && Object.keys(catalog).length) {
+            const linkType = route.page === 'gems' ? 'item' : 'spell';
+            const els = Object.keys(catalog).map((id, i) => ({
+                '@type': 'ListItem', position: i + 1, name: catalog[id].name,
+                url: `https://www.wowhead.com/tbc/${linkType}=${id}`
+            }));
+            schemas.push({
+                '@context': 'https://schema.org', '@type': 'ItemList',
+                name: seo.title, numberOfItems: els.length, itemListElement: els
+            });
+        }
+    }
+
+    if (route.type === 'phase' || route.type === 'pvp') {
+        const itemListElement = buildItemListElements(route);
+        const itemList = {
             '@context': 'https://schema.org',
             '@type':    'ItemList',
             name:        seo.title,
             description: seo.desc,
             url:         seo.url
-        });
+        };
+        if (itemListElement.length) {
+            itemList.numberOfItems = itemListElement.length;
+            itemList.itemListElement = itemListElement;
+        }
+        schemas.push(itemList);
     }
 
     // Article schema for phase + PvP pages — eligible for rich results in search.
@@ -917,25 +1090,7 @@ function buildJsonLd(route, seo) {
     }
 
     if (route.type === 'phase') {
-        const phLabel = PHASE_NAMES[route.phase].label;
-        const faq = [
-            {
-                q: `What is BiS for ${route.spec} ${route.cls} in ${phLabel}?`,
-                a: seo.desc
-            },
-            {
-                q: `Where do I get ${route.spec} ${route.cls} ${phLabel} gear?`,
-                a: 'The best gear comes from ' +
-                    (route.phase === 0
-                        ? 'dungeons, heroics, reputation vendors, and crafting.'
-                        : 'raid drops, Badge of Justice vendor, arena, and crafted items.') +
-                    ' See the full list above with item sources for each slot.'
-            },
-            {
-                q: `What enchants should ${route.spec} ${route.cls} use in ${phLabel}?`,
-                a: `Each slot has a recommended enchant shown next to the item. Enchants are chosen based on stat weights for ${route.spec} ${route.cls} in TBC Classic.`
-            }
-        ];
+        const faq = phaseFaqItems(route, seo);
         schemas.push({
             '@context': 'https://schema.org',
             '@type':    'FAQPage',
@@ -1080,6 +1235,28 @@ function rewriteHtml(template, seo, jsonLd, bodyBlocks) {
                 `<div class="bis-static-summary" id="bisStaticSummary">${bodyBlocks.staticBis}</div>`
             );
         }
+        // Guide page body (#staticPageContent) — prerendered so crawlers see
+        // the full article (the SPA re-renders the same content for users).
+        if (bodyBlocks.staticContent) {
+            html = html.replace(
+                /<div class="static-page" id="staticPageContent"><\/div>/,
+                `<div class="static-page" id="staticPageContent">${bodyBlocks.staticContent}</div>`
+            );
+        }
+        // Gems browser: fill the #gemGrid mount with the crawlable full gem list
+        // (the SPA replaces it with the interactive filtered grid on load).
+        if (bodyBlocks.gemGrid) {
+            html = html.replace(
+                '<div class="gem-grid" id="gemGrid"></div>',
+                `<div class="gem-grid" id="gemGrid">${bodyBlocks.gemGrid}</div>`
+            );
+        }
+        if (bodyBlocks.enchGrid) {
+            html = html.replace(
+                '<div class="gem-grid" id="enchGrid"></div>',
+                `<div class="gem-grid" id="enchGrid">${bodyBlocks.enchGrid}</div>`
+            );
+        }
     }
 
     return html;
@@ -1204,6 +1381,15 @@ function main() {
             specLanding:  buildSpecLandingBlock(route),
             staticBis:    enableStaticBis
                 ? (buildStaticBisBlock(route) || buildPvpDataSummaryBlock(route))
+                : null,
+            staticContent: (route.type === 'static' && GUIDES[route.page])
+                ? GUIDES[route.page].bodyHtml
+                : null,
+            gemGrid: (route.type === 'static' && route.page === 'gems')
+                ? buildGemGridStatic()
+                : null,
+            enchGrid: (route.type === 'static' && route.page === 'enchants')
+                ? buildEnchantGridStatic()
                 : null,
         };
         const html = rewriteHtml(template, seo, jsonLd, bodyBlocks);
