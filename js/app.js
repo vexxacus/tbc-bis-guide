@@ -542,11 +542,7 @@
             const pvpTag = '<span class="pvp-tag">PvP</span>';
             headerTitle.innerHTML = `${cls} — ${specEntry.spec} PvP ${pvpTag}`;
             headerTitle.style.color = CLASS_META[cls].color;
-            const meta = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta) || {};
-            const dateStr = meta.analyzedAt
-                ? new Date(meta.analyzedAt).toLocaleDateString('sv-SE')
-                : 'recently';
-            headerSub.textContent = `Live snapshot · Updated ${dateStr}`;
+            headerSub.textContent = pvpHeaderSub(state.pvpKey);
             renderSpecGrid(cls);
             renderBisList();
             state.history.push('class', 'spec');
@@ -1451,13 +1447,17 @@
     function renderPvpSummary(el) {
         const cls  = state.selectedClass;
         const spec = state.selectedSpec;
-        const sd   = (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) ? PVP_DATA.specs[`${cls}|${spec}`] : null;
+        const pvpKey = state.pvpKey || `${cls}|${spec}`;
+        const sd   = (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) ? PVP_DATA.specs[pvpKey] : null;
         const analyzedAt = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta && PVP_DATA.meta.analyzedAt)
             ? PVP_DATA.meta.analyzedAt.slice(0, 10) : null;
 
-        const dataNote = sd
-            ? `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. The snapshot refreshes weekly so the rankings track the live meta.${analyzedAt ? ` Current snapshot analyzed on ${escapeHtmlText(analyzedAt)}.` : ''}</p>`
-            : '';
+        let dataNote = '';
+        if (sd && sd.stale) {
+            dataNote = `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. Too few ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s reached the leaderboard cutoff in recent scrapes, so this shows the last confirmed snapshot${sd.dataDate ? ` from ${escapeHtmlText(sd.dataDate)}` : ''} rather than hiding the page — it refreshes automatically once the spec returns to the ladder in numbers.</p>`;
+        } else if (sd) {
+            dataNote = `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. The snapshot refreshes weekly so the rankings track the live meta.${analyzedAt ? ` Current snapshot analyzed on ${escapeHtmlText(analyzedAt)}.` : ''}</p>`;
+        }
 
         const pveLink = `<a href="/${toSlug(cls)}/${toSlug(spec)}"><strong>${escapeHtmlText(spec)} ${escapeHtmlText(cls)} PvE BiS</strong></a>`;
 
@@ -1865,6 +1865,8 @@
                 spec: data.spec,
                 playerCount: data.playerCount,
                 ratingRange: data.ratingRange,
+                stale: !!data.stale,
+                dataDate: data.dataDate || null,
             });
         }
         // Sort each class's specs by player count descending
@@ -1872,6 +1874,18 @@
         return map;
     }
     const PVP_SPECS_BY_CLASS = buildPvpSpecs();
+
+    /** Header subtitle for a PvP spec. Stale (fallback) specs show the date of
+     *  their last confirmed snapshot; live specs show the weekly refresh date. */
+    function pvpHeaderSub(pvpKey) {
+        const sd = (typeof PVP_DATA !== 'undefined' && PVP_DATA.specs) ? PVP_DATA.specs[pvpKey] : null;
+        if (sd && sd.stale && sd.dataDate) return `Snapshot ${sd.dataDate} · last confirmed`;
+        const meta = (typeof PVP_DATA !== 'undefined' && PVP_DATA.meta) || {};
+        const dateStr = meta.analyzedAt
+            ? new Date(meta.analyzedAt).toLocaleDateString('sv-SE')
+            : 'recently';
+        return `Live snapshot · Updated ${dateStr}`;
+    }
 
     // For backwards compat — pick the most popular PvP spec per class
     const PVP_SPEC_MAP = {};
@@ -2396,12 +2410,15 @@
                 const ratingLabel = pvp.ratingRange
                     ? `${pvp.ratingRange.min}–${pvp.ratingRange.max} rating`
                     : '';
+                const roleLine = pvp.stale
+                    ? `Last confirmed snapshot${pvp.dataDate ? ' · ' + pvp.dataDate : ''}`
+                    : `${playerLabel}${ratingLabel ? ' · ' + ratingLabel : ''}`;
                 html += `
-                    <a class="spec-card is-pvp" href="/${toSlug(cls)}/${toSlug(pvp.spec)}/pvp" data-spec="${pvp.spec}" data-pvp="true" data-pvp-key="${pvp.key}">
+                    <a class="spec-card is-pvp${pvp.stale ? ' is-stale' : ''}" href="/${toSlug(cls)}/${toSlug(pvp.spec)}/pvp" data-spec="${pvp.spec}" data-pvp="true" data-pvp-key="${pvp.key}">
                         <div class="spec-emoji">${pvpSpecIconForSpec(cls, pvp.spec)}</div>
                         <div class="spec-info">
                             <div class="spec-name" style="color:#c41e3a">${pvp.spec} PvP</div>
-                            <div class="spec-role">${playerLabel}${ratingLabel ? ' · ' + ratingLabel : ''}</div>
+                            <div class="spec-role">${roleLine}</div>
                         </div>
                         <span class="spec-pvp-badge">PVP</span>
                         <div class="spec-arrow">▸</div>
@@ -2443,11 +2460,7 @@
 
                 if (hasPvpData) {
                     state.selectedPhase = null; // no phase for PvP
-                    const meta = PVP_DATA.meta || {};
-                    const dateStr = meta.analyzedAt
-                        ? new Date(meta.analyzedAt).toLocaleDateString('sv-SE')
-                        : 'recently';
-                    headerSub.textContent = `Live snapshot · Updated ${dateStr}`;
+                    headerSub.textContent = pvpHeaderSub(state.pvpKey);
                     renderBisList();
                     state.history.push('spec');
                     showStep(stepBis);
@@ -4405,18 +4418,29 @@
             if (pvpSpecData) {
                 const rr = pvpSpecData.ratingRange;
                 const ratingInfo = rr ? `${rr.min}–${rr.max} rating (avg ${rr.avg})` : '';
-                const isHist = !!_pvpHistoryDate;
-                const dateStr = isHist
-                    ? _pvpHistoryDate
-                    : ((typeof PVP_DATA !== 'undefined' && PVP_DATA.meta && PVP_DATA.meta.analyzedAt)
-                        ? new Date(PVP_DATA.meta.analyzedAt).toLocaleDateString('sv-SE') : '');
+                // Stale = fallback data spliced in by apply-pvp-fallback.js because the
+                // spec fell below the arena sample threshold. Key it off the data object
+                // itself so that even dragging the slider to a week where the spec is
+                // absent (→ we fall back to this object) is still labelled correctly.
+                const isStale = !!pvpSpecData.stale;
+                const isHist  = !isStale && !!_pvpHistoryDate;   // genuine historical week
+                const dateStr = isStale
+                    ? (pvpSpecData.dataDate || '')
+                    : isHist
+                        ? _pvpHistoryDate
+                        : ((typeof PVP_DATA !== 'undefined' && PVP_DATA.meta && PVP_DATA.meta.analyzedAt)
+                            ? new Date(PVP_DATA.meta.analyzedAt).toLocaleDateString('sv-SE') : '');
                 const specName = pvpSpecData.spec || state.selectedSpec;
-                html += `<div class="pvp-info-banner">
-                    <div class="pvp-banner-title">⚔️ <strong>Arena BiS — ${isHist ? 'Snapshot ' + escapeHtmlText(dateStr) : 'Live Snapshot'}</strong></div>
+                const bannerTitle = isHist
+                    ? 'Snapshot ' + escapeHtmlText(dateStr)
+                    : isStale ? 'Last Confirmed Snapshot' : 'Live Snapshot';
+                html += `<div class="pvp-info-banner${isStale ? ' is-stale' : ''}">
+                    <div class="pvp-banner-title">⚔️ <strong>Arena BiS — ${bannerTitle}</strong></div>
                     <div class="pvp-banner-meta">
-                        What the top ${pvpSpecData.playerCount} ${escapeHtmlText(specName)} players ${isHist ? 'were wearing that week' : 'are wearing right now'}.
+                        What the top ${pvpSpecData.playerCount} ${escapeHtmlText(specName)} players ${isHist || isStale ? 'were wearing' : 'are wearing right now'}${isStale ? ' as of ' + escapeHtmlText(dateStr) : ''}.
                         ${ratingInfo ? '<br>' + ratingInfo : ''}
-                        ${dateStr ? '<br>📅 ' + (isHist ? 'Snapshot' : 'Last updated') + ': ' + escapeHtmlText(dateStr) : ''}
+                        ${dateStr ? '<br>📅 ' + (isHist ? 'Snapshot' : isStale ? 'Last confirmed' : 'Last updated') + ': ' + escapeHtmlText(dateStr) : ''}
+                        ${isStale ? '<br><span class="pvp-stale-note">Too few ' + escapeHtmlText(specName) + ' players hit the arena leaderboard cutoff in the latest scrape, so we\u2019re showing the last confirmed snapshot instead of hiding the page. It\u2019ll refresh automatically once the spec returns to the ladder in numbers.</span>' : ''}
                     </div>
                     <div class="pvp-banner-legend">
                         <span class="pvp-legend-item"><span class="pvp-pop-badge pvp-tier-gold">🥇 70%+</span> Gold</span>

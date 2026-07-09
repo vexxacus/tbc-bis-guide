@@ -39,6 +39,10 @@ function trim(PVP) {
     const out = {};
     for (const key of Object.keys(PVP.specs || {})) {
         const s = PVP.specs[key];
+        // Skip fallback/stale specs: they're re-used data from an earlier week
+        // (spliced in by apply-pvp-fallback.js), not a genuine snapshot of THIS
+        // week, so recording them would corrupt the meta-evolution timeline.
+        if (s && s.stale) continue;
         const slots = {};
         for (const slot of Object.keys(s.slots || {})) {
             slots[slot] = (s.slots[slot] || []).map(it => ({

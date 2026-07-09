@@ -12,7 +12,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 OUTPUT_DIR="$SCRIPT_DIR/output"
-TOP="${1:---top 1500}"
+TOP="${1:---top 500}"
 
 echo ""
 echo "══════════════════════════════════════════════════════════"
@@ -35,7 +35,7 @@ rm -f "$OUTPUT_DIR/gear-raw.json"
 # Step 3: Fetch gear data
 echo ""
 echo "─── Step 3/4: Fetching gear data ($TOP) ───"
-node scraper/fetch-gear.js $TOP
+node scraper/fetch-gear.js $TOP --delay 800
 
 # Step 4: Run frequency analysis
 echo ""
@@ -54,6 +54,18 @@ console.log('Specs:', Object.keys(data.specs).length);
 console.log('Players analyzed:', data.meta.totalPlayers);
 console.log('Analyzed at:', data.meta.analyzedAt);
 "
+
+# Step 6: Append this week's snapshot to the meta-evolution history
+echo ""
+echo "─── Updating pvp-history.json ───"
+node build-pvp-history.js
+
+# Step 7: Revive any sitemap PvP spec that fell below the sample threshold this
+# week, using its most recent history snapshot (tagged stale). Runs AFTER history
+# so the fallback data never pollutes the meta-evolution timeline.
+echo ""
+echo "─── Applying PvP fallback (specs below threshold) ───"
+node apply-pvp-fallback.js
 
 echo ""
 echo "══════════════════════════════════════════════════════════"

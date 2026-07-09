@@ -781,6 +781,15 @@ function buildPvpDataSummaryBlock(route) {
         return `<dt>${escapeHtmlText(slot)}</dt><dd><a href="${href}" rel="external">${escapeHtmlText(top.name)}</a> <span class="bis-static-src">(${top.popularity}% of players)</span></dd>`;
     }).filter(Boolean).join('\n        ');
 
+    if (sd.stale) {
+        const asOf = sd.dataDate ? ` (as of ${escapeHtmlText(sd.dataDate)})` : '';
+        return `<h3>Most-used gear — last confirmed arena snapshot${asOf}</h3>
+    <p>Too few ${escapeHtmlText(route.spec)} ${escapeHtmlText(route.cls)}s reached the arena leaderboard cutoff in the latest scrape, so this shows the <strong>last confirmed snapshot</strong>${sd.dataDate ? ` from <strong>${escapeHtmlText(sd.dataDate)}</strong>` : ''} — across <strong>${sd.playerCount}</strong> top-rated players (rating <strong>${rr.min}–${rr.max}</strong>, average <strong>${rr.avg}</strong>) — rather than hiding the page. It refreshes automatically once the spec returns to the ladder in numbers.</p>
+    <dl>
+        ${rows}
+    </dl>`;
+    }
+
     return `<h3>Most-used gear — live arena snapshot</h3>
     <p>Across <strong>${sd.playerCount}</strong> top-rated ${escapeHtmlText(route.spec)} ${escapeHtmlText(route.cls)}s in this snapshot (rating <strong>${rr.min}–${rr.max}</strong>, average <strong>${rr.avg}</strong>), the most popular pick per slot is shown below. Full alternatives, gem and enchant breakdowns are in the interactive list further down.</p>
     <dl>
@@ -909,7 +918,9 @@ function buildPvpSummaryBlock(route) {
     // Data freshness paragraph — visible E-E-A-T signal explaining methodology.
     const sd = getPvpSpecData(route);
     let dataNote = '';
-    if (sd) {
+    if (sd && sd.stale) {
+        dataNote = `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. Too few ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s reached the leaderboard cutoff in recent scrapes, so this shows the last confirmed snapshot${sd.dataDate ? ` from ${escapeHtmlText(sd.dataDate)}` : ''} rather than hiding the page — it refreshes automatically once the spec returns to the ladder in numbers.</p>`;
+    } else if (sd) {
         const data = getPvpData();
         const analyzedAt = (data.meta && data.meta.analyzedAt) ? data.meta.analyzedAt.slice(0, 10) : null;
         dataNote = `<p><em>How this list is built:</em> the items above are aggregated from the public arena leaderboard scrape at ironforge.pro, filtered to ${escapeHtmlText(spec)} ${escapeHtmlText(cls)}s within a competitive rating range. The snapshot refreshes weekly so the rankings track the live meta.${analyzedAt ? ` Current snapshot analyzed on ${escapeHtmlText(analyzedAt)}.` : ''}</p>`;

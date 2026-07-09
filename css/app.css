@@ -3067,6 +3067,24 @@ a[data-wh-item]:hover {
     margin-bottom: 12px;
 }
 
+/* Stale = fallback data spliced in from the last confirmed weekly snapshot
+   (apply-pvp-fallback.js) because the spec dropped below the arena sample size.
+   Amber instead of red to flag "still valid, just not live". */
+.pvp-info-banner.is-stale {
+    background: rgba(232, 168, 56, 0.07);
+    border-color: rgba(232, 168, 56, 0.32);
+}
+.pvp-info-banner.is-stale .pvp-banner-title { color: #d9962b; }
+.pvp-stale-note {
+    display: inline-block;
+    margin-top: 4px;
+    font-style: italic;
+    opacity: 0.9;
+}
+/* Spec-select card for a stale PvP spec — subtle amber accent. */
+.spec-card.is-pvp.is-stale { border-left: 2px solid rgba(232, 168, 56, 0.5); }
+.spec-card.is-pvp.is-stale .spec-role { color: #d9962b; }
+
 /* ── PvP meta-evolution slider ── */
 .pvp-meta-slider {
     padding: 11px 14px;

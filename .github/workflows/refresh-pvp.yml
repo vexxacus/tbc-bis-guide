@@ -8,15 +8,15 @@ on:
   workflow_dispatch:
     inputs:
       top:
-        description: 'Antal spelare att analysera (default: 200)'
+        description: 'Antal spelare att analysera (default: 500)'
         required: false
-        default: '200'
+        default: '500'
 
 jobs:
   refresh:
     name: Fetch & Analyze PvP BiS Data
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     permissions:
       contents: write
 
@@ -42,7 +42,7 @@ jobs:
         run: node scraper/fetch-leaderboard.js
 
       - name: Fetch gear data
-        run: node scraper/fetch-gear.js --top ${{ github.event.inputs.top || '200' }}
+        run: node scraper/fetch-gear.js --top ${{ github.event.inputs.top || '500' }} --delay 800
 
       - name: Analyze gear
         run: node scraper/analyze-gear.js
@@ -61,6 +61,13 @@ jobs:
 
       - name: Update PvP meta history (append this week's snapshot)
         run: node build-pvp-history.js
+
+      # Keep every PvP page in sitemap.xml alive: if a rare spec (e.g. Enhancement
+      # Shaman) dropped below the sample threshold this week, splice in its most
+      # recent snapshot from pvp-history.json, tagged stale. Runs AFTER history so
+      # the revived data never pollutes the meta-evolution timeline.
+      - name: Apply PvP fallback (revive specs below sample threshold)
+        run: node apply-pvp-fallback.js
 
       - name: Check for changes
         id: changes
