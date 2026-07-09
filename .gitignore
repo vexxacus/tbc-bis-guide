@@ -1,9 +1,7 @@
 node_modules/
 .env
 scraper/.env
-.icon-cache.json
 .quality-cache.json
-.socket-cache.json
 .gem-catalog-cache.json
 .enchant-catalog-cache.json
 firebase-debug.log

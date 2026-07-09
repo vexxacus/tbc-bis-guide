@@ -81,6 +81,28 @@ async function main() {
         console.log(`  📡 Included PvP item IDs`);
     }
 
+    // Also read the generated client PvP data (js/pvp-data.js) — it's the source
+    // of truth for what's actually rendered and is refreshed weekly by CI, so it
+    // catches items the stale scraper/output may miss (e.g. Season 2 "Merciless
+    // Gladiator" pieces). Mirrors the same logic in fetch-icons.js.
+    const PVP_JS_FILE = path.join(__dirname, 'js', 'pvp-data.js');
+    if (fs.existsSync(PVP_JS_FILE)) {
+        try {
+            const sandbox = {};
+            const src = fs.readFileSync(PVP_JS_FILE, 'utf8').replace('const PVP_DATA', 'sandbox.PVP_DATA');
+            (new Function('sandbox', src))(sandbox);
+            for (const spec of Object.values((sandbox.PVP_DATA || {}).specs || {})) {
+                for (const items of Object.values(spec.slots || {})) {
+                    for (const item of items) {
+                        itemIds.add(String(item.id));
+                        for (const gem of item.topGems || []) itemIds.add(String(gem.id));
+                    }
+                }
+            }
+            console.log(`  📡 Included PvP item IDs from js/pvp-data.js`);
+        } catch (e) { console.warn(`  ⚠ could not parse js/pvp-data.js: ${e.message}`); }
+    }
+
     console.log(`📦 ${itemIds.size} unique items to check for sockets`);
 
     // Load cache

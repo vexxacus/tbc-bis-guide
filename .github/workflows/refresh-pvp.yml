@@ -69,26 +69,44 @@ jobs:
       - name: Apply PvP fallback (revive specs below sample threshold)
         run: node apply-pvp-fallback.js
 
+      # New PvP items each week need their Wowhead icon + gem-socket data, or they
+      # render as a red questionmark with no gems (e.g. the Season 2 "Merciless
+      # Gladiator" pieces). Both scripts are cache-backed (only new IDs hit the
+      # network) and read js/pvp-data.js, so this is cheap on a normal week.
+      - name: Refresh PvP item icons & sockets
+        run: |
+          node fetch-sockets.js
+          node fetch-icons.js
+
       - name: Check for changes
         id: changes
         run: |
-          git diff --quiet js/pvp-data.js && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          if git diff --quiet js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Bust pvp-data.js cache
+      - name: Bust JS caches
         if: steps.changes.outputs.changed == 'true'
         run: |
           # js files are served immutable (max-age=1y), so a content change is invisible
-          # to returning visitors unless the ?v= query string also changes. Bump it to
-          # match this week's refresh date.
+          # to returning visitors unless the ?v= query string also changes. Bump all
+          # three data files to this week's refresh date.
           V=$(date -u '+%Y%m%d')
           sed -i -E "s#(/js/pvp-data\.js\?v=)[^\"']+#\1$V#" index.html
+          sed -i -E "s#(/js/icons\.js\?v=)[^\"']+#\1$V#" index.html
+          sed -i -E "s#(/js/item-sockets\.js\?v=)[^\"']+#\1$V#" index.html
 
       - name: Commit & push updated PvP data
         if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add js/pvp-data.js pvp-history.json index.html
+          # Cache files (.icon-cache.json/.socket-cache.json) ride along so the next
+          # weekly run only fetches genuinely-new item IDs instead of cold-fetching
+          # thousands from Wowhead.
+          git add js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json index.html .icon-cache.json .socket-cache.json
           git commit -m "chore: auto-refresh PvP BiS data $(date -u '+%Y-%m-%d')"
           git push
 
