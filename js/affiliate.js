@@ -8,8 +8,9 @@
      • Never a modal / overlay / interstitial / sticky / sound / video.
      • Two low-friction placements are active (owner-approved):
          – Footer line: every page, at the very bottom (low profile).
-         – Ad-slot (#adSlot1): spec/gear pages only (incl. PvP), never the
-           start / class-select or static pages.
+         – "Utility" item-card: spec/gear pages only (incl. PvP), inserted right
+           after the gear list and BEFORE the SEO FAQ. Never on the start /
+           class-select or static pages.
      • Dismissable permanently via ✕ (stored in localStorage, per placement).
      • No layout blink on gear/sim state changes — injected once, statically.
    ═══════════════════════════════════════════════════════════════════════ */
@@ -47,7 +48,10 @@
         const btn = e.target.closest('[data-dismiss-affiliate]');
         if (!btn) return;
         dismiss(btn.dataset.dismissAffiliate);
-        btn.closest('.affiliate-slot, .affiliate-footer-line, .ad-slot')?.remove();
+        // Remove the whole area: item-card wrapper (header + slot), footer line,
+        // or the legacy ad-slot — whichever this ✕ belongs to.
+        const area = btn.closest('#affiliateItemCard, .affiliate-footer-line, .ad-slot');
+        (area || btn.closest('.affiliate-slot'))?.remove();
     });
 
     // ── Is this a spec/gear page? (never the start or static pages) ──
@@ -61,21 +65,33 @@
         return AFFILIATE_COPY[Math.floor(Math.random() * AFFILIATE_COPY.length)];
     }
 
-    // ── Placement 3 — the existing reserved ad-slot (#adSlot1) ───────
-    // Lowest risk: it already lives last in the page flow, after the gear list
-    // and SEO sections, before the footer. We fill it with the item-card style
-    // markup and reveal it. One area per page — no other placement is shown.
-    function injectAdSlot() {
+    // ── Placement 1 — "Utility" item-card in the gear list ──────────
+    // Inserted right after the gear list and BEFORE the SEO FAQ, with a proper
+    // "Utility" category header (icon + "not a real slot" note) matching the
+    // site's own .weapon-section-header style — as per the spec. Clearly
+    // separated from real gear, always last of the gear section.
+    function injectItemCard() {
         const KEY = 'ad-slot1';
         if (isDismissed(KEY)) return;
-        const slot = document.getElementById('adSlot1');
-        if (!slot) return;
-        if (slot.dataset.affiliateReady === '1') {
-            // Already built — just make sure it's visible again.
-            slot.style.display = 'block';
-            return;
-        }
-        slot.innerHTML = `
+
+        // Anchor: put it before the FAQ if present, else before the SEO summary,
+        // else fall back to the reserved #adSlot1. Whichever exists first.
+        const faq  = document.getElementById('seoFaq');
+        const anchor = faq || document.getElementById('seoSummary') || document.getElementById('adSlot1');
+        if (!anchor || !anchor.parentNode) return;
+
+        // Already injected? Just make sure it's visible.
+        const existing = document.getElementById('affiliateItemCard');
+        if (existing) { existing.style.display = ''; return; }
+
+        const wrap = document.createElement('div');
+        wrap.id = 'affiliateItemCard';
+        wrap.innerHTML = `
+            <div class="weapon-section-header">
+                <span class="weapon-section-icon">🧰</span>
+                <span class="weapon-section-title">Utility</span>
+                <span class="weapon-section-note">not a real slot</span>
+            </div>
             <div class="affiliate-slot" data-affiliate="nordvpn">
                 <img src="${ICON}" alt="" class="affiliate-slot-icon" width="24" height="16" loading="lazy" decoding="async">
                 <div class="affiliate-slot-text">
@@ -85,8 +101,7 @@
                 <a href="${LINK}" target="_blank" rel="sponsored noopener" class="affiliate-slot-cta">NordVPN ↗</a>
                 <button class="affiliate-slot-close" data-dismiss-affiliate="${KEY}" aria-label="Hide this permanently" title="Hide this">✕</button>
             </div>`;
-        slot.dataset.affiliateReady = '1';
-        slot.style.display = 'block';
+        anchor.parentNode.insertBefore(wrap, anchor);
     }
 
     // ── Placement 2 — low-profile footer line (#siteFooter) ──────────
@@ -114,15 +129,15 @@
         // Footer line: every page (low-profile, sits below all content).
         injectFooterLine();
 
-        // Ad-slot: only spec/gear pages (incl. PvP: /{class}/{spec}/pvp).
-        const slot = document.getElementById('adSlot1');
+        // Item card: only spec/gear pages (incl. PvP: /{class}/{spec}/pvp).
+        const card = document.getElementById('affiliateItemCard');
         if (!isSpecPage()) {
             // Honor "no prominent ad on the start / static pages" — hide if we
             // navigated back to a non-spec view within the SPA.
-            if (slot && slot.dataset.affiliateReady === '1') slot.style.display = 'none';
+            if (card) card.style.display = 'none';
             return;
         }
-        injectAdSlot();
+        injectItemCard();
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', run, { once: true });
