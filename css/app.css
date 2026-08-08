@@ -3710,3 +3710,45 @@ a[data-wh-item]:hover {
 .fb-item-reason { font-size: 0.78rem; color: #f87171; margin-top: 4px; font-style: italic; }
 .fb-loading { color: var(--text-muted); font-size: 0.85rem; }
 .fb-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; }
+
+/* ─── Affiliate (NordVPN "Ping Ward") ─────────────────────────────────
+   Rendered by js/affiliate.js into the existing #adSlot1 area. Item-card
+   style so it blends with the gear list, clearly labelled "Sponsored".      */
+.affiliate-slot {
+    background: var(--bg-card);
+    border: 1px solid rgba(124, 92, 255, 0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+.affiliate-slot-icon { border-radius: 2px; flex-shrink: 0; object-fit: contain; }
+.affiliate-slot-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.affiliate-slot-title { color: var(--accent-gold); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.affiliate-slot-tag {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    color: var(--text-muted); border: 1px solid var(--border-light);
+    border-radius: 3px; padding: 1px 4px;
+}
+.affiliate-slot-desc { color: #9ca3af; font-size: 11px; line-height: 1.4; }
+.affiliate-slot-cta { color: #6b7280; font-size: 10px; white-space: nowrap; text-decoration: none; }
+.affiliate-slot-cta:hover { color: var(--accent-gold); }
+.affiliate-slot-close {
+    background: none; border: none; color: #6b7280; font-size: 12px;
+    cursor: pointer; padding: 2px 4px; flex-shrink: 0; line-height: 1;
+}
+.affiliate-slot-close:hover { color: #e5e7eb; }
+
+/* Footer-line placement (not injected yet — reserved for a possible 2nd layer) */
+.affiliate-footer-line {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 8px 16px; background: var(--bg-secondary);
+    font-size: 11px; color: #8b8f9a;
+}
+.affiliate-footer-line a { color: inherit; text-decoration: none; }
+.affiliate-footer-line a:hover { color: var(--accent-gold); }
+.affiliate-footer-line img { border-radius: 2px; }
+.affiliate-footer-line button { background: none; border: none; color: #6b7280; font-size: 11px; cursor: pointer; }
+.affiliate-footer-line button:hover { color: #e5e7eb; }
