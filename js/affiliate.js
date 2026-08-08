@@ -17,6 +17,13 @@
 (() => {
     'use strict';
 
+    // ── Master kill-switch ───────────────────────────────────────────
+    // Set to false to hide ALL affiliate placements site-wide (item-card +
+    // footer line), everywhere, immediately. Nothing renders and no listeners
+    // do anything. Flip back to true (and bump the ?v= on the <script> tag in
+    // index.html) to re-enable once commercial-use approval is in place.
+    const AFFILIATE_ENABLED = false;
+
     // ── Config ───────────────────────────────────────────────────────
     const LINK = 'https://go.adt242.com/t/t?a=1960529974&as=2095863399&t=2&tk=1&utm_source=tbc-bis-guide';
     const ICON = '/img/nordvpn-logo-icon.png';
@@ -126,6 +133,8 @@
     }
 
     function run() {
+        if (!AFFILIATE_ENABLED) return;   // master kill-switch — render nothing.
+
         // Footer line: every page (low-profile, sits below all content).
         injectFooterLine();
 
