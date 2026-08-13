@@ -3376,6 +3376,15 @@ a[data-wh-item]:hover {
     transition: color .15s;
 }
 .footer-credits a:hover { color: var(--accent-gold); }
+.footer-disclaimer {
+    margin: 8px auto 10px;
+    max-width: 640px;
+    font-size: .68rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,.28);
+}
+.footer-disclaimer a { color: rgba(255,255,255,.4); text-decoration: underline; text-decoration-color: rgba(255,255,255,.15); }
+.footer-disclaimer a:hover { color: var(--accent-gold); }
 .footer-copy { opacity: .5; font-size: .72rem; }
 
 /* ═══════════════════════════════════════════════════════════════════════

@@ -5305,7 +5305,11 @@
                     </li>
                     <li>
                         <span class="credit-name"><a href="https://wowsims.github.io/tbc/" target="_blank" rel="noopener">wowsims / TBC</a></span>
-                        <span class="credit-desc">The open-source WoW TBC simulator. We use their WASM engine for character stats and DPS simulation.</span>
+                        <span class="credit-desc">The open-source WoW TBC simulator (MIT License). We use their WASM engine for character stats and DPS simulation.</span>
+                    </li>
+                    <li>
+                        <span class="credit-name"><a href="https://ironforge.pro" target="_blank" rel="noopener">Ironforge.pro</a></span>
+                        <span class="credit-desc">Arena leaderboard &amp; character data that powers our PvP gear snapshots.</span>
                     </li>
                     <li>
                         <span class="credit-name"><a href="https://www.curseforge.com/wow/addons/atlaslootclassic" target="_blank" rel="noopener">AtlasLoot Classic</a></span>
@@ -5317,6 +5321,13 @@
                     </li>
                 </ul>
 
+                <h2>Disclaimers</h2>
+                <ul>
+                    <li><strong>Not affiliated with Blizzard.</strong> TBC BiS Guide is a fan-made project and is not affiliated with, endorsed, sponsored, or approved by Blizzard Entertainment. World of Warcraft, The Burning Crusade, and all related trademarks are the property of Blizzard Entertainment, Inc.</li>
+                    <li><strong>Affiliate links.</strong> Some links on this site are affiliate links, meaning we may earn a small commission if you make a purchase — at no extra cost to you. Sponsored links are clearly labelled. This never influences our gear recommendations, which are based purely on data.</li>
+                    <li><strong>Recommendations, not guarantees.</strong> BiS lists are data-driven suggestions from real player data and simulations. Optimal gear depends on your build, encounter, and playstyle.</li>
+                </ul>
+
                 <h2>Contact</h2>
                 <p>Found a bug or have a suggestion? Open an issue on <a href="https://github.com/vexxacus/tbc-bis-guide" target="_blank" rel="noopener">GitHub</a>.</p>
             `
@@ -5326,7 +5337,7 @@
             description: 'Privacy Policy for TBC BiS Guide.',
             html: `
                 <h1>Privacy Policy</h1>
-                <p><em>Last updated: April 2026</em></p>
+                <p><em>Last updated: August 2026</em></p>
 
                 <h2>Overview</h2>
                 <p>TBC BiS Guide is a free tool for the World of Warcraft community. We respect your privacy and collect minimal data.</p>
@@ -5334,14 +5345,15 @@
                 <h2>What we collect</h2>
                 <ul>
                     <li><strong>Local storage:</strong> Your gear selections and UI preferences are saved in your browser's localStorage. This data never leaves your device.</li>
+                    <li><strong>Analytics:</strong> We use Google Analytics to understand aggregate, anonymised usage (e.g. which pages are popular). It may set cookies and process your IP address. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</li>
                     <li><strong>Firebase Hosting:</strong> Our site is hosted on Firebase (Google). Standard web server logs may include your IP address, browser type, and pages visited. See <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase Privacy Policy</a>.</li>
                 </ul>
 
                 <h2>What we don't collect</h2>
                 <ul>
-                    <li>We do not use analytics or tracking cookies</li>
                     <li>We do not collect personal information (name, email, etc.)</li>
-                    <li>We do not sell or share any data with third parties</li>
+                    <li>We do not sell your personal data</li>
+                    <li>We do not require an account or login</li>
                 </ul>
 
                 <h2>Third-party services</h2>
@@ -5349,6 +5361,10 @@
                     <li><strong>Wowhead tooltips:</strong> We load tooltip scripts from <code>wow.zamimg.com</code>. Wowhead may set cookies — see their <a href="https://www.wowhead.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</li>
                     <li><strong>Google Fonts:</strong> We load the Inter font from Google Fonts. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</li>
                 </ul>
+
+                <h2>Affiliate links</h2>
+                <p>This site contains affiliate links. If you click a sponsored link and make a purchase, we may earn a commission at no additional cost to you. This helps keep the site free. Affiliate/sponsored links are clearly labelled (e.g. marked "Sponsored") and never affect our data-driven gear recommendations.</p>
+                <p>When you click an affiliate link, the destination service (e.g. our advertising partner NordVPN, via the Adtraction network) may set cookies or process your data according to their own privacy policies. We do not share any personal data with them.</p>
 
                 <h2>Your choices</h2>
                 <p>You can clear your saved preferences at any time by clearing your browser's localStorage for this site. No account or login is required to use this tool.</p>

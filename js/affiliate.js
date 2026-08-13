@@ -22,7 +22,7 @@
     // footer line), everywhere, immediately. Nothing renders and no listeners
     // do anything. Flip back to true (and bump the ?v= on the <script> tag in
     // index.html) to re-enable once commercial-use approval is in place.
-    const AFFILIATE_ENABLED = false;
+    const AFFILIATE_ENABLED = true;
 
     // ── Config ───────────────────────────────────────────────────────
     const LINK = 'https://go.adt242.com/t/t?a=1960529974&as=2095863399&t=2&tk=1&utm_source=tbc-bis-guide';
