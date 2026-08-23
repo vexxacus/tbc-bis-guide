@@ -1,5 +1,6 @@
 {
   "3776": "ability_poisonsting",
+  "6533": "inv_misc_food_26",
   "8345": "inv_helmet_04",
   "9186": "spell_nature_nullifydisease",
   "10518": "inv_misc_cape_11",
@@ -7,6 +8,7 @@
   "10921": "inv_misc_herb_16",
   "10922": "inv_misc_herb_16",
   "11122": "inv_misc_food_54",
+  "11815": "inv_jewelry_talisman_01",
   "12414": "inv_pants_04",
   "12420": "inv_pants_03",
   "12422": "inv_chest_plate10",
@@ -101,6 +103,7 @@
   "18823": "inv_gauntlets_23",
   "18828": "inv_axe_02",
   "19019": "inv_sword_39",
+  "19022": "inv_fishingpole_01",
   "19048": "inv_boots_chain_10",
   "19049": "inv_gauntlets_26",
   "19050": "inv_shoulder_19",
