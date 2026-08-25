@@ -135,8 +135,10 @@
     function run() {
         if (!AFFILIATE_ENABLED) return;   // master kill-switch — render nothing.
 
-        // Footer line: every page (low-profile, sits below all content).
-        injectFooterLine();
+        // Footer line: disabled — the footer is now reserved for the Ko-fi
+        // "Buy me a coffee" line (see js/kofi.js). NordVPN stays only as the
+        // "Utility" item-card in the gear list.
+        // injectFooterLine();
 
         // Item card: only spec/gear pages (incl. PvP: /{class}/{spec}/pvp).
         const card = document.getElementById('affiliateItemCard');

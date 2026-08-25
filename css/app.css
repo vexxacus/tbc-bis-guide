@@ -3761,3 +3761,34 @@ a[data-wh-item]:hover {
 .affiliate-footer-line img { border-radius: 2px; }
 .affiliate-footer-line button { background: none; border: none; color: #6b7280; font-size: 11px; cursor: pointer; }
 .affiliate-footer-line button:hover { color: #e5e7eb; }
+
+/* Ko-fi footer line — "Buy me a coffee" (see js/kofi.js) */
+.kofi-footer-line {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 8px 16px; background: var(--bg-secondary);
+    font-size: 11px; color: #8b8f9a;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.kofi-footer-line img { display: block; }
+.kofi-footer-line a { color: var(--accent-gold); text-decoration: none; font-weight: 600; }
+.kofi-footer-line a:hover { text-decoration: underline; }
+.kofi-footer-line button { background: none; border: none; color: #6b7280; font-size: 11px; cursor: pointer; }
+.kofi-footer-line button:hover { color: #e5e7eb; }
+
+/* Ko-fi "Support" pill in the share-build bar (see js/kofi.js) */
+.kofi-share-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, rgba(232, 176, 74, 0.14), rgba(232, 176, 74, 0.05));
+    border: 1px solid rgba(232, 176, 74, 0.30);
+    border-radius: 8px;
+    color: var(--accent-gold);
+    font-size: .82rem; font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.kofi-share-btn img { display: block; }
+.kofi-share-btn:hover {
+    background: linear-gradient(135deg, rgba(232, 176, 74, 0.22), rgba(232, 176, 74, 0.10));
+    border-color: rgba(232, 176, 74, 0.5);
+}
