@@ -5413,6 +5413,17 @@
         }
     };
 
+    // The /stats page (item popularity, meta shifts, arena leaderboards).
+    // Shell HTML + interaction live in js/stats-page.js so app.js stays lean.
+    if (typeof window.renderStatsPageShell === 'function') {
+        STATIC_PAGES['stats'] = {
+            title: 'TBC Classic Stats — Item Popularity & Top Players',
+            description: 'See which items top players actually run, how the meta shifts through the phases, and today\'s arena leaderboards for TBC Classic — built from WarcraftLogs & Ironforge.pro data.',
+            html: window.renderStatsPageShell(),
+            onLoad: function() { if (typeof window.initStatsPage === 'function') window.initStatsPage(); }
+        };
+    }
+
     // Guide pages (gems, …) share their content with the prerenderer via
     // js/guides.js so the visible page and the crawled HTML stay identical.
     const GUIDES = (typeof window !== 'undefined' && window.GUIDES) || {};
