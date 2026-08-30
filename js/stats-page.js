@@ -276,7 +276,7 @@
                 <img class="usage-icon q-${qClass}" src="${iconUrl(it.id)}" alt="" loading="lazy" width="38" height="38">
                 <div class="usage-main">
                     <div class="usage-name">${esc(it.name)}</div>
-                    <div class="usage-slot">${esc(it.slot)}</div>
+                    <div class="usage-slot">${esc(it.slot)}${it.isTop ? ' <span class="top-pick-badge">🥇 Top pick</span>' : ''}</div>
                     <div class="usage-bar-track"><div class="usage-bar-fill" style="width:${pop}%;"></div></div>
                 </div>
                 <div class="usage-pct"><div class="pct-num">${pop}%</div><div class="pct-sub">${tierLabel(pop)}</div></div>

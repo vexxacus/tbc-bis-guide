@@ -3992,7 +3992,7 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .usage-pct .pct-num { font-size: 1rem; font-weight: 700; color: var(--accent-parse); font-variant-numeric: tabular-nums; }
 .stats-page .usage-pct .pct-sub { font-size: .62rem; color: var(--text-muted); }
 .stats-page .usage-row.is-top .usage-icon.q-epic { box-shadow: var(--glow-epic); }
-.stats-page .usage-row.is-top::after { content: "🥇 Top pick"; position: absolute; top: 8px; left: 66px; font-size: .6rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; letter-spacing: .04em; }
+.stats-page .top-pick-badge { display: inline-block; margin-left: 6px; font-size: .6rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; letter-spacing: .04em; vertical-align: middle; }
 
 /* ─── Spec Meta ─────────────────────────────────────────────────── */
 .stats-page .caveat-note { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; margin-bottom: 14px; background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.12); border-radius: var(--radius-sm); font-size: .72rem; color: var(--text-secondary); line-height: 1.5; }
