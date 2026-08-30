@@ -226,6 +226,10 @@
     function baseTooltip(pointerType, unit) {
         return {
             trigger: 'axis',
+            // confine keeps the panel inside the canvas; mousemove trigger + shadow
+            // pointer make the whole category band hoverable (fixes intermittent hover).
+            confine: true,
+            triggerOn: 'mousemove',
             axisPointer: pointerType === 'shadow'
                 ? { type: 'shadow' }
                 : { type: 'line', lineStyle: { color: 'rgba(255,255,255,.25)' } },

@@ -485,7 +485,6 @@
             xAxis: CH.baseCategoryAxis(labels, !isPvp),
             yAxis: CH.baseValueAxis({ max: 100, formatter: '{value}%' }),
             tooltip: CH.baseTooltip('shadow', '%'),
-            dataZoom: [{ type: 'inside' }],
             animationEasing: 'cubicOut', animationDuration: 900,
             series
         };
