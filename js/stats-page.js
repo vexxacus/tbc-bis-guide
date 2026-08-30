@@ -123,9 +123,15 @@
             </div>
 
             <div class="global-mode-wrap">
-                <div class="mode-toggle mode-toggle-hero" id="globalModeToggle">
-                    <button class="active" data-mode="pve">⚔️ PvE</button>
-                    <button data-mode="pvp">🏆 PvP</button>
+                <div class="global-mode-row">
+                    <div class="mode-toggle mode-toggle-hero" id="globalModeToggle">
+                        <button class="active" data-mode="pve">⚔️ PvE</button>
+                        <button data-mode="pvp">🏆 PvP</button>
+                    </div>
+                    <a class="kofi-share-btn stats-kofi-btn" href="https://ko-fi.com/vexxan" target="_blank" rel="noopener">
+                        <img src="/img/kofi_symbol.svg" alt="" width="16" height="13" loading="lazy" decoding="async">
+                        <span>Buy me a coffee</span>
+                    </a>
                 </div>
                 <span class="global-mode-hint">Sets the mode for the whole page — highlights, charts and tabs below all follow this.</span>
             </div>

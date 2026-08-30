@@ -3826,6 +3826,9 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 
 /* ─── Global mode toggle ────────────────────────────────────────── */
 .stats-page .global-mode-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 18px; }
+.stats-page .global-mode-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* Ko-fi pill sitting beside the PvE/PvP toggle — match its taller hero height. */
+.stats-page .stats-kofi-btn { align-self: stretch; padding-top: 0; padding-bottom: 0; font-size: .84rem; font-weight: 600; }
 .stats-page .mode-toggle-hero { padding: 4px; }
 .stats-page .mode-toggle-hero button { font-size: .88rem; padding: 10px 22px; }
 .stats-page .global-mode-hint { font-size: .68rem; color: var(--text-muted); }
