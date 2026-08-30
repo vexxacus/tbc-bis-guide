@@ -193,8 +193,69 @@
 
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
-    function renderPlayers(p)   { p.innerHTML = soon('Top Players'); }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
+
+    // ════════════════════════════════════════════════════════════════
+    // Top Players — PvP-only arena ladder, top-20 per class|spec|bracket.
+    // Reads STATS_DATA.topPlayers (already aggregated in build-stats-data).
+    // See STATS-PAGE-DESIGN.md §3 / mockup #panel-players.
+    // ════════════════════════════════════════════════════════════════
+    function renderPlayers(panel) {
+        const data = D();
+        if (!data || !data.topPlayers) { panel.innerHTML = soon('Top Players'); return; }
+        if (S.mode !== 'pvp') {
+            panel.innerHTML = `<p class="empty-note">Top Players is a PvP-only view — switch to 🏆 PvP mode above.</p>`;
+            return;
+        }
+        if (!S.class) {
+            panel.innerHTML = `<p class="empty-note">Pick a class (and spec) above to see the top of the arena ladder.</p>`;
+            return;
+        }
+        const specs = specsForClass('pvp', S.class, S.phase);
+        if (!specs.length) {
+            panel.innerHTML = `<p class="empty-note">No arena ladder data recorded for ${esc(S.class)} yet.</p>`;
+            return;
+        }
+        if (!S.spec || !specs.includes(S.spec)) S.spec = specs[0];
+
+        const key = `${S.class}|${S.spec}|${S.bracket}`;
+        const group = data.topPlayers[key];
+        if (!group || !group.players.length) {
+            panel.innerHTML = `<p class="empty-note">No ${esc(S.bracket)} ladder entries for ${esc(S.spec)} ${esc(S.class)} in this snapshot.</p>`;
+            return;
+        }
+
+        const players = group.players;
+        const maxWr = Math.max(...players.map(p => p.winrate || 0), 1);
+        const rows = players.map(p => {
+            const rankCls = p.rank <= 3 ? ` rank-${p.rank}` : '';
+            const wr = p.winrate != null ? Math.round(p.winrate) : null;
+            const wrPct = wr != null ? Math.round((p.winrate / maxWr) * 100) : 0;
+            const region = p.region ? p.region.toUpperCase() : '';
+            const meta = [p.server, p.race, region].filter(Boolean).join(' · ');
+            return `
+            <div class="lb-row${rankCls}">
+                <div class="lb-rank">${p.rank}</div>
+                <div class="lb-player">
+                    <div class="lb-name">${esc(p.name)}</div>
+                    <div class="lb-meta">${esc(meta)}</div>
+                </div>
+                <div class="lb-rating">${p.rating != null ? p.rating.toLocaleString('en-US') : '—'}</div>
+                <div class="lb-winrate">
+                    <div class="lb-winrate-track"><div class="lb-winrate-fill" style="width:${wrPct}%;"></div></div>
+                    <div class="lb-winrate-num">${wr != null ? wr + '% WR' : '—'}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        const scraped = group.scrapedAt ? group.scrapedAt.slice(0, 10) : null;
+        panel.innerHTML = `
+            <div class="pvp-only">
+                <div class="section-label">Top ${players.length} — ${esc(S.spec)} ${esc(S.class)} · ${esc(S.bracket)} · EU+US combined</div>
+                <div class="lb-table">${rows}</div>
+                ${scraped ? `<p class="chart-note">Arena ladder from Ironforge.pro, scraped ${esc(scraped)}. Ratings and win-rates reflect that snapshot — the ladder refreshes weekly.</p>` : ''}
+            </div>`;
+    }
 
     // ════════════════════════════════════════════════════════════════
     // Overview — 4 interactive ECharts (CHART-UPGRADE-GUIDE.md §2, §4).
