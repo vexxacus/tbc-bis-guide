@@ -127,6 +127,7 @@
                 <div class="page-eyebrow">Stats &amp; Meta</div>
                 <h1 class="page-title">What top players actually run</h1>
                 <p class="page-desc">Item popularity, meta shifts through the phases, and today's arena leaderboards — pulled from the same WarcraftLogs and Ironforge.pro data that powers your BiS lists.</p>
+                <p class="page-freshness" id="statsFreshness"></p>
             </div>
 
             <div class="global-mode-wrap">
@@ -1085,7 +1086,31 @@
 
         renderHighlights(mode);
         renderSpecChips();
+        updateFreshnessCopy(mode);
         renderActivePanel();
+    }
+
+    // Freshness copy driven by STATS_DATA.meta.sources — never hardcode
+    // "live"/"daily". PvP refreshes weekly; PvE only when a new phase lands.
+    function updateFreshnessCopy(mode) {
+        const el = document.getElementById('statsFreshness');
+        const data = D();
+        if (!el || !data || !data.meta) return;
+        const src = data.meta.sources || {};
+        let txt = '';
+        if (mode === 'pvp') {
+            const snap = src.pvp && src.pvp.latestSnapshot;
+            txt = snap
+                ? `🏆 Arena data as of ${snap}, updated weekly.`
+                : `🏆 Arena data updated weekly.`;
+        } else {
+            const latest = data.meta.latestPhase;
+            const scraped = src.pve && src.pve.scrapedAt ? src.pve.scrapedAt.slice(0, 10) : null;
+            txt = latest
+                ? `⚔️ Raid data from Phase ${latest}${scraped ? ` (logs as of ${scraped})` : ''} — refreshed each new phase, not daily.`
+                : `⚔️ Raid data refreshed each new phase.`;
+        }
+        el.textContent = txt;
     }
 
     // ════════════════════════════════════════════════════════════════

@@ -3822,6 +3822,7 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .page-eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-parse); }
 .stats-page .page-title { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
 .stats-page .page-desc { font-size: .82rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; max-width: 60ch; }
+.stats-page .page-freshness { font-size: .72rem; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
 
 /* ─── Global mode toggle ────────────────────────────────────────── */
 .stats-page .global-mode-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 18px; }
