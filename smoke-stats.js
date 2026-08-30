@@ -56,6 +56,40 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     } catch (e) {
         errors.push('navigation: ' + e.message);
     }
+
+    // Deep-link check: a shared "drilled-in" URL must land on Item Usage
+    // with the spec pre-filled (NAV-REVISION-GUIDE.md §4). Derive a real
+    // URL by drilling in via the UI, then re-open it from scratch.
+    let deepLinkOk = false;
+    try {
+        await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(400);
+        await page.evaluate(() => document.querySelector('.stats-page .tab-btn[data-panel="usage"]')?.click());
+        await sleep(150);
+        await page.evaluate(() => document.querySelector('#specPickerBar [data-pick-class]')?.click());
+        await sleep(120);
+        await page.evaluate(() => document.querySelector('#specPickerBar [data-pick-spec]')?.click());
+        await sleep(150);
+        const drilledUrl = page.url();
+        const expected = await page.evaluate(() => {
+            const s = window.StatsPage && window.StatsPage.state;
+            return { cls: s && s.class, spec: s && s.spec };
+        });
+        if (!/[?&]class=/.test(drilledUrl) || !/[?&]spec=/.test(drilledUrl)) {
+            errors.push('deep-link: drilling in did not put class/spec in the URL (' + drilledUrl + ')');
+        }
+        // Re-open the captured URL fresh.
+        await page.goto(drilledUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(500);
+        deepLinkOk = await page.evaluate(exp => {
+            const s = window.StatsPage && window.StatsPage.state;
+            const usageActive = document.querySelector('.stats-page .tab-btn[data-panel="usage"]')?.classList.contains('active');
+            return !!(s && s.class === exp.cls && s.spec === exp.spec && usageActive);
+        }, expected);
+        if (!deepLinkOk) errors.push('deep-link: re-opening ' + drilledUrl + ' did not restore the drilled-in Item Usage view');
+    } catch (e) {
+        errors.push('deep-link navigation: ' + e.message);
+    }
     await browser.close();
 
     if (errors.length) {
@@ -64,4 +98,5 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         process.exit(1);
     }
     console.log('✅ Clicked all 6 tabs (drilling into a spec) in both modes ×5 — no console errors.');
+    console.log('✅ Deep-link ?class=&spec=&view=usage restored the drilled-in Item Usage view.');
 })();

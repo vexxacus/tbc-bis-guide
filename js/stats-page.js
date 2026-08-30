@@ -162,6 +162,7 @@
         S.tab = name;
         document.querySelectorAll('.stats-page .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
         document.querySelectorAll('.stats-page .panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+        syncUrl();
         renderActivePanel();
     }
 
@@ -1065,8 +1066,7 @@
         S.spec = specName;
         S._pickerOpen = false;
         if (className) document.body.dataset.class = className;
-        syncUrl();
-        switchPanel('usage');
+        switchPanel('usage');   // sets S.tab + syncs URL (class/spec/view)
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1084,6 +1084,9 @@
         const q = new URLSearchParams(location.search);
         if (S.class) q.set('class', S.class.toLowerCase()); else q.delete('class');
         if (S.spec) q.set('spec', S.spec.toLowerCase()); else q.delete('spec');
+        // Reflect the active tab so a drilled-in view is shareable/bookmarkable.
+        // Overview is the default — keep it out of the URL to stay clean.
+        if (S.tab && S.tab !== 'overview') q.set('view', S.tab); else q.delete('view');
         const qs = q.toString();
         try { history.replaceState(null, '', qs ? `${location.pathname}?${qs}` : location.pathname); } catch (_) { /* ignore */ }
     }
