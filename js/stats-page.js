@@ -90,6 +90,53 @@
         return [...set].sort();
     }
 
+    // ── Shared SVG line-chart builder ───────────────────────────────
+    // series: [{ label, color, points:[{x:0..1, v:number}|null] }], xLabels: []
+    // Values are auto-scaled to the min/max across all series (with padding).
+    const CHART_COLORS = ['var(--chart-a)', 'var(--chart-b)', 'var(--chart-c)', 'var(--accent-success)', 'var(--accent-danger)'];
+    function lineChart(series, xLabels, opts) {
+        opts = opts || {};
+        const W = 320, H = 150, padL = 30, padR = 20, padT = 16, padB = 24;
+        const allVals = series.flatMap(s => s.points.filter(p => p != null).map(p => p.v));
+        if (!allVals.length) return '<p class="empty-note">Not enough data to chart yet.</p>';
+        let lo = Math.min(...allVals), hi = Math.max(...allVals);
+        if (opts.min != null) lo = opts.min;
+        if (opts.max != null) hi = opts.max;
+        if (hi === lo) { hi += 1; lo -= 1; }
+        const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
+        const n = xLabels.length;
+        const xAt = i => padL + (n <= 1 ? 0 : (i / (n - 1)) * (W - padL - padR));
+        const yAt = v => (H - padB) - ((v - lo) / (hi - lo)) * (H - padT - padB);
+
+        let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="150" role="img" aria-label="${esc(opts.aria || 'Line chart')}">`;
+        svg += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="rgba(255,255,255,.08)"/>`;
+        svg += `<line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="rgba(255,255,255,.08)"/>`;
+        series.forEach(s => {
+            let d = '', started = false;
+            s.points.forEach((p, i) => {
+                if (p == null) { started = false; return; }
+                d += `${started ? 'L' : 'M'} ${xAt(i).toFixed(1)} ${yAt(p.v).toFixed(1)} `;
+                started = true;
+            });
+            svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+            // end dot + label on last valid point
+            let lastIdx = -1;
+            for (let i = s.points.length - 1; i >= 0; i--) { if (s.points[i] != null) { lastIdx = i; break; } }
+            if (lastIdx >= 0) {
+                const p = s.points[lastIdx];
+                svg += `<circle cx="${xAt(lastIdx).toFixed(1)}" cy="${yAt(p.v).toFixed(1)}" r="3.5" fill="${s.color}" stroke="#0c0e14" stroke-width="1.5"/>`;
+            }
+        });
+        // x-axis labels (thin them out if crowded)
+        const step = Math.ceil(n / 6);
+        xLabels.forEach((lab, i) => {
+            if (i % step !== 0 && i !== n - 1) return;
+            svg += `<text x="${xAt(i).toFixed(1)}" y="${H - 8}" fill="#656d76" font-size="8" font-family="Inter, sans-serif" text-anchor="middle">${esc(lab)}</text>`;
+        });
+        svg += `</svg>`;
+        return svg;
+    }
+
     // ════════════════════════════════════════════════════════════════
     // Shell HTML — mirrors stats-page-mockup.html (minus its own header /
     // footer / mockup banner; the app's global header + footer wrap this).
@@ -189,10 +236,181 @@
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
     function renderOverview(p)  { p.innerHTML = soon('Overview charts'); }
-    function renderSpecMeta(p)  { p.innerHTML = soon('Spec Meta'); }
     function renderEvolution(p) { p.innerHTML = soon('Meta Evolution'); }
     function renderPlayers(p)   { p.innerHTML = soon('Top Players'); }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
+
+    // ════════════════════════════════════════════════════════════════
+    // Spec Meta — representation tier list + how-it-shifted trend.
+    // "Popularity, not power" — see STATS-PAGE-DESIGN.md §3b.
+    // ════════════════════════════════════════════════════════════════
+    const SPEC_LABEL = { spec: s => s }; // placeholder for any future relabeling
+    function specDotStyle(cls) {
+        const c = CLASS_COLORS[cls] || 'var(--text-muted)';
+        return `background:${c}; color:${c};`;
+    }
+    // Trend arrow by comparing the last two available data points.
+    function trendOf(series) {
+        const vals = series.filter(v => v != null);
+        if (vals.length < 2) return { cls: 'flat', arrow: '–' };
+        const delta = vals[vals.length - 1] - vals[vals.length - 2];
+        if (delta > 0.3) return { cls: 'up', arrow: '▲' };
+        if (delta < -0.3) return { cls: 'down', arrow: '▼' };
+        return { cls: 'flat', arrow: '–' };
+    }
+
+    function renderSpecMeta(panel) {
+        const data = D();
+        if (!data || !data.specMeta) { panel.innerHTML = soon('Spec Meta'); return; }
+
+        const caveat = `
+            <div class="caveat-note">
+                <span>ℹ️</span>
+                <span><strong>Popularity, not power.</strong> These rankings show how many logged/ranked players run each spec — not measured DPS or a "best spec" verdict. A spec optimizers flock to is usually strong, but treat this as pick-rate, same as archon.gg's popularity column.</span>
+            </div>`;
+        const pveCaveat = `
+            <div class="caveat-note pve-only">
+                <span>ℹ️</span>
+                <span><strong>Mature sample, not day-one logs.</strong> PvE stats reflect a settled, high-volume sample. When a phase has just gone live, early logs are too sparse and skewed toward day-one speedrunners to be representative — so this data may lag brand-new content by several weeks.</span>
+            </div>`;
+
+        // ── PvE: tier by representation for the selected phase ────────
+        const phase = S.phase || data.meta.latestPhase;
+        const pve = data.specMeta.pve[phase];
+        let pveHtml = '';
+        if (pve) {
+            // Build a share-lookup from the previous phase for trend arrows.
+            const phaseIds = data.meta.phases.map(p => p.id);
+            const prevPhase = phaseIds[phaseIds.indexOf(phase) - 1];
+            const prevShare = {};
+            if (prevPhase && data.specMeta.pve[prevPhase]) {
+                data.specMeta.pve[prevPhase].ranking.forEach(r => prevShare[`${r.class}|${r.spec}`] = r.share);
+            }
+            const top = pve.ranking.slice(0, 12);
+            const maxShare = top.length ? top[0].share : 1;
+            const rows = top.map((r, i) => {
+                const key = `${r.class}|${r.spec}`;
+                const prev = prevShare[key];
+                let tr = { cls: 'flat', arrow: '–' };
+                if (prev != null) tr = trendOf([prev, r.share]);
+                const color = CLASS_COLORS[r.class] || 'var(--text-muted)';
+                const barW = Math.round((r.share / maxShare) * 100);
+                return `
+                <div class="tier-row${i === 0 ? ' rank-1' : ''}">
+                    <div class="tier-rank">${i + 1}</div>
+                    <div class="tier-dot" style="${specDotStyle(r.class)}"></div>
+                    <div class="tier-main">
+                        <div class="tier-name">${esc(r.spec)} <span class="tier-class">${esc(r.class)}</span></div>
+                        <div class="tier-bar-track"><div class="tier-bar-fill" style="width:${barW}%;background:${color};"></div></div>
+                    </div>
+                    <div class="tier-pct">${r.share}%</div>
+                    <div class="tier-trend ${tr.cls}">${tr.arrow}</div>
+                </div>`;
+            }).join('');
+            pveHtml = `
+                <div class="pve-only">
+                    <div class="section-label">Tier by representation — Phase ${esc(phase)} (PvE, ${pve.totalPlayersAllSpecs.toLocaleString('en-US')} logged players)</div>
+                    <div class="tier-list">${rows}</div>
+                    ${renderSpecTrendPve(data, phase)}
+                </div>`;
+        }
+
+        // ── PvP: tier from latest snapshot share + 21-week trend ──────
+        const pvpSeries = data.specMeta.pvp.all;
+        let pvpHtml = '';
+        if (pvpSeries) {
+            const lastIdx = pvpSeries.dates.length - 1;
+            const ranked = pvpSeries.specs.map(s => {
+                const last = [...s.shareSeries].reverse().find(v => v != null) || 0;
+                return { class: s.class, spec: s.spec, share: last, series: s.shareSeries };
+            }).sort((a, b) => b.share - a.share).slice(0, 12);
+            const maxShare = ranked.length ? ranked[0].share : 1;
+            const rows = ranked.map((r, i) => {
+                const tr = trendOf(r.series);
+                const color = CLASS_COLORS[r.class] || 'var(--text-muted)';
+                const barW = Math.round((r.share / maxShare) * 100);
+                return `
+                <div class="tier-row${i === 0 ? ' rank-1' : ''}">
+                    <div class="tier-rank">${i + 1}</div>
+                    <div class="tier-dot" style="${specDotStyle(r.class)}"></div>
+                    <div class="tier-main">
+                        <div class="tier-name">${esc(r.spec)} <span class="tier-class">${esc(r.class)}</span></div>
+                        <div class="tier-bar-track"><div class="tier-bar-fill" style="width:${barW}%;background:${color};"></div></div>
+                    </div>
+                    <div class="tier-pct">${r.share}%</div>
+                    <div class="tier-trend ${tr.cls}">${tr.arrow}</div>
+                </div>`;
+            }).join('');
+            pvpHtml = `
+                <div class="pvp-only">
+                    <div class="section-label">Tier by representation — arena ladder (PvP, ${pvpSeries.dates.length} weekly snapshots)</div>
+                    <div class="tier-list">${rows}</div>
+                    ${renderSpecTrendPvp(data, ranked)}
+                </div>`;
+        }
+
+        panel.innerHTML = caveat + pveCaveat + pveHtml + pvpHtml;
+    }
+
+    // PvE spec-share trend across phases (top 3 specs of the selected phase).
+    function renderSpecTrendPve(data, phase) {
+        const phaseIds = data.meta.phases.map(p => p.id);
+        const cur = data.specMeta.pve[phase];
+        if (!cur) return '';
+        const topSpecs = cur.ranking.slice(0, 3).map(r => `${r.class}|${r.spec}`);
+        const shareByPhaseSpec = {};
+        phaseIds.forEach(pid => {
+            const pd = data.specMeta.pve[pid];
+            if (!pd) return;
+            pd.ranking.forEach(r => { shareByPhaseSpec[`${pid}|${r.class}|${r.spec}`] = r.share; });
+        });
+        const series = topSpecs.map((key, i) => {
+            const [cls, spec] = key.split('|');
+            return {
+                label: `${spec} ${cls}`,
+                color: CHART_COLORS[i],
+                cls,
+                points: phaseIds.map(pid => {
+                    const v = shareByPhaseSpec[`${pid}|${key}`];
+                    return v != null ? { v } : null;
+                })
+            };
+        });
+        const legend = series.map(s =>
+            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
+        ).join('');
+        return `
+            <div class="section-label">How it's shifted — across the phases (PvE)</div>
+            <div class="chart-card">
+                <div class="chart-head"><h3>Spec share, phase by phase</h3><span class="chart-sub">Phase ${esc(phaseIds[0])} → ${esc(phaseIds[phaseIds.length - 1])}</span></div>
+                <div class="chart-svg-wrap">${lineChart(series, phaseIds.map(p => 'P' + p), { aria: 'PvE spec share across phases' })}</div>
+                <div class="chart-legend">${legend}</div>
+                <p class="chart-note">Only ${phaseIds.length} data points total, so read this as a broad trend — PvP mode gives you a week-by-week pulse instead.</p>
+            </div>`;
+    }
+
+    // PvP spec-share trend across the 21 weekly snapshots (top 3 specs).
+    function renderSpecTrendPvp(data, ranked) {
+        const dates = data.specMeta.pvp.all.dates;
+        const top = ranked.slice(0, 3);
+        const series = top.map((r, i) => ({
+            label: `${r.spec} ${r.class}`,
+            color: CHART_COLORS[i],
+            cls: r.class,
+            points: r.series.map(v => v != null ? { v } : null)
+        }));
+        const legend = series.map(s =>
+            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
+        ).join('');
+        return `
+            <div class="section-label">How it's shifted — last ${dates.length} weeks (PvP, top of the ladder)</div>
+            <div class="chart-card">
+                <div class="chart-head"><h3>Spec share of the top of the ladder</h3><span class="chart-sub">${esc(dates[0])} → ${esc(dates[dates.length - 1])}</span></div>
+                <div class="chart-svg-wrap">${lineChart(series, dates, { aria: 'PvP spec share across weekly snapshots' })}</div>
+                <div class="chart-legend">${legend}</div>
+                <p class="chart-note">21 real weekly snapshots — a steady multi-week climb is a genuine trend, not noise.</p>
+            </div>`;
+    }
 
     // ── Spec chip row (Mode → Class → Spec) ─────────────────────────
     // Shown once a class is picked. Tabs that need a specific spec
