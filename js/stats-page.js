@@ -381,11 +381,11 @@
         CH.initChart('ovConc', concOpt);
         CH.initChart('ovSurvivors', survivorsOpt, inst => {
             inst.off('click');
-            inst.on('click', params => {
+            inst.on('click', touchGateChart(inst, p => `surv:${p.dataIndex}`, params => {
                 const rows = survivorRows();
                 const row = rows[params.dataIndex];
                 if (row) openSurvivorTrend(row, CH);
-            });
+            }));
         });
 
         // ── Drill-down: click an aggregated mark → goToSpec (NAV §2) ──
@@ -393,21 +393,21 @@
         // (Legend clicks still isolate visually — that's a separate event.)
         CH.initChart('ovStack', stackOpt, inst => {
             inst.off('click');
-            inst.on('click', params => {
+            inst.on('click', touchGateChart(inst, p => `stack:${p.seriesName}:${p.dataIndex}`, params => {
                 if (params.componentType !== 'series') return;
                 const cls = params.seriesName;
                 const rec = data.overview.classStacking[mode].classes[cls];
                 const spec = rec && rec.topSpec;
                 if (cls && spec) goToSpec(cls, spec);
-            });
+            }));
         });
         // Biggest Movers: click a bar → that spec.
         CH.initChart('ovMovers', moversOpt, inst => {
             inst.off('click');
-            inst.on('click', params => {
+            inst.on('click', touchGateChart(inst, p => `mov:${p.dataIndex}`, params => {
                 const row = moversData(data, mode)[params.dataIndex];
                 if (row && row.cls && row.spec) goToSpec(row.cls, row.spec);
-            });
+            }));
         });
 
         // ── Wire fullscreen buttons + slot filter ────────────────────
@@ -1269,6 +1269,30 @@
     // Init — wires all event listeners. Called by app.js after the shell
     // HTML is injected.
     // ════════════════════════════════════════════════════════════════
+    // ── Touch: first tap reveals, second tap follows (chart drill-down) ──
+    // A chart segment/bar drills down to that spec on click. On touch there's
+    // no hover, so a single tap would jump before the tooltip could be read.
+    // Same best-practice pattern: first tap just shows the ECharts tooltip,
+    // a confirming second tap on the same data item performs the drill-down.
+    // Desktop (hover-capable) is untouched — one click drills down immediately.
+    const _isTouchDevice = () => window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    function touchGateChart(inst, keyFn, action) {
+        let armedKey = null, timer = null;
+        const disarm = () => { armedKey = null; if (timer) { clearTimeout(timer); timer = null; } };
+        return params => {
+            if (!_isTouchDevice()) { action(params); return; }
+            const key = keyFn(params);
+            if (key === armedKey) { disarm(); action(params); return; } // 2nd tap → drill
+            // 1st tap: just reveal the tooltip for this point, don't navigate.
+            armedKey = key;
+            try {
+                inst.dispatchAction({ type: 'showTip', seriesIndex: params.seriesIndex, dataIndex: params.dataIndex });
+            } catch (_) { /* tooltip is best-effort */ }
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(disarm, 4000); // auto-reset if the 2nd tap never comes
+        };
+    }
+
     // ── Touch: first tap reveals, second tap follows (Wowhead links) ──
     // Touch devices have no hover, so a single tap on an item link would jump
     // straight to Wowhead before the user could read its tooltip. Best practice
