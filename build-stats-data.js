@@ -254,7 +254,11 @@ function hhiFrom(entries /* [{key,count}] */) {
     if (!total) return { score: 0, top3: [] };
     let sumSq = 0;
     for (const e of entries) { const share = e.count / total; sumSq += share * share; }
-    const score = Math.round(sumSq * 100 * 10); // scaled 0-100-ish for readability
+    // Normalised Herfindahl index → 0–100. 0 = perfectly even (wide-open
+    // meta), 100 = a single spec dominates. Normalising against 1/N stops
+    // the raw HHI from saturating at the top for a crowded field.
+    const n = entries.length;
+    const score = n <= 1 ? 100 : Math.max(0, Math.min(100, round1(((sumSq - 1 / n) / (1 - 1 / n)) * 100)));
     const top3 = entries.slice().sort((a, b) => b.count - a.count).slice(0, 3)
         .map(e => {
             const [cls, spec] = e.key.split('|');

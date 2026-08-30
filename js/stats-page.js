@@ -275,7 +275,7 @@
                             <button class="chart-expand-btn" data-fs="survivors">⛶ Fullscreen</button>
                         </div>
                     </div>
-                    <div class="chart-canvas" id="ovSurvivors"></div>
+                    <div class="chart-canvas chart-canvas-tall" id="ovSurvivors"></div>
                 </div>
             </div>`;
 
@@ -365,7 +365,7 @@
         return {
             backgroundColor: 'transparent',
             color: classes.map(c => CH.CLASS_COLORS[c]),
-            grid: { left: 38, right: 12, top: 10, bottom: 56 },
+            grid: { left: 38, right: 12, top: 34, bottom: 56 },
             legend: CH.baseLegend('rect'),
             xAxis: CH.baseCategoryAxis(labels, !isPvp),
             yAxis: CH.baseValueAxis({ max: 100, formatter: '{value}%' }),
@@ -436,7 +436,7 @@
         const values = src.map(p => p.score);
         return {
             backgroundColor: 'transparent',
-            grid: { left: 38, right: 16, top: 16, bottom: 30 },
+            grid: { left: 38, right: 16, top: 34, bottom: 30 },
             xAxis: CH.baseCategoryAxis(labels, false),
             yAxis: CH.baseValueAxis({ formatter: '{value}' }),
             tooltip: {
