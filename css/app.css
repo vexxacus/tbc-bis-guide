@@ -4102,3 +4102,24 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .at-sub { font-size: .66rem; color: var(--text-muted); margin-top: 1px; }
 .stats-page .phase-pill { display: inline-block; font-size: .58rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: rgba(232,176,74,.12); border: 1px solid rgba(232,176,74,.25); color: var(--accent-gold); margin-right: 3px; }
 .stats-page .at-value { flex-shrink: 0; font-size: .82rem; font-weight: 700; color: var(--accent-arcane); }
+
+/* ─── Mobile: comfortable tap targets (≥44px) ───────────────────────
+   On touch-width screens every primary control (mode toggle, phase/
+   bracket segments, tabs, and the spec-picker back/change buttons) must
+   be thumb-friendly. NAV-REVISION-GUIDE.md §6 calls out "← Overview"
+   specifically. Desktop keeps its tighter sizing. */
+@media (max-width: 640px) {
+    .stats-page .mode-toggle-hero button,
+    .stats-page .mode-toggle button { min-height: 44px; }
+    .stats-page .segmented button { min-height: 42px; padding: 10px 6px; }
+    .stats-page .tab-btn { min-height: 46px; padding: 12px 6px; }
+    .stats-page .spec-picker-back,
+    .stats-page .spec-picker-change { min-height: 44px; padding: 10px 14px; font-size: .78rem; }
+    .stats-page .chart-expand-btn { min-height: 42px; padding: 9px 12px; }
+    .stats-page .ov-mini-seg button { min-height: 36px; }
+    .stats-page .ov-slot-select { min-height: 40px; }
+    /* Keep the breadcrumb + Change button on one comfortable row; let the
+       crumb text shrink rather than the buttons. */
+    .stats-page .spec-picker-crumb { font-size: .82rem; min-width: 0; flex: 1 1 auto; }
+    .stats-page .spec-picker-crumb strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
