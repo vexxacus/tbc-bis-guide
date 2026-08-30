@@ -346,8 +346,8 @@
         panel.innerHTML = `
             <p class="overview-intro">A fast pulse check — these four charts always follow the ${isPvp ? '🏆 PvP' : '⚔️ PvE'} mode toggle above. Hover for exact numbers, click a legend entry to isolate a series, and press ⛶ to expand any chart to fullscreen.</p>
             <div class="overview-grid">
-                ${overviewCard('ovStack', '🧬 Class Stacking', isPvp ? 'Share of the arena ladder per class, week by week' : "Share of logged raiders per class, phase by phase", 'ov-full', 'stack')}
-                ${overviewCard('ovMovers', '📈 Biggest Movers', isPvp ? 'This snapshot vs. the previous one' : 'Latest phase vs. the one before', 'ov-half', 'movers')}
+                ${overviewCard('ovStack', '🧬 Class Stacking', (isPvp ? 'Share of the arena ladder per class, week by week' : "Share of logged raiders per class, phase by phase") + ' · click a class → its item usage', 'ov-full', 'stack')}
+                ${overviewCard('ovMovers', '📈 Biggest Movers', (isPvp ? 'This snapshot vs. the previous one' : 'Latest phase vs. the one before') + ' · click a bar → item usage', 'ov-half', 'movers')}
                 ${overviewCard('ovConc', '🌡️ How Solved Is The Meta?', 'Higher = a few specs dominate. Lower = wide open.', 'ov-half', 'conc')}
                 <div class="ov-card ov-full">
                     <div class="chart-head">
@@ -371,8 +371,6 @@
         const survivorRows = () => survivorData(data, mode, S._ovSlot);
         const survivorsOpt = () => survivorsOption(survivorRows(), CH);
 
-        CH.initChart('ovStack', stackOpt);
-        CH.initChart('ovMovers', moversOpt);
         CH.initChart('ovConc', concOpt);
         CH.initChart('ovSurvivors', survivorsOpt, inst => {
             inst.off('click');
@@ -380,6 +378,28 @@
                 const rows = survivorRows();
                 const row = rows[params.dataIndex];
                 if (row) openSurvivorTrend(row, CH);
+            });
+        });
+
+        // ── Drill-down: click an aggregated mark → goToSpec (NAV §2) ──
+        // Class Stacking: click a segment/area → that class's top spec.
+        // (Legend clicks still isolate visually — that's a separate event.)
+        CH.initChart('ovStack', stackOpt, inst => {
+            inst.off('click');
+            inst.on('click', params => {
+                if (params.componentType !== 'series') return;
+                const cls = params.seriesName;
+                const rec = data.overview.classStacking[mode].classes[cls];
+                const spec = rec && rec.topSpec;
+                if (cls && spec) goToSpec(cls, spec);
+            });
+        });
+        // Biggest Movers: click a bar → that spec.
+        CH.initChart('ovMovers', moversOpt, inst => {
+            inst.off('click');
+            inst.on('click', params => {
+                const row = moversData(data, mode)[params.dataIndex];
+                if (row && row.cls && row.spec) goToSpec(row.cls, row.spec);
             });
         });
 
@@ -436,14 +456,14 @@
             ...(isPvp ? {
                 smooth: true, symbol: 'none', lineStyle: { width: 0 },
                 areaStyle: { color: CH.CLASS_COLORS[cls], opacity: 0.85 },
-                emphasis: { focus: 'series' }
+                emphasis: { focus: 'series' }, cursor: 'pointer'
             } : {
                 barMaxWidth: 26,
                 itemStyle: {
                     color: CH.CLASS_COLORS[cls], borderColor: CH.SURFACE, borderWidth: 2,
                     borderRadius: i === classes.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]
                 },
-                emphasis: { focus: 'series' }
+                emphasis: { focus: 'series' }, cursor: 'pointer'
             }),
             animationDelay: i * 50
         }));
@@ -466,7 +486,7 @@
     function moversData(data, mode) {
         const raw = data.overview.movers[mode] || [];
         // Δ in raw player counts → sort by absolute movement, keep the top 12.
-        return raw.map(m => ({ name: `${m.spec} ${m.class}`, cls: m.class, delta: m.curr - m.prev }))
+        return raw.map(m => ({ name: `${m.spec} ${m.class}`, cls: m.class, spec: m.spec, delta: m.curr - m.prev }))
             .filter(m => m.delta !== 0)
             .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
             .slice(0, 12)
@@ -499,6 +519,7 @@
             },
             series: [{
                 type: 'bar', data: rows.map(r => r.delta), barMaxWidth: 18,
+                cursor: 'pointer',
                 itemStyle: {
                     color: p => p.value >= 0 ? '#4cd97b' : '#ef4d4d',
                     borderRadius: 3
@@ -845,7 +866,7 @@
                 const color = CLASS_COLORS[r.class] || 'var(--text-muted)';
                 const barW = Math.round((r.share / maxShare) * 100);
                 return `
-                <div class="tier-row${i === 0 ? ' rank-1' : ''}">
+                <div class="tier-row tier-clickable${i === 0 ? ' rank-1' : ''}" data-class="${esc(r.class)}" data-spec="${esc(r.spec)}">
                     <div class="tier-rank">${i + 1}</div>
                     <div class="tier-dot" style="${specDotStyle(r.class)}"></div>
                     <div class="tier-main">
@@ -879,7 +900,7 @@
                 const color = CLASS_COLORS[r.class] || 'var(--text-muted)';
                 const barW = Math.round((r.share / maxShare) * 100);
                 return `
-                <div class="tier-row${i === 0 ? ' rank-1' : ''}">
+                <div class="tier-row tier-clickable${i === 0 ? ' rank-1' : ''}" data-class="${esc(r.class)}" data-spec="${esc(r.spec)}">
                     <div class="tier-rank">${i + 1}</div>
                     <div class="tier-dot" style="${specDotStyle(r.class)}"></div>
                     <div class="tier-main">
@@ -899,6 +920,13 @@
         }
 
         panel.innerHTML = caveat + pveCaveat + pveHtml + pvpHtml;
+        panel.querySelectorAll('.tier-clickable').forEach(row => {
+            row.addEventListener('click', () => {
+                const cls = row.getAttribute('data-class');
+                const spec = row.getAttribute('data-spec');
+                if (cls && spec) goToSpec(cls, spec);
+            });
+        });
         wireLineCharts(panel);
     }
 

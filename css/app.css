@@ -4015,6 +4015,10 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .tier-list { display: flex; flex-direction: column; gap: 8px; }
 .stats-page .tier-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-elev-1); border: 1px solid rgba(255,255,255,.04); border-radius: var(--radius-sm); box-shadow: var(--shadow-soft); transition: transform var(--transition-spring); }
 .stats-page .tier-row:hover { transform: translateY(-1px); }
+.stats-page .tier-clickable { cursor: pointer; }
+.stats-page .tier-clickable:hover { border-color: rgba(255,255,255,.14); background: var(--surface-elev-2); }
+.stats-page .tier-clickable .tier-name::after { content: ' ›'; color: var(--text-muted); opacity: 0; transition: opacity var(--transition-spring); }
+.stats-page .tier-clickable:hover .tier-name::after { opacity: 1; }
 .stats-page .tier-rank { width: 20px; text-align: center; font-family: 'Cinzel','Inter',serif; font-weight: 700; color: var(--text-muted); font-size: .85rem; }
 .stats-page .tier-row.rank-1 .tier-rank { color: var(--accent-gold); }
 .stats-page .tier-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
