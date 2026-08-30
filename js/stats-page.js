@@ -198,11 +198,12 @@
     //   PvP: highest-rated specs ever + most-used arena gear all-time.
     // Reads STATS_DATA.allTime. See mockup #panel-alltime.
     // ════════════════════════════════════════════════════════════════
-    function atItem(rank, name, sub, value) {
+    function atItem(rank, name, sub, value, titleText) {
+        const t = titleText ? ` title="${esc(titleText)}"` : '';
         return `
         <div class="alltime-item">
             <div class="at-rank">${rank}</div>
-            <div class="at-main"><div class="at-name">${name}</div><div class="at-sub">${sub}</div></div>
+            <div class="at-main"><div class="at-name"${t}>${name}</div><div class="at-sub">${sub}</div></div>
             <div class="at-value">${esc(value)}</div>
         </div>`;
     }
@@ -215,24 +216,21 @@
         const at = data.allTime;
 
         // ── PvE ──────────────────────────────────────────────────────
+        // All-Time is class-agnostic — it must NEVER read the drilled-in
+        // spec (S.class/S.spec) or a class name would leak in from another
+        // tab (BUGFIX-GUIDE §5). Show gear aggregated across every spec.
         let pveGearCard = '';
-        if (S.class) {
-            const specs = specsForClass('pve', S.class, S.phase);
-            const spec = (S.spec && specs.includes(S.spec)) ? S.spec : specs[0];
-            const key = spec ? `${S.class}|${spec}` : null;
-            const rec = key && at.pve[key];
-            if (rec && rec.mostUsedItems.length) {
-                const rows = rec.mostUsedItems.slice(0, 5).map((it, i) => {
-                    const n = it.phasesSeenIn.length;
-                    const sub = `${phasePills(it.phasesSeenIn)}seen in ${n} phase${n === 1 ? '' : 's'}`;
-                    const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener">${esc(it.name)}</a>`;
-                    return atItem(i + 1, name, sub, `avg ${it.avgPopularity}%`);
-                }).join('');
-                pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — ${esc(spec)} ${esc(S.class)}</h3>${rows}</div>`;
-            }
-        }
-        if (!pveGearCard) {
-            pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — all-time</h3><p class="empty-note" style="margin:0;">Pick a class and spec above to see its longest-standing BiS gear across every phase.</p></div>`;
+        const pveGear = at.pveGear || [];
+        if (pveGear.length) {
+            const rows = pveGear.slice(0, 5).map((it, i) => {
+                const n = it.phasesSeenIn.length;
+                const sub = `${phasePills(it.phasesSeenIn)}seen in ${n} phase${n === 1 ? '' : 's'}`;
+                const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener" title="${esc(it.name)}">${esc(it.name)}</a>`;
+                return atItem(i + 1, name, sub, `avg ${it.avgPopularity}%`, it.name);
+            }).join('');
+            pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — all classes, all phases</h3>${rows}</div>`;
+        } else {
+            pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — all-time</h3><p class="empty-note" style="margin:0;">No cross-phase gear data recorded yet.</p></div>`;
         }
         const totalPhases = data.meta.phases.length;
         const specRows = (at.pveSpecs || []).slice(0, 5).map((s, i) => {
@@ -240,22 +238,24 @@
             let sub;
             if (s.leads > 0) sub = `led the pick-rate in ${s.leads} of ${totalPhases} phase${totalPhases === 1 ? '' : 's'}`;
             else sub = 'never led, but always ranked';
-            const name = `<span style="color:${color};">${esc(s.spec)} ${esc(s.class)}</span>`;
-            return atItem(i + 1, name, sub, `avg ${s.avgShare}%`);
+            const label = `${s.spec} ${s.class}`;
+            const name = `<span style="color:${color};">${esc(label)}</span>`;
+            return atItem(i + 1, name, sub, `avg ${s.avgShare}%`, label);
         }).join('');
         const pveSpecCard = specRows ? `<div class="alltime-card"><h3>👑 Most dominant spec — all phases</h3>${specRows}</div>` : '';
 
         // ── PvP ──────────────────────────────────────────────────────
         const ratedRows = (at.pvp.highestRatedSpecs || []).slice(0, 5).map((s, i) => {
             const color = CLASS_COLORS[s.class] || 'var(--text-muted)';
-            const name = `<span style="color:${color};">${esc(s.spec)} ${esc(s.class)} — ${esc(s.bracket)}</span>`;
-            return atItem(i + 1, name, `peak on ${esc(s.dateOfPeak)}`, s.peakRating.toLocaleString('en-US'));
+            const label = `${s.spec} ${s.class} — ${s.bracket}`;
+            const name = `<span style="color:${color};">${esc(label)}</span>`;
+            return atItem(i + 1, name, `peak on ${esc(s.dateOfPeak)}`, s.peakRating.toLocaleString('en-US'), label);
         }).join('');
         const pvpRatedCard = ratedRows ? `<div class="alltime-card"><h3>⚡ Highest rated specs ever recorded</h3>${ratedRows}</div>` : '';
 
         const gearRows = (at.pvp.mostUsedGear || []).slice(0, 5).map((it, i) => {
-            const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener">${esc(it.name)}</a>`;
-            return atItem(i + 1, name, `tracked since ${esc(it.since)}`, `avg ${it.avgPopularity}%`);
+            const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener" title="${esc(it.name)}">${esc(it.name)}</a>`;
+            return atItem(i + 1, name, `tracked since ${esc(it.since)}`, `avg ${it.avgPopularity}%`, it.name);
         }).join('');
         const pvpGearCard = gearRows ? `<div class="alltime-card"><h3>🏅 Most used arena gear — all-time</h3>${gearRows}</div>` : '';
 
@@ -326,7 +326,7 @@
             <div class="pvp-only">
                 <div class="section-label">Top ${players.length} — ${esc(S.spec)} ${esc(S.class)} · ${esc(S.bracket)} · EU+US combined</div>
                 <div class="lb-table">${rows}</div>
-                ${scraped ? `<p class="chart-note">Arena ladder from Ironforge.pro, scraped ${esc(scraped)}. Ratings and win-rates reflect that snapshot — the ladder refreshes weekly.</p>` : ''}
+                ${scraped ? `<p class="chart-note">Arena ladder ranks &amp; ratings from Ironforge.pro, scraped ${esc(scraped)}. This is a separate snapshot from the weekly gear data above and refreshes on its own schedule.</p>` : ''}
             </div>`);
     }
 
@@ -354,7 +354,7 @@
             <p class="overview-intro">A fast pulse check — these four charts always follow the ${isPvp ? '🏆 PvP' : '⚔️ PvE'} mode toggle above. Hover for exact numbers, click a legend entry to isolate a series, and press ⛶ to expand any chart to fullscreen.</p>
             <div class="overview-grid">
                 ${overviewCard('ovStack', '🧬 Class Stacking', (isPvp ? 'Share of the arena ladder per class, week by week' : "Share of logged raiders per class, phase by phase") + ' · click a class → its item usage', 'ov-full', 'stack')}
-                ${overviewCard('ovMovers', '📈 Biggest Movers', (isPvp ? 'This snapshot vs. the previous one' : 'Latest phase vs. the one before') + ' · click a bar → item usage', 'ov-half', 'movers')}
+                ${overviewCard('ovMovers', '📈 Biggest Movers', (isPvp ? 'Change in share, this snapshot vs. the previous one' : 'Change in share, latest phase vs. the one before') + ' · click a bar → item usage', 'ov-half', 'movers')}
                 ${overviewCard('ovConc', '🌡️ How Solved Is The Meta?', 'Higher = a few specs dominate. Lower = wide open.', 'ov-half', 'conc')}
                 <div class="ov-card ov-full">
                     <div class="chart-head">
@@ -465,9 +465,12 @@
                 areaStyle: { color: CH.CLASS_COLORS[cls], opacity: 0.85 },
                 emphasis: { focus: 'series' }, cursor: 'pointer'
             } : {
-                barMaxWidth: 26,
+                barMaxWidth: 44,
+                barCategoryGap: '18%',
                 itemStyle: {
-                    color: CH.CLASS_COLORS[cls], borderColor: CH.SURFACE, borderWidth: 2,
+                    color: CH.CLASS_COLORS[cls],
+                    // Thin seam only between stacked segments (top/bottom), keeps columns solid rather than blocky boxes.
+                    borderColor: CH.SURFACE, borderWidth: i === classes.length - 1 ? 0 : 1,
                     borderRadius: i === classes.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]
                 },
                 emphasis: { focus: 'series' }, cursor: 'pointer'
@@ -491,8 +494,9 @@
     // ── B. Biggest Movers (diverging bar around zero) ────────────────
     function moversData(data, mode) {
         const raw = data.overview.movers[mode] || [];
-        // Δ in raw player counts → sort by absolute movement, keep the top 12.
-        return raw.map(m => ({ name: `${m.spec} ${m.class}`, cls: m.class, spec: m.spec, delta: m.curr - m.prev }))
+        // Δ in SHARE (percentage points) → sort by absolute movement, keep top 12.
+        // Share-based so a shrinking scrape sample doesn't paint every spec red.
+        return raw.map(m => ({ name: `${m.spec} ${m.class}`, cls: m.class, spec: m.spec, delta: Math.round((m.curr - m.prev) * 10) / 10 }))
             .filter(m => m.delta !== 0)
             .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
             .slice(0, 12)
@@ -500,13 +504,14 @@
     }
     function moversOption(data, mode, CH) {
         const rows = moversData(data, mode);
+        const fmt = v => `${v > 0 ? '+' : ''}${v} pp`;
         return {
             backgroundColor: 'transparent',
             grid: { left: 8, right: 20, top: 10, bottom: 24, containLabel: true },
             xAxis: {
                 type: 'value',
                 splitLine: { lineStyle: { color: CH.SPLIT_LINE } },
-                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11 }
+                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11, formatter: v => `${v > 0 ? '+' : ''}${v}` }
             },
             yAxis: {
                 type: 'category',
@@ -518,9 +523,8 @@
             tooltip: {
                 trigger: 'item', className: 'ec-tooltip',
                 formatter: p => {
-                    const sign = p.value > 0 ? '+' : '';
                     const col = p.value >= 0 ? '#4cd97b' : '#ef4d4d';
-                    return `<div style="font-size:12px;color:#e6edf3;"><span style="display:inline-block;width:10px;height:2px;background:${col};border-radius:2px;margin-right:6px;vertical-align:middle;"></span><strong>${sign}${p.value}</strong> <span style="color:#8b949e;">${escHtml(p.name)}</span></div>`;
+                    return `<div style="font-size:12px;color:#e6edf3;"><span style="display:inline-block;width:10px;height:2px;background:${col};border-radius:2px;margin-right:6px;vertical-align:middle;"></span><strong>${fmt(p.value)}</strong> <span style="color:#8b949e;">${escHtml(p.name)}</span></div><div style="font-size:11px;color:#8b949e;margin-top:2px;">change in share of the field</div>`;
                 }
             },
             series: [{
@@ -545,12 +549,18 @@
     function concentrationOption(data, mode, CH) {
         const src = data.overview.concentration[mode] || [];
         const labels = src.map(p => p.date);
-        const values = src.map(p => p.score);
+        const values = src.map(p => p.score); // null = insufficient sample → gap
+        // Fix the y-axis to a stable, meaningful window so a genuinely flat,
+        // wide-open meta (PvE sits ~0 — 28 specs, all ~3.6%) reads as "low and
+        // steady" instead of ECharts auto-zooming into 0–0.1 and turning
+        // rounding noise into dramatic-looking swings (BUGFIX-GUIDE §4).
+        const dataMax = Math.max(0, ...values.filter(v => v != null));
+        const yMax = Math.max(10, Math.ceil(dataMax * 1.4));
         return {
             backgroundColor: 'transparent',
             grid: { left: 38, right: 16, top: 16, bottom: 30 },
             xAxis: CH.baseCategoryAxis(labels, false),
-            yAxis: CH.baseValueAxis({ formatter: '{value}' }),
+            yAxis: CH.baseValueAxis({ formatter: '{value}', min: 0, max: yMax }),
             tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'line', lineStyle: { color: 'rgba(255,255,255,.25)' } },
@@ -558,15 +568,20 @@
                 formatter: params => {
                     const p = params[0];
                     const rec = src[p.dataIndex];
-                    const top = (rec && rec.top3 || []).map(([n, pct]) =>
+                    if (!rec || rec.score == null) {
+                        return `<div style="font-weight:700;font-size:12px;color:#e6edf3;margin-bottom:4px;">${escHtml(p.axisValueLabel)}</div>
+                            <div style="font-size:11px;color:#8b949e;">Insufficient data${rec && rec.sample != null ? ` (only ${rec.sample} players)` : ''}</div>`;
+                    }
+                    const top = (rec.top3 || []).map(([n, pct]) =>
                         `<div style="font-size:11px;color:#8b949e;padding:1px 0;">${escHtml(n)} — <strong style="color:#e6edf3;">${pct}%</strong></div>`).join('');
                     return `<div style="font-weight:700;font-size:12px;color:#e6edf3;margin-bottom:4px;">${escHtml(p.axisValueLabel)}</div>
-                        <div style="font-size:12px;color:#e6edf3;margin-bottom:4px;">Index <strong style="color:#a97e38;">${p.value}</strong></div>${top}`;
+                        <div style="font-size:12px;color:#e6edf3;margin-bottom:4px;">Index <strong style="color:#a97e38;">${rec.score}</strong> / 100</div>${top}`;
                 }
             },
             dataZoom: [{ type: 'inside' }],
             series: [{
                 type: 'line', data: values, smooth: true, symbol: 'circle', symbolSize: 8,
+                connectNulls: false,
                 lineStyle: { width: 2, color: '#a97e38' },
                 itemStyle: { color: '#a97e38', borderColor: CH.SURFACE, borderWidth: 2 },
                 areaStyle: { color: '#a97e38', opacity: 0.1 },
@@ -1138,17 +1153,18 @@
 
         // Flatten to one "top item per slot" list, plus the runners-up.
         const slots = Object.keys(spec.slots).sort(slotSort);
-        const rows = [];
+        const groups = [];
         for (const slot of slots) {
             const items = (spec.slots[slot] || []).slice().sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-            items.forEach((it, idx) => rows.push({ ...it, slot, isTop: idx === 0 }));
+            if (!items.length) continue;
+            groups.push({ slot, items: items.map((it, idx) => ({ ...it, slot, isTop: idx === 0 })) });
         }
-        if (!rows.length) {
+        if (!groups.length) {
             finish(`<p class="empty-note">No gear data for this combination yet.</p>`);
             return;
         }
 
-        const list = rows.map(it => {
+        const rowHtml = it => {
             const q = qualityOf(it.id, it.quality);
             const qClass = (q === 'epic' || q === 'rare' || q === 'legendary' || q === 'uncommon') ? q : 'epic';
             const pop = it.popularity || 0;
@@ -1157,12 +1173,18 @@
                 <img class="usage-icon q-${qClass}" src="${iconUrl(it.id)}" alt="" loading="lazy" width="38" height="38">
                 <div class="usage-main">
                     <div class="usage-name">${esc(it.name)}</div>
-                    <div class="usage-slot">${esc(it.slot)}${it.isTop ? ' <span class="top-pick-badge">🥇 Top pick</span>' : ''}</div>
+                    ${it.isTop ? '<div class="usage-slot"><span class="top-pick-badge">🥇 Top pick</span></div>' : ''}
                     <div class="usage-bar-track"><div class="usage-bar-fill" style="width:${pop}%;"></div></div>
                 </div>
                 <div class="usage-pct"><div class="pct-num">${pop}%</div><div class="pct-sub">${tierLabel(pop)}</div></div>
             </a>`;
-        }).join('');
+        };
+
+        const list = groups.map(g => `
+            <div class="usage-group">
+                <div class="usage-group-header">${esc(g.slot)}</div>
+                ${g.items.map(rowHtml).join('')}
+            </div>`).join('');
 
         finish(`
             <div class="section-label">${esc(S.spec)} ${esc(S.class)} — ${esc(sub)}</div>
@@ -1227,9 +1249,13 @@
         let txt = '';
         if (mode === 'pvp') {
             const snap = src.pvp && src.pvp.latestSnapshot;
-            txt = snap
-                ? `🏆 Arena data as of ${snap}, updated weekly.`
-                : `🏆 Arena data updated weekly.`;
+            const ladder = src.leaderboard && src.leaderboard.scrapedAt ? src.leaderboard.scrapedAt.slice(0, 10) : null;
+            // Two distinct PvP sources with different cadences — name them so a
+            // date mismatch never looks like a bug (BUGFIX-GUIDE §1):
+            //   • gear/meta = weekly pvp-history snapshot
+            //   • Top Players ladder = leaderboard scrape (less frequent)
+            const gearTxt = snap ? `🏆 Arena gear & meta from the weekly snapshot (${snap})` : `🏆 Arena gear & meta updated weekly`;
+            txt = ladder ? `${gearTxt}. Top Players ladder scraped ${ladder}.` : `${gearTxt}.`;
         } else {
             const latest = data.meta.latestPhase;
             const scraped = src.pve && src.pve.scrapedAt ? src.pve.scrapedAt.slice(0, 10) : null;

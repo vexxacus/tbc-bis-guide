@@ -3984,6 +3984,14 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 
 /* ─── Item usage rows ───────────────────────────────────────────── */
 .stats-page .usage-list { display: flex; flex-direction: column; gap: 8px; }
+.stats-page .usage-group { display: flex; flex-direction: column; gap: 8px; }
+.stats-page .usage-group + .usage-group { margin-top: 14px; }
+.stats-page .usage-group-header {
+    position: sticky; top: 0; z-index: 1;
+    font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-muted); padding: 6px 4px 4px; margin-bottom: 2px;
+    border-bottom: 1px solid var(--border-subtle); background: var(--surface);
+}
 .stats-page .usage-row {
     position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius);
     border: 1px solid rgba(255,255,255,.04); box-shadow: var(--shadow-soft);

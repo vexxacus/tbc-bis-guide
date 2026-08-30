@@ -37,6 +37,11 @@ function readJson(file) {
     return JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
 }
 const round1 = n => Math.round(n * 10) / 10;
+// Item "popularity" is a per-slot pick rate that CAN legitimately exceed
+// 100% in the raw data when one item fills two slots (e.g. the same ring in
+// both ring slots — "The 2 Ring"). A share shown to users must never read
+// >100%, so clamp every pick-rate we surface. clampPct(113) → 100.
+const clampPct = n => Math.max(0, Math.min(100, n));
 
 log('▶ build-stats-data.js\n');
 
@@ -220,38 +225,61 @@ STATS.overview.classStacking = {
 };
 
 // ── B. Biggest Movers ──────────────────────────────────────────────
-// PvE: last two phases, per spec representation.
+// Movers are measured in SHARE (% of the population), NOT raw player
+// counts. Raw counts swing with how many logs/players were scraped that
+// week/phase (e.g. P4→P5 total dropped 8466→5513), which would make every
+// spec look like it "fell". Share deltas isolate real representation shifts.
 const moversPve = [];
 if (phases.length >= 2) {
     const prevP = phases[phases.length - 2], currP = phases[phases.length - 1];
+    const prevTotal = Object.values(WCL.phases[prevP]).reduce((s, x) => s + x.totalPlayers, 0) || 1;
+    const currTotal = Object.values(WCL.phases[currP]).reduce((s, x) => s + x.totalPlayers, 0) || 1;
     for (const key of Object.keys(WCL.phases[currP])) {
         const [cls, spec] = key.split('|');
-        const prev = WCL.phases[prevP][key]?.totalPlayers;
-        const curr = WCL.phases[currP][key]?.totalPlayers;
-        if (prev && curr) moversPve.push({ class: cls, spec, prev, curr });
+        const prevN = WCL.phases[prevP][key]?.totalPlayers;
+        const currN = WCL.phases[currP][key]?.totalPlayers;
+        if (prevN && currN) {
+            moversPve.push({
+                class: cls, spec,
+                prev: round1((prevN / prevTotal) * 100),
+                curr: round1((currN / currTotal) * 100)
+            });
+        }
     }
 }
-// PvP: last two weekly snapshots.
+// PvP: last two weekly snapshots, share-based.
 const moversPvp = [];
 {
     const dates = HIST.dates;
     if (dates.length >= 2) {
         const prevD = dates[dates.length - 2], currD = dates[dates.length - 1];
         const prevSnap = HIST.snapshots[prevD] || {}, currSnap = HIST.snapshots[currD] || {};
+        const prevTotal = Object.values(prevSnap).reduce((s, x) => s + (x.playerCount || 0), 0) || 1;
+        const currTotal = Object.values(currSnap).reduce((s, x) => s + (x.playerCount || 0), 0) || 1;
         for (const key of Object.keys(currSnap)) {
             const [cls, spec] = key.split('|');
-            const prev = prevSnap[key]?.playerCount;
-            const curr = currSnap[key]?.playerCount;
-            if (prev && curr) moversPvp.push({ class: cls, spec, prev, curr });
+            const prevN = prevSnap[key]?.playerCount;
+            const currN = currSnap[key]?.playerCount;
+            if (prevN && currN) {
+                moversPvp.push({
+                    class: cls, spec,
+                    prev: round1((prevN / prevTotal) * 100),
+                    curr: round1((currN / currTotal) * 100)
+                });
+            }
         }
     }
 }
 STATS.overview.movers = { pve: moversPve, pvp: moversPvp };
 
 // ── C. Meta Concentration Index (Herfindahl-style) ─────────────────
+// Data points backed by fewer than this many players are statistically
+// meaningless for a distribution metric → emitted as null (a gap in the
+// line + "insufficient data" on hover) rather than a misleading number.
+const CONC_MIN_SAMPLE = 200;
 function hhiFrom(entries /* [{key,count}] */) {
     const total = entries.reduce((s, e) => s + e.count, 0);
-    if (!total) return { score: 0, top3: [] };
+    if (total < CONC_MIN_SAMPLE) return { score: null, top3: [], sample: total };
     let sumSq = 0;
     for (const e of entries) { const share = e.count / total; sumSq += share * share; }
     // Normalised Herfindahl index → 0–100. 0 = perfectly even (wide-open
@@ -264,18 +292,18 @@ function hhiFrom(entries /* [{key,count}] */) {
             const [cls, spec] = e.key.split('|');
             return [`${cls}/${spec}`, round1((e.count / total) * 100)];
         });
-    return { score: Math.min(100, score), top3 };
+    return { score: Math.min(100, score), top3, sample: total };
 }
 const concPve = phases.map(p => {
     const entries = Object.entries(WCL.phases[p]).map(([key, s]) => ({ key, count: s.totalPlayers }));
-    const { score, top3 } = hhiFrom(entries);
-    return { date: phaseLabel(p), score, top3 };
+    const { score, top3, sample } = hhiFrom(entries);
+    return { date: phaseLabel(p), score, top3, sample };
 });
 const concPvp = HIST.dates.map(d => {
     const snap = HIST.snapshots[d] || {};
     const entries = Object.entries(snap).map(([key, s]) => ({ key, count: s.playerCount || 0 }));
-    const { score, top3 } = hhiFrom(entries);
-    return { date: d, score, top3 };
+    const { score, top3, sample } = hhiFrom(entries);
+    return { date: d, score, top3, sample };
 });
 STATS.overview.concentration = { pve: concPve, pvp: concPvp };
 
@@ -391,7 +419,7 @@ STATS.allTime = { pve: {}, pvp: {} };
             for (const items of Object.values(spec.slots)) {
                 for (const it of items) {
                     const rec = target[it.id] = target[it.id] || { name: it.name, pops: [], phases: new Set() };
-                    rec.pops.push(it.popularity);
+                    rec.pops.push(clampPct(it.popularity));
                     rec.phases.add(+p);
                 }
             }
@@ -423,6 +451,29 @@ STATS.allTime = { pve: {}, pvp: {} };
         const [cls, spec] = key.split('|');
         return { class: cls, spec, leads: r.leads, avgShare: round1(r.shares.reduce((s, v) => s + v, 0) / r.shares.length) };
     }).sort((a, b) => (b.leads - a.leads) || (b.avgShare - a.avgShare)).slice(0, 10);
+
+    // Aggregated PvE gear across ALL classes/specs/phases — the All-Time tab
+    // is class-agnostic (NAV-REVISION-GUIDE.md §0), so this must never depend
+    // on the drilled-in spec. Mirrors the PvP mostUsedGear aggregation.
+    {
+        const gear = {}; // id -> { name, pops:[], phases:Set }
+        for (const p of phases) {
+            for (const spec of Object.values(WCL.phases[p])) {
+                for (const items of Object.values(spec.slots)) {
+                    for (const it of items) {
+                        const rec = gear[it.id] = gear[it.id] || { name: it.name, pops: [], phases: new Set() };
+                        rec.pops.push(clampPct(it.popularity));
+                        rec.phases.add(+p);
+                    }
+                }
+            }
+        }
+        STATS.allTime.pveGear = Object.entries(gear).map(([id, r]) => ({
+            id: +id, name: r.name,
+            avgPopularity: Math.round(r.pops.reduce((s, v) => s + v, 0) / r.pops.length),
+            phasesSeenIn: [...r.phases].sort((a, b) => a - b)
+        })).sort((a, b) => (b.avgPopularity * b.phasesSeenIn.length) - (a.avgPopularity * a.phasesSeenIn.length)).slice(0, 10);
+    }
 }
 
 // PvP: highest rated specs ever + most used arena gear all-time.
@@ -449,7 +500,7 @@ STATS.allTime = { pve: {}, pvp: {} };
             for (const items of Object.values(spec.slots)) {
                 for (const it of items) {
                     const rec = gear[it.id] = gear[it.id] || { name: it.name, pops: [], firstDate: d };
-                    rec.pops.push(it.popularity);
+                    rec.pops.push(clampPct(it.popularity));
                 }
             }
         }
@@ -473,7 +524,8 @@ log('Building highlights…');
     for (const [key, spec] of Object.entries(WCL.phases[latestP])) {
         for (const items of Object.values(spec.slots)) {
             for (const it of items) {
-                if (it.popularity > topItem.pop) topItem = { name: it.name, pop: it.popularity, spec: key.replace('|', ' ') };
+                const pop = clampPct(it.popularity);
+                if (pop > topItem.pop) topItem = { name: it.name, pop, spec: key.replace('|', ' ') };
             }
         }
     }
@@ -486,7 +538,7 @@ log('Building highlights…');
     let topItemPvp = { name: '—', pop: 0 };
     for (const spec of Object.values(latestSnap)) {
         for (const items of Object.values(spec.slots)) {
-            for (const it of items) if (it.popularity > topItemPvp.pop) topItemPvp = { name: it.name, pop: it.popularity };
+            for (const it of items) { const pop = clampPct(it.popularity); if (pop > topItemPvp.pop) topItemPvp = { name: it.name, pop }; }
         }
     }
     const peakSpec = STATS.allTime.pvp.highestRatedSpecs[0];
@@ -505,6 +557,37 @@ log('Building highlights…');
     };
 }
 log('  ✓ highlights built\n');
+
+// ════════════════════════════════════════════════════════════════════
+// VALIDATION — catch impossible percentages before they reach production.
+// Every share/pick-rate we compute or surface must be 0–100. If a future
+// data quirk pushes one past 100, fail the build loudly instead of quietly
+// publishing a "136%"-style number (STATS-PAGE-BUGFIX-GUIDE.md §2).
+// ════════════════════════════════════════════════════════════════════
+log('Validating percentages…');
+{
+    const problems = [];
+    const check = (label, v) => { if (typeof v === 'number' && v > 100.01) problems.push(`${label} = ${v}`); };
+
+    // Spec-meta shares (PvE per phase + PvP series).
+    for (const [p, o] of Object.entries(STATS.specMeta.pve)) o.ranking.forEach(s => check(`specMeta.pve[${p}] ${s.class}/${s.spec}.share`, s.share));
+    STATS.specMeta.pvp.all.specs.forEach(s => (s.shareSeries || []).forEach(v => check(`specMeta.pvp ${s.class}/${s.spec}`, v)));
+    // Class-stacking shares (both modes).
+    for (const mode of ['pve', 'pvp']) for (const [cls, rec] of Object.entries(STATS.overview.classStacking[mode].classes)) rec.shares.forEach(v => check(`classStacking.${mode}[${cls}]`, v));
+    // Concentration scores.
+    for (const mode of ['pve', 'pvp']) STATS.overview.concentration[mode].forEach(pt => check(`concentration.${mode}[${pt.date}]`, pt.score));
+    // Surfaced item pick-rates (highlights + all-time gear).
+    STATS.highlights.pve.concat(STATS.highlights.pvp).forEach(t => { const m = /^(\d+(?:\.\d+)?)%$/.exec(t.num); if (m) check(`highlight "${t.label}"`, +m[1]); });
+    (STATS.allTime.pveGear || []).forEach(it => check(`allTime.pveGear ${it.name}`, it.avgPopularity));
+    (STATS.allTime.pvp.mostUsedGear || []).forEach(it => check(`allTime.pvp.mostUsedGear ${it.name}`, it.avgPopularity));
+
+    if (problems.length) {
+        console.error('\n✗ Percentage sanity-check FAILED — impossible values (>100%):');
+        problems.forEach(p => console.error('   • ' + p));
+        throw new Error(`build-stats-data: ${problems.length} percentage(s) exceed 100% — refusing to write stats-data.js`);
+    }
+    log(`  ✓ all surfaced percentages within 0–100%\n`);
+}
 
 // ════════════════════════════════════════════════════════════════════
 // WRITE OUTPUT
