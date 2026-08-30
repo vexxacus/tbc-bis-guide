@@ -1269,6 +1269,34 @@
     // Init — wires all event listeners. Called by app.js after the shell
     // HTML is injected.
     // ════════════════════════════════════════════════════════════════
+    // ── Touch: first tap reveals, second tap follows (Wowhead links) ──
+    // Touch devices have no hover, so a single tap on an item link would jump
+    // straight to Wowhead before the user could read its tooltip. Best practice
+    // (Wowhead, map POIs, etc.): arm on the first tap — letting the tooltip
+    // show — and only navigate on a confirming second tap of the same link.
+    // Desktop (any hover-capable pointer) is untouched: one click opens.
+    function wireTouchLinkGuard(root) {
+        if (!root) return;
+        const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+        if (!isTouch) return;
+        let armed = null, timer = null;
+        const disarm = () => {
+            if (armed) armed.classList.remove('tap-armed');
+            armed = null;
+            if (timer) { clearTimeout(timer); timer = null; }
+        };
+        root.addEventListener('click', e => {
+            const link = e.target.closest('a.usage-row, a.at-name-link');
+            if (!link) { disarm(); return; }        // tapped elsewhere → reset
+            if (link === armed) { disarm(); return; } // 2nd tap → let it navigate
+            e.preventDefault();                     // 1st tap → reveal, don't jump
+            disarm();
+            armed = link;
+            link.classList.add('tap-armed');
+            timer = setTimeout(disarm, 4000);       // auto-reset if ignored
+        });
+    }
+
     function initStatsPage() {
         applyQueryParams();
 
@@ -1314,6 +1342,9 @@
             if (!btn || btn.style.pointerEvents === 'none') return;
             switchPanel(btn.dataset.panel);
         });
+
+        // Touch UX: first tap reveals, second tap follows a Wowhead link.
+        wireTouchLinkGuard(document.querySelector('.stats-page'));
 
         // Reflect restored state into the controls, then render.
         syncControlsToState();
