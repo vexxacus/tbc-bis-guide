@@ -114,7 +114,7 @@
         return `<div class="chart-load-error">⚠️ ${escapeHtml(msg || 'Chart library failed to load — check your connection and reload.')}</div>`;
     }
 
-    function initChart(containerId, optionFn) {
+    function initChart(containerId, optionFn, onReady) {
         const el = document.getElementById(containerId);
         if (!el) return;
         ensureECharts().then(ec => {
@@ -125,6 +125,7 @@
             const inst = ec.init(el);
             inst.setOption(optionFn());
             _charts.set(containerId, { inst, optionFn });
+            if (typeof onReady === 'function') onReady(inst);
         }).catch(() => { el.innerHTML = loadFailedMarkup(); });
     }
 

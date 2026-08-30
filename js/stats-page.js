@@ -235,9 +235,302 @@
 
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
-    function renderOverview(p)  { p.innerHTML = soon('Overview charts'); }
     function renderPlayers(p)   { p.innerHTML = soon('Top Players'); }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
+
+    // ════════════════════════════════════════════════════════════════
+    // Overview — 4 interactive ECharts (CHART-UPGRADE-GUIDE.md §2, §4).
+    // A fast "pulse check" dashboard that always follows the global mode.
+    //   A. Class Stacking      — stacked columns (PvE) / stacked area (PvP)
+    //   B. Biggest Movers      — diverging bar around a zero line
+    //   C. Meta Concentration  — single-series line (Herfindahl index)
+    //   D. Cross-Phase Survivors — horizontal bar, click → mini-line ⛶
+    // Charts are built via window.ChartHelpers (shared ECharts layer).
+    // ════════════════════════════════════════════════════════════════
+    function renderOverview(panel) {
+        const data = D();
+        const CH = window.ChartHelpers;
+        if (!data || !data.overview || !CH) { panel.innerHTML = soon('Overview charts'); return; }
+
+        const mode = S.mode;
+        const isPvp = mode === 'pvp';
+        // Per-mode survivor slot filter state.
+        if (!S._ovSlot) S._ovSlot = 'all';
+        const slots = (data.overview.survivors.slots || []);
+
+        panel.innerHTML = `
+            <p class="overview-intro">A fast pulse check — these four charts always follow the ${isPvp ? '🏆 PvP' : '⚔️ PvE'} mode toggle above. Hover for exact numbers, click a legend entry to isolate a series, and press ⛶ to expand any chart to fullscreen.</p>
+            <div class="overview-grid">
+                ${overviewCard('ovStack', '🧬 Class Stacking', isPvp ? 'Share of the arena ladder per class, week by week' : "Share of logged raiders per class, phase by phase", 'ov-full', 'stack')}
+                ${overviewCard('ovMovers', '📈 Biggest Movers', isPvp ? 'This snapshot vs. the previous one' : 'Latest phase vs. the one before', 'ov-half', 'movers')}
+                ${overviewCard('ovConc', '🌡️ How Solved Is The Meta?', 'Higher = a few specs dominate. Lower = wide open.', 'ov-half', 'conc')}
+                <div class="ov-card ov-full">
+                    <div class="chart-head">
+                        <div><h3>🏆 Cross-Phase Survivors</h3><span class="chart-sub">Gear that stayed BiS-tier across ${isPvp ? 'multiple weeks' : 'multiple phases'} — click a bar to see its popularity trend</span></div>
+                        <div class="chart-head-actions">
+                            <select class="ov-slot-select" id="ovSurvivorSlot">
+                                <option value="all"${S._ovSlot === 'all' ? ' selected' : ''}>All slots</option>
+                                ${slots.map(s => `<option value="${esc(s)}"${S._ovSlot === s ? ' selected' : ''}>${esc(s)}</option>`).join('')}
+                            </select>
+                            <button class="chart-expand-btn" data-fs="survivors">⛶ Fullscreen</button>
+                        </div>
+                    </div>
+                    <div class="chart-canvas" id="ovSurvivors"></div>
+                </div>
+            </div>`;
+
+        // ── Build the four option factories (closures capture `data`/`mode`) ──
+        const stackOpt = () => stackOption(data, mode, CH);
+        const moversOpt = () => moversOption(data, mode, CH);
+        const concOpt = () => concentrationOption(data, mode, CH);
+        const survivorRows = () => survivorData(data, mode, S._ovSlot);
+        const survivorsOpt = () => survivorsOption(survivorRows(), CH);
+
+        CH.initChart('ovStack', stackOpt);
+        CH.initChart('ovMovers', moversOpt);
+        CH.initChart('ovConc', concOpt);
+        CH.initChart('ovSurvivors', survivorsOpt, inst => {
+            inst.off('click');
+            inst.on('click', params => {
+                const rows = survivorRows();
+                const row = rows[params.dataIndex];
+                if (row) openSurvivorTrend(row, CH);
+            });
+        });
+
+        // ── Wire fullscreen buttons + slot filter ────────────────────
+        panel.querySelectorAll('.chart-expand-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switch (btn.dataset.fs) {
+                    case 'stack':     CH.openFullscreen('Class Stacking', stackOpt); break;
+                    case 'movers':    CH.openFullscreen('Biggest Movers', moversOpt); break;
+                    case 'conc':      CH.openFullscreen('How Solved Is The Meta?', concOpt); break;
+                    case 'survivors': CH.openFullscreen('Cross-Phase Survivors', survivorsOpt); break;
+                }
+            });
+        });
+        const slotSel = panel.querySelector('#ovSurvivorSlot');
+        if (slotSel) slotSel.addEventListener('change', e => {
+            S._ovSlot = e.target.value;
+            CH.initChart('ovSurvivors', () => survivorsOption(survivorData(data, mode, S._ovSlot), CH), inst => {
+                inst.off('click');
+                inst.on('click', params => {
+                    const rows = survivorData(data, mode, S._ovSlot);
+                    const row = rows[params.dataIndex];
+                    if (row) openSurvivorTrend(row, CH);
+                });
+            });
+        });
+    }
+
+    // A card shell whose canvas is filled by an ECharts instance.
+    function overviewCard(canvasId, title, sub, spanClass, fsKey) {
+        return `
+            <div class="ov-card ${spanClass}">
+                <div class="chart-head">
+                    <div><h3>${title}</h3><span class="chart-sub">${esc(sub)}</span></div>
+                    <div class="chart-head-actions">
+                        <button class="chart-expand-btn" data-fs="${fsKey}">⛶ Fullscreen</button>
+                    </div>
+                </div>
+                <div class="chart-canvas" id="${canvasId}"></div>
+            </div>`;
+    }
+
+    // ── A. Class Stacking ────────────────────────────────────────────
+    function stackOption(data, mode, CH) {
+        const src = data.overview.classStacking[mode];
+        const labels = src.labels;
+        const classes = CH.CLASS_ORDER.filter(c => src.classes[c]);
+        const isPvp = mode === 'pvp';
+        const series = classes.map((cls, i) => ({
+            name: cls,
+            type: isPvp ? 'line' : 'bar',
+            stack: 'total',
+            data: src.classes[cls].shares,
+            ...(isPvp ? {
+                smooth: true, symbol: 'none', lineStyle: { width: 0 },
+                areaStyle: { color: CH.CLASS_COLORS[cls], opacity: 0.85 },
+                emphasis: { focus: 'series' }
+            } : {
+                barMaxWidth: 26,
+                itemStyle: {
+                    color: CH.CLASS_COLORS[cls], borderColor: CH.SURFACE, borderWidth: 2,
+                    borderRadius: i === classes.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]
+                },
+                emphasis: { focus: 'series' }
+            }),
+            animationDelay: i * 50
+        }));
+        return {
+            backgroundColor: 'transparent',
+            color: classes.map(c => CH.CLASS_COLORS[c]),
+            grid: { left: 38, right: 12, top: 10, bottom: 56 },
+            legend: CH.baseLegend('rect'),
+            xAxis: CH.baseCategoryAxis(labels, !isPvp),
+            yAxis: CH.baseValueAxis({ max: 100, formatter: '{value}%' }),
+            tooltip: CH.baseTooltip('shadow', '%'),
+            toolbox: CH.baseToolbox(),
+            dataZoom: [{ type: 'inside' }],
+            animationEasing: 'cubicOut', animationDuration: 900,
+            series
+        };
+    }
+
+    // ── B. Biggest Movers (diverging bar around zero) ────────────────
+    function moversData(data, mode) {
+        const raw = data.overview.movers[mode] || [];
+        // Δ in raw player counts → sort by absolute movement, keep the top 12.
+        return raw.map(m => ({ name: `${m.spec} ${m.class}`, cls: m.class, delta: m.curr - m.prev }))
+            .filter(m => m.delta !== 0)
+            .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+            .slice(0, 12)
+            .sort((a, b) => a.delta - b.delta); // ascending so bars read bottom-negative → top-positive
+    }
+    function moversOption(data, mode, CH) {
+        const rows = moversData(data, mode);
+        return {
+            backgroundColor: 'transparent',
+            grid: { left: 8, right: 20, top: 10, bottom: 24, containLabel: true },
+            xAxis: {
+                type: 'value',
+                splitLine: { lineStyle: { color: CH.SPLIT_LINE } },
+                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11 }
+            },
+            yAxis: {
+                type: 'category',
+                data: rows.map(r => r.name),
+                axisLine: { lineStyle: { color: CH.AXIS_LINE } },
+                axisTick: { show: false },
+                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11 }
+            },
+            tooltip: {
+                trigger: 'item', className: 'ec-tooltip',
+                formatter: p => {
+                    const sign = p.value > 0 ? '+' : '';
+                    const col = p.value >= 0 ? '#4cd97b' : '#ef4d4d';
+                    return `<div style="font-size:12px;color:#e6edf3;"><span style="display:inline-block;width:10px;height:2px;background:${col};border-radius:2px;margin-right:6px;vertical-align:middle;"></span><strong>${sign}${p.value}</strong> <span style="color:#8b949e;">${escHtml(p.name)}</span></div>`;
+                }
+            },
+            series: [{
+                type: 'bar', data: rows.map(r => r.delta), barMaxWidth: 18,
+                itemStyle: {
+                    color: p => p.value >= 0 ? '#4cd97b' : '#ef4d4d',
+                    borderRadius: 3
+                },
+                markLine: {
+                    silent: true, symbol: 'none',
+                    lineStyle: { color: 'rgba(255,255,255,.25)', type: 'solid', width: 1 },
+                    data: [{ xAxis: 0 }], label: { show: false }
+                },
+                animationDelay: (i) => i * 40
+            }],
+            animationEasing: 'cubicOut', animationDuration: 800
+        };
+    }
+
+    // ── C. Meta Concentration Index (single-series line) ─────────────
+    function concentrationOption(data, mode, CH) {
+        const src = data.overview.concentration[mode] || [];
+        const labels = src.map(p => p.date);
+        const values = src.map(p => p.score);
+        return {
+            backgroundColor: 'transparent',
+            grid: { left: 38, right: 16, top: 16, bottom: 30 },
+            xAxis: CH.baseCategoryAxis(labels, false),
+            yAxis: CH.baseValueAxis({ formatter: '{value}' }),
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'line', lineStyle: { color: 'rgba(255,255,255,.25)' } },
+                className: 'ec-tooltip',
+                formatter: params => {
+                    const p = params[0];
+                    const rec = src[p.dataIndex];
+                    const top = (rec && rec.top3 || []).map(([n, pct]) =>
+                        `<div style="font-size:11px;color:#8b949e;padding:1px 0;">${escHtml(n)} — <strong style="color:#e6edf3;">${pct}%</strong></div>`).join('');
+                    return `<div style="font-weight:700;font-size:12px;color:#e6edf3;margin-bottom:4px;">${escHtml(p.axisValueLabel)}</div>
+                        <div style="font-size:12px;color:#e6edf3;margin-bottom:4px;">Index <strong style="color:#a97e38;">${p.value}</strong></div>${top}`;
+                }
+            },
+            toolbox: CH.baseToolbox(),
+            dataZoom: [{ type: 'inside' }],
+            series: [{
+                type: 'line', data: values, smooth: true, symbol: 'circle', symbolSize: 8,
+                lineStyle: { width: 2, color: '#a97e38' },
+                itemStyle: { color: '#a97e38', borderColor: CH.SURFACE, borderWidth: 2 },
+                areaStyle: { color: '#a97e38', opacity: 0.1 },
+                emphasis: { focus: 'series', lineStyle: { width: 3 } }
+            }],
+            animationEasing: 'cubicOut', animationDuration: 1000
+        };
+    }
+
+    // ── D. Cross-Phase Survivors ─────────────────────────────────────
+    function survivorData(data, mode, slotFilter) {
+        let rows = data.overview.survivors[mode] || [];
+        if (slotFilter && slotFilter !== 'all') rows = rows.filter(r => r.slot === slotFilter);
+        // Rank by how many periods it survived, then by average popularity.
+        return rows.slice(0, 14).map(r => ({
+            name: r.name, slot: r.slot, quality: r.quality,
+            periods: r.series.length,
+            series: r.series,
+            avg: Math.round(r.series.reduce((s, [, v]) => s + v, 0) / (r.series.length || 1))
+        }));
+    }
+    const QUALITY_HEX = { poor: '#9d9d9d', common: '#ffffff', uncommon: '#1eff00', rare: '#0070dd', epic: '#a335ee', legendary: '#ff8000' };
+    function survivorsOption(rows, CH) {
+        // Reverse so the strongest survivor sits at the top of a horizontal bar.
+        const ordered = rows.slice().reverse();
+        return {
+            backgroundColor: 'transparent',
+            grid: { left: 8, right: 28, top: 8, bottom: 20, containLabel: true },
+            xAxis: {
+                type: 'value', minInterval: 1,
+                splitLine: { lineStyle: { color: CH.SPLIT_LINE } },
+                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11 }
+            },
+            yAxis: {
+                type: 'category', data: ordered.map(r => r.name),
+                axisLine: { lineStyle: { color: CH.AXIS_LINE } },
+                axisTick: { show: false },
+                axisLabel: { color: CH.TEXT_SECONDARY, fontSize: 11, width: 150, overflow: 'truncate' }
+            },
+            tooltip: {
+                trigger: 'item', className: 'ec-tooltip',
+                formatter: p => {
+                    const r = ordered[p.dataIndex];
+                    return `<div style="font-size:12px;color:#e6edf3;font-weight:700;margin-bottom:3px;">${escHtml(r.name)}</div>
+                        <div style="font-size:11px;color:#8b949e;">${escHtml(r.slot)} · survived <strong style="color:#e6edf3;">${r.periods}</strong> periods · avg <strong style="color:#e6edf3;">${r.avg}%</strong></div>
+                        <div style="font-size:11px;color:#a97e38;margin-top:3px;">Click to see its popularity trend →</div>`;
+                }
+            },
+            series: [{
+                type: 'bar', data: ordered.map(r => r.periods), barMaxWidth: 16,
+                itemStyle: { color: p => QUALITY_HEX[ordered[p.dataIndex].quality] || '#a335ee', borderRadius: [0, 3, 3, 0] },
+                animationDelay: (i) => i * 30
+            }],
+            animationEasing: 'cubicOut', animationDuration: 800
+        };
+    }
+    // Fullscreen mini-line for one survivor's popularity over time.
+    function openSurvivorTrend(row, CH) {
+        CH.openFullscreen(`${row.name} — popularity over time`, () => ({
+            backgroundColor: 'transparent',
+            grid: { left: 38, right: 20, top: 20, bottom: 40 },
+            xAxis: CH.baseCategoryAxis(row.series.map(([l]) => l), false),
+            yAxis: CH.baseValueAxis({ max: 100, formatter: '{value}%' }),
+            tooltip: CH.baseTooltip('line', '%'),
+            series: [{
+                name: row.name, type: 'line', data: row.series.map(([, v]) => v),
+                smooth: true, symbol: 'circle', symbolSize: 9,
+                lineStyle: { width: 2, color: '#3d8fc9' },
+                itemStyle: { color: '#3d8fc9', borderColor: CH.SURFACE, borderWidth: 2 },
+                areaStyle: { color: '#3d8fc9', opacity: 0.1 }
+            }],
+            animationDuration: 700
+        }));
+    }
+    const escHtml = s => esc(s);
 
     // ════════════════════════════════════════════════════════════════
     // Meta Evolution — how a slot's item popularity shifts over time.
