@@ -34,11 +34,12 @@
     // ── Module state ────────────────────────────────────────────────
     const S = {
         mode: 'pve',        // 'pve' | 'pvp'
-        class: '',          // '' = all
+        class: '',          // '' = nothing drilled into yet
         spec: '',
         phase: null,        // string phase id, e.g. '3'
         bracket: '2v2',
-        tab: 'overview'
+        tab: 'overview',
+        _pickerOpen: false  // spec-picker "Change" expanded? (selected mode)
     };
 
     const D = () => (typeof window !== 'undefined' && window.STATS_DATA) || null;
@@ -105,15 +106,6 @@
         const phases = data ? data.meta.phases : [{ id: '1', label: 'P1' }];
         const brackets = data ? data.meta.brackets : ['2v2', '3v3'];
 
-        const classChips = ['', ...CLASS_ORDER].map(cls => {
-            const active = cls === '' ? ' active' : '';
-            const rgb = cls === '' ? '139,148,158' : CLASS_RGB[cls];
-            const dot = cls === '' ? 'ALL' : CLASS_ABBR[cls];
-            const dotBg = cls === '' ? '#8b949e' : `var(--${cls.toLowerCase()})`;
-            const label = cls === '' ? 'All classes' : cls;
-            return `<button class="class-chip${active}" data-class="${cls}" style="--chip-rgb:${rgb};"><span class="cc-dot" style="background:${dotBg};">${dot}</span>${label}</button>`;
-        }).join('');
-
         const phaseButtons = phases.map((p, i) =>
             `<button class="${i === phases.length - 1 ? 'active' : ''}" data-phase="${p.id}">Phase ${p.id}</button>`
         ).join('');
@@ -141,8 +133,6 @@
             <div class="highlight-strip" id="highlightStrip"></div>
 
             <div class="filter-bar">
-                <div class="chip-row" id="classChips">${classChips}</div>
-                <div class="chip-row hidden" id="specChips"></div>
                 <div class="segmented" id="phaseSeg">${phaseButtons}</div>
                 <div class="segmented hidden" id="bracketSeg">${bracketButtons}</div>
             </div>
@@ -269,7 +259,6 @@
                 <div class="pvp-only">${pvpRatedCard}${pvpGearCard}</div>
             </div>`;
     }
-    function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
 
     // ════════════════════════════════════════════════════════════════
     // Top Players — PvP-only arena ladder, top-20 per class|spec|bracket.
@@ -283,21 +272,22 @@
             panel.innerHTML = `<p class="empty-note">Top Players is a PvP-only view — switch to 🏆 PvP mode above.</p>`;
             return;
         }
-        if (!S.class) {
-            panel.innerHTML = `<p class="empty-note">Pick a class (and spec) above to see the top of the arena ladder.</p>`;
+        const bar = specPickerBarHtml('players');
+        const finish = html => { panel.innerHTML = bar + html; wireSpecPicker(panel, 'players'); };
+        if (!S.class || !S.spec) {
+            finish(`<p class="empty-note">Pick a class and spec above — or click into one from the Overview charts — to see the top of the arena ladder.</p>`);
             return;
         }
         const specs = specsForClass('pvp', S.class, S.phase);
-        if (!specs.length) {
-            panel.innerHTML = `<p class="empty-note">No arena ladder data recorded for ${esc(S.class)} yet.</p>`;
+        if (!specs.length || !specs.includes(S.spec)) {
+            finish(`<p class="empty-note">No arena ladder data recorded for ${esc(S.spec || S.class)} yet.</p>`);
             return;
         }
-        if (!S.spec || !specs.includes(S.spec)) S.spec = specs[0];
 
         const key = `${S.class}|${S.spec}|${S.bracket}`;
         const group = data.topPlayers[key];
         if (!group || !group.players.length) {
-            panel.innerHTML = `<p class="empty-note">No ${esc(S.bracket)} ladder entries for ${esc(S.spec)} ${esc(S.class)} in this snapshot.</p>`;
+            finish(`<p class="empty-note">No ${esc(S.bracket)} ladder entries for ${esc(S.spec)} ${esc(S.class)} in this snapshot.</p>`);
             return;
         }
 
@@ -325,12 +315,12 @@
         }).join('');
 
         const scraped = group.scrapedAt ? group.scrapedAt.slice(0, 10) : null;
-        panel.innerHTML = `
+        finish(`
             <div class="pvp-only">
                 <div class="section-label">Top ${players.length} — ${esc(S.spec)} ${esc(S.class)} · ${esc(S.bracket)} · EU+US combined</div>
                 <div class="lb-table">${rows}</div>
                 ${scraped ? `<p class="chart-note">Arena ladder from Ironforge.pro, scraped ${esc(scraped)}. Ratings and win-rates reflect that snapshot — the ladder refreshes weekly.</p>` : ''}
-            </div>`;
+            </div>`);
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -701,18 +691,22 @@
     // (STATS_DATA.metaEvolution.pvp). See STATS-PAGE-DESIGN.md §5.
     // ════════════════════════════════════════════════════════════════
     function renderEvolution(panel) {
-        if (!S.class) {
-            panel.innerHTML = `<p class="empty-note">Pick a class and spec above to see how its gear meta shifted over time.</p>`;
+        const bar = specPickerBarHtml('evolution');
+        panel.innerHTML = bar + `<div id="evoBody"></div>`;
+        wireSpecPicker(panel, 'evolution');
+        const body = panel.querySelector('#evoBody');
+        if (!S.class || !S.spec) {
+            body.innerHTML = `<p class="empty-note">Pick a class and spec above — or click into one from the Overview charts — to see how its gear meta shifted over time.</p>`;
             return;
         }
         const specs = specsForClass(S.mode, S.class, S.phase);
-        if (!specs.length || !S.spec) {
-            panel.innerHTML = `<p class="empty-note">No data recorded for ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+        if (!specs.length || !specs.includes(S.spec)) {
+            body.innerHTML = `<p class="empty-note">No data recorded for ${esc(S.spec || S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
             return;
         }
         const specKey = `${S.class}|${S.spec}`;
-        if (S.mode === 'pve') renderEvolutionPve(panel, specKey);
-        else renderEvolutionPvp(panel, specKey);
+        if (S.mode === 'pve') renderEvolutionPve(panel, body, specKey);
+        else renderEvolutionPvp(panel, body, specKey);
     }
 
     function evoSlotSelect(slots, current) {
@@ -720,11 +714,11 @@
         return `<select class="ov-slot-select" id="evoSlotSelect">${opts}</select>`;
     }
 
-    function renderEvolutionPve(panel, specKey) {
+    function renderEvolutionPve(panel, body, specKey) {
         const coh = (typeof WCL_COHORTS !== 'undefined') ? WCL_COHORTS : null;
         const spec = coh && coh.phases[S.phase] && coh.phases[S.phase][specKey];
         if (!spec) {
-            panel.innerHTML = `<div class="pve-only"><p class="empty-note">No cohort data for ${esc(S.spec)} ${esc(S.class)} in Phase ${esc(S.phase)} yet.</p></div>`;
+            body.innerHTML = `<div class="pve-only"><p class="empty-note">No cohort data for ${esc(S.spec)} ${esc(S.class)} in Phase ${esc(S.phase)} yet.</p></div>`;
             return;
         }
         const stages = ['early', 'mid', 'late'];
@@ -746,7 +740,7 @@
             data: stages.map(st => stageItems[st][it.id] != null ? stageItems[st][it.id] : null)
         }));
 
-        panel.innerHTML = `
+        body.innerHTML = `
             <div class="pve-only">
                 <div class="section-label">How the meta shifted this phase</div>
                 <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
@@ -754,15 +748,15 @@
                     `Early → Mid → Late, Phase ${S.phase}`, series, ['Early', 'Mid', 'Late'],
                     `Early/Mid/Late split the phase's logs into equal-count thirds by parse date — it captures how gearing shifted <em>within</em> the phase as more raiders cleared content.`)}
             </div>`;
-        wireLineCharts(panel);
+        wireLineCharts(body);
         wireEvoSlotSelect(panel);
     }
 
-    function renderEvolutionPvp(panel, specKey) {
+    function renderEvolutionPvp(panel, body, specKey) {
         const data = D();
         const evo = data && data.metaEvolution && data.metaEvolution.pvp[specKey];
         if (!evo) {
-            panel.innerHTML = `<div class="pvp-only"><p class="empty-note">No weekly arena history for ${esc(S.spec)} ${esc(S.class)} yet.</p></div>`;
+            body.innerHTML = `<div class="pvp-only"><p class="empty-note">No weekly arena history for ${esc(S.spec)} ${esc(S.class)} yet.</p></div>`;
             return;
         }
         const slots = Object.keys(evo.slots).sort(slotSort);
@@ -775,7 +769,7 @@
             data: it.series.map(v => v != null ? v : null)
         }));
 
-        panel.innerHTML = `
+        body.innerHTML = `
             <div class="pvp-only">
                 <div class="section-label">How the meta shifted, week by week</div>
                 <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
@@ -783,7 +777,7 @@
                     `${evo.dates[0]} → ${evo.dates[evo.dates.length - 1]}, weekly`, series, evo.dates,
                     `The arena crowd re-gears within weeks, not phases — so crossovers show up here much faster than in the raid-log (PvE) version.`)}
             </div>`;
-        wireLineCharts(panel);
+        wireLineCharts(body);
         wireEvoSlotSelect(panel);
     }
 
@@ -954,25 +948,116 @@
             `${dates.length} real weekly snapshots — a steady multi-week climb is a genuine trend, not noise.`);
     }
 
-    // ── Spec chip row (Mode → Class → Spec) ─────────────────────────
-    // Shown once a class is picked. Tabs that need a specific spec
-    // (Item Usage, Meta Evolution) read S.spec; others ignore it.
-    function renderSpecChips() {
-        const row = document.getElementById('specChips');
-        if (!row) return;
-        const specs = specsForClass(S.mode, S.class, S.phase);
-        if (!S.class || !specs.length) {
-            row.classList.add('hidden');
-            row.innerHTML = '';
-            return;
+    // ════════════════════════════════════════════════════════════════
+    // Shared spec-picker bar (NAV-REVISION-GUIDE.md §1–§4).
+    // ONE component + ONE shared state (S.class / S.spec), mounted at the
+    // top of Item Usage, Meta Evolution and Top Players. No longer a global
+    // filter row — "aggregerat först, grotta ned sig sen".
+    //   • empty mode  → prompt + class/spec chips (nothing drilled into yet)
+    //   • selected mode → "← Overview" + breadcrumb + "Change ▾"
+    // ════════════════════════════════════════════════════════════════
+    const CONTEXT_LABEL = { usage: 'item usage', evolution: 'meta evolution', players: 'the arena ladder' };
+
+    function specPickerBarHtml(contextKey) {
+        const ctx = CONTEXT_LABEL[contextKey] || 'the details';
+        const hasSel = !!(S.class && S.spec);
+        const showChips = !hasSel || S._pickerOpen;
+
+        // Class chip row (no "All" option — this is a drill-in, not a filter).
+        const classChips = CLASS_ORDER.map(cls => {
+            const rgb = CLASS_RGB[cls];
+            return `<button class="class-chip${cls === S.class ? ' active' : ''}" data-pick-class="${cls}" style="--chip-rgb:${rgb};"><span class="cc-dot" style="background:var(--${cls.toLowerCase()});">${CLASS_ABBR[cls]}</span>${cls}</button>`;
+        }).join('');
+
+        // Spec sub-menu for the currently picked class.
+        let specChips = '';
+        if (S.class) {
+            const specs = specsForClass(S.mode, S.class, S.phase);
+            const rgb = CLASS_RGB[S.class] || '139,148,158';
+            specChips = specs.map(sp =>
+                `<button class="class-chip spec-chip${sp === S.spec ? ' active' : ''}" data-pick-spec="${esc(sp)}" style="--chip-rgb:${rgb};">${esc(sp)}</button>`
+            ).join('');
         }
-        // Keep current spec if still valid, else default to first.
-        if (!specs.includes(S.spec)) S.spec = specs[0];
-        row.classList.remove('hidden');
-        const rgb = CLASS_RGB[S.class] || '139,148,158';
-        row.innerHTML = specs.map(sp =>
-            `<button class="class-chip spec-chip${sp === S.spec ? ' active' : ''}" data-spec="${esc(sp)}" style="--chip-rgb:${rgb};">${esc(sp)}</button>`
-        ).join('');
+
+        const dotBg = S.class ? `var(--${S.class.toLowerCase()})` : '#8b949e';
+        const crumb = hasSel
+            ? `<div class="spec-picker-current">
+                    <button class="spec-picker-back" data-picker-back title="Back to Overview">← Overview</button>
+                    <span class="spec-picker-crumb"><span class="spec-picker-dot" style="background:${dotBg};"></span><strong>${esc(S.spec)} ${esc(S.class)}</strong></span>
+                    <button class="spec-picker-change" data-picker-change>${S._pickerOpen ? 'Done' : 'Change ▾'}</button>
+                </div>`
+            : `<div class="spec-picker-empty"><span>Pick a class to see its ${esc(ctx)}:</span></div>`;
+
+        return `
+            <div class="spec-picker-bar" id="specPickerBar">
+                ${crumb}
+                <div class="chip-scroll${showChips ? '' : ' hidden'}">
+                    <div class="chip-row">${classChips}</div>
+                    ${S.class ? `<div class="chip-row spec-sub">${specChips}</div>` : ''}
+                </div>
+            </div>`;
+    }
+
+    // Wire the picker inside a freshly-rendered panel. Delegated so it keeps
+    // working after the panel re-renders.
+    function wireSpecPicker(panel, contextKey) {
+        const bar = panel.querySelector('#specPickerBar');
+        if (!bar) return;
+        bar.addEventListener('click', e => {
+            const clsBtn = e.target.closest('[data-pick-class]');
+            const specBtn = e.target.closest('[data-pick-spec]');
+            const back = e.target.closest('[data-picker-back]');
+            const change = e.target.closest('[data-picker-change]');
+            if (clsBtn) {
+                const cls = clsBtn.dataset.pickClass;
+                S.class = cls;
+                document.body.dataset.class = cls;
+                const specs = specsForClass(S.mode, cls, S.phase);
+                S.spec = specs.includes(S.spec) ? S.spec : (specs[0] || '');
+                S._pickerOpen = true;           // keep open so a spec can be chosen
+                renderActivePanel();
+            } else if (specBtn) {
+                S.spec = specBtn.dataset.pickSpec;
+                S._pickerOpen = false;          // collapse back to breadcrumb
+                syncUrl();
+                renderActivePanel();
+            } else if (back) {
+                clearSelection();
+                switchPanel('overview');
+            } else if (change) {
+                S._pickerOpen = !S._pickerOpen;
+                renderActivePanel();
+            }
+        });
+    }
+
+    // Programmatic drill-in from an aggregated view (Step 2 uses this).
+    function goToSpec(className, specName) {
+        S.class = className;
+        S.spec = specName;
+        S._pickerOpen = false;
+        if (className) document.body.dataset.class = className;
+        syncUrl();
+        switchPanel('usage');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearSelection() {
+        S.class = '';
+        S.spec = '';
+        S._pickerOpen = false;
+        document.body.dataset.class = '';
+        syncUrl();
+    }
+
+    // Keep class/spec in the URL only while drilled in (replaceState so we
+    // don't spam back-history). NAV-REVISION-GUIDE.md §4.
+    function syncUrl() {
+        const q = new URLSearchParams(location.search);
+        if (S.class) q.set('class', S.class.toLowerCase()); else q.delete('class');
+        if (S.spec) q.set('spec', S.spec.toLowerCase()); else q.delete('spec');
+        const qs = q.toString();
+        try { history.replaceState(null, '', qs ? `${location.pathname}?${qs}` : location.pathname); } catch (_) { /* ignore */ }
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -988,13 +1073,15 @@
     }
 
     function renderUsage(panel) {
-        if (!S.class) {
-            panel.innerHTML = `<p class="empty-note">Pick a class above to see what its top players actually run.</p>`;
+        const bar = specPickerBarHtml('usage');
+        const finish = html => { panel.innerHTML = bar + html; wireSpecPicker(panel, 'usage'); };
+        if (!S.class || !S.spec) {
+            finish(`<p class="empty-note">Pick a class and spec above — or click into one from the Overview charts — to see what its top players actually run.</p>`);
             return;
         }
         const specs = specsForClass(S.mode, S.class, S.phase);
-        if (!specs.length || !S.spec) {
-            panel.innerHTML = `<p class="empty-note">No data recorded for ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+        if (!specs.length || !specs.includes(S.spec)) {
+            finish(`<p class="empty-note">No data recorded for ${esc(S.spec || S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`);
             return;
         }
         const specKey = `${S.class}|${S.spec}`;
@@ -1011,7 +1098,7 @@
             sub = `Arena ladder · ${count} players analyzed`;
         }
         if (!spec || !spec.slots) {
-            panel.innerHTML = `<p class="empty-note">No gear data for ${esc(S.spec)} ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+            finish(`<p class="empty-note">No gear data for ${esc(S.spec)} ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`);
             return;
         }
 
@@ -1023,7 +1110,7 @@
             items.forEach((it, idx) => rows.push({ ...it, slot, isTop: idx === 0 }));
         }
         if (!rows.length) {
-            panel.innerHTML = `<p class="empty-note">No gear data for this combination yet.</p>`;
+            finish(`<p class="empty-note">No gear data for this combination yet.</p>`);
             return;
         }
 
@@ -1043,9 +1130,9 @@
             </a>`;
         }).join('');
 
-        panel.innerHTML = `
+        finish(`
             <div class="section-label">${esc(S.spec)} ${esc(S.class)} — ${esc(sub)}</div>
-            <div class="usage-list">${list}</div>`;
+            <div class="usage-list">${list}</div>`);
     }
 
     // ── Highlights strip ────────────────────────────────────────────
@@ -1084,8 +1171,14 @@
         // Top Players is PvP-only — bounce to Overview if it was open in PvE.
         if (!isPvp && S.tab === 'players') { switchPanel('overview'); }
 
+        // A spec valid in one mode may not exist in the other — fall back to
+        // the empty (un-drilled) state rather than showing a broken view.
+        if (S.class && S.spec) {
+            const specs = specsForClass(mode, S.class, S.phase);
+            if (!specs.includes(S.spec)) clearSelection();
+        }
+
         renderHighlights(mode);
-        renderSpecChips();
         updateFreshnessCopy(mode);
         renderActivePanel();
     }
@@ -1127,30 +1220,8 @@
             if (btn) setGlobalMode(btn.dataset.mode);
         });
 
-        // Class chips — also drive the class-tint atmosphere via body[data-class]
-        const chips = document.getElementById('classChips');
-        if (chips) chips.addEventListener('click', e => {
-            const btn = e.target.closest('.class-chip');
-            if (!btn) return;
-            document.querySelectorAll('#classChips .class-chip').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            S.class = btn.dataset.class || '';
-            S.spec = '';
-            document.body.dataset.class = S.class || '';
-            renderSpecChips();
-            renderActivePanel();
-        });
-
-        // Spec chips (Mode → Class → Spec)
-        const specChips = document.getElementById('specChips');
-        if (specChips) specChips.addEventListener('click', e => {
-            const btn = e.target.closest('.spec-chip');
-            if (!btn) return;
-            document.querySelectorAll('#specChips .spec-chip').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            S.spec = btn.dataset.spec || '';
-            renderActivePanel();
-        });
+        // NOTE: class/spec are no longer a global filter row — they live in
+        // the per-panel spec-picker bar (see specPickerBarHtml / wireSpecPicker).
 
         // Phase / bracket segmented controls
         const phaseSeg = document.getElementById('phaseSeg');
@@ -1160,7 +1231,11 @@
             [...phaseSeg.children].forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             S.phase = btn.dataset.phase;
-            renderSpecChips();
+            // A selected spec may not exist in the newly-picked phase.
+            if (S.class && S.spec) {
+                const specs = specsForClass(S.mode, S.class, S.phase);
+                if (!specs.includes(S.spec)) clearSelection();
+            }
             renderActivePanel();
         });
         const bracketSeg = document.getElementById('bracketSeg');
@@ -1199,23 +1274,30 @@
             if (match) S.class = match;
         }
         const spec = q.get('spec');
-        if (spec) S.spec = spec;
+        if (spec && S.class) {
+            // Match case-insensitively against the specs that actually exist
+            // for this class+mode, so ?spec=subtlety resolves to "Subtlety".
+            const specs = specsForClass(S.mode, S.class, S.phase || (data && data.meta.latestPhase));
+            const match = specs.find(s => s.toLowerCase() === spec.toLowerCase());
+            if (match) S.spec = match;
+        }
         const phase = q.get('phase');
         if (phase) S.phase = phase;
         const bracket = q.get('bracket');
         if (bracket) S.bracket = bracket;
         const view = q.get('view');
+        const viewAlias = { 'all-time': 'alltime', alltime: 'alltime' };
+        const normView = view ? (viewAlias[view] || view) : null;
         const validTabs = ['overview', 'usage', 'specmeta', 'evolution', 'players', 'alltime'];
-        if (view && validTabs.includes(view)) S.tab = view;
+        if (normView && validTabs.includes(normView)) S.tab = normView;
         // Default phase = latest.
         if (!S.phase && data) S.phase = data.meta.latestPhase;
+        // class without a resolved spec = not fully drilled in → treat as none.
+        if (S.class && !S.spec) S.class = '';
+        if (S.class) document.body.dataset.class = S.class;
     }
 
     function syncControlsToState() {
-        // Class chip
-        document.querySelectorAll('.stats-page .class-chip').forEach(c =>
-            c.classList.toggle('active', (c.dataset.class || '') === S.class));
-        if (S.class) document.body.dataset.class = S.class;
         // Phase
         document.querySelectorAll('#phaseSeg button').forEach(b =>
             b.classList.toggle('active', b.dataset.phase === S.phase));

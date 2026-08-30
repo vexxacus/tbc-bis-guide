@@ -3865,6 +3865,21 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .class-chip .cc-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 800; color: #0c0e14; flex-shrink: 0; }
 .stats-page .class-chip.active { border-color: rgba(var(--chip-rgb), .5); background: rgba(var(--chip-rgb), .12); color: var(--text-primary); box-shadow: 0 0 12px rgba(var(--chip-rgb), .25); }
 .stats-page .spec-chip { padding: 6px 14px; }
+
+/* ─── Spec-picker bar (per-panel drill-in, NAV-REVISION-GUIDE.md) ── */
+.stats-page .spec-picker-bar { background: var(--surface-elev-1); border: 1px solid rgba(255,255,255,.05); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+.stats-page .spec-picker-empty { font-size: .8rem; color: var(--text-secondary); font-weight: 600; }
+.stats-page .spec-picker-current { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.stats-page .spec-picker-back { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); color: var(--text-secondary); font-family: inherit; font-size: .72rem; font-weight: 600; padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background var(--transition), color var(--transition), border-color var(--transition); }
+.stats-page .spec-picker-back:hover { background: rgba(232,176,74,.1); border-color: rgba(232,176,74,.3); color: var(--accent-gold); }
+.stats-page .spec-picker-crumb { display: flex; align-items: center; gap: 7px; font-size: .9rem; }
+.stats-page .spec-picker-crumb strong { font-weight: 700; }
+.stats-page .spec-picker-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px rgba(255,255,255,.15); }
+.stats-page .spec-picker-change { margin-left: auto; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); color: var(--text-secondary); font-family: inherit; font-size: .72rem; font-weight: 600; padding: 6px 12px; border-radius: 7px; cursor: pointer; transition: background var(--transition), color var(--transition), border-color var(--transition); }
+.stats-page .spec-picker-change:hover { background: var(--surface-elev-2); color: var(--text-primary); }
+.stats-page .spec-picker-bar .chip-scroll { display: flex; flex-direction: column; gap: 8px; }
+.stats-page .spec-picker-bar .chip-scroll.hidden { display: none; }
+.stats-page .spec-picker-bar .spec-sub { border-top: 1px solid rgba(255,255,255,.05); padding-top: 8px; }
 .stats-page .segmented { display: flex; gap: 6px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; }
 .stats-page .segmented button {
     flex: 1; border: none; background: transparent; color: var(--text-secondary); font-family: inherit;

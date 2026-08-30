@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /* Smoke-test the /stats page: click every tab in both PvE and PvP modes,
-   pick a class+spec+bracket, and fail if the browser logs any console.error
-   or a page error. Requires the dev server running on :5500.
+   drill into the first class+spec via the per-panel spec-picker, and fail
+   if the browser logs any console.error or a page error. Requires the dev
+   server running on :5500.
 
    Run:  node smoke-stats.js
    (Fas D verification — catches "stuck old-mode data" / missing-var bugs.)  */
@@ -19,17 +20,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     page.on('pageerror', e => errors.push('pageerror: ' + e.message));
 
     async function clickTabs(mode) {
-        // set global mode
         await page.evaluate(m => {
             const btn = document.querySelector(`#globalModeToggle button[data-mode="${m}"]`);
             if (btn) btn.click();
         }, mode);
-        await sleep(120);
-        // pick first class chip that isn't "All"
-        await page.evaluate(() => {
-            const chip = document.querySelector('#classChips .class-chip[data-class]:not([data-class=""])');
-            if (chip) chip.click();
-        });
         await sleep(120);
         for (const tab of TABS) {
             await page.evaluate(t => {
@@ -37,6 +31,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
                 if (b && b.style.pointerEvents !== 'none') b.click();
             }, tab);
             await sleep(100);
+            // On a spec-picker tab, drill into the first class + spec so the
+            // panel actually renders content (not just the empty prompt).
+            await page.evaluate(() => {
+                const cls = document.querySelector('#specPickerBar [data-pick-class]');
+                if (cls) cls.click();
+            });
+            await sleep(80);
+            await page.evaluate(() => {
+                const sp = document.querySelector('#specPickerBar [data-pick-spec]');
+                if (sp) sp.click();
+            });
+            await sleep(80);
         }
     }
 
@@ -57,5 +63,5 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         [...new Set(errors)].forEach(e => console.error('  • ' + e));
         process.exit(1);
     }
-    console.log('✅ Clicked all 6 tabs in both modes ×5 — no console errors.');
+    console.log('✅ Clicked all 6 tabs (drilling into a spec) in both modes ×5 — no console errors.');
 })();
