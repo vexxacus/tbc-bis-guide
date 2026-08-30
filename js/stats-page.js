@@ -90,52 +90,10 @@
         return [...set].sort();
     }
 
-    // ── Shared SVG line-chart builder ───────────────────────────────
-    // series: [{ label, color, points:[{x:0..1, v:number}|null] }], xLabels: []
-    // Values are auto-scaled to the min/max across all series (with padding).
-    const CHART_COLORS = ['var(--chart-a)', 'var(--chart-b)', 'var(--chart-c)', 'var(--accent-success)', 'var(--accent-danger)'];
-    function lineChart(series, xLabels, opts) {
-        opts = opts || {};
-        const W = 320, H = 150, padL = 30, padR = 20, padT = 16, padB = 24;
-        const allVals = series.flatMap(s => s.points.filter(p => p != null).map(p => p.v));
-        if (!allVals.length) return '<p class="empty-note">Not enough data to chart yet.</p>';
-        let lo = Math.min(...allVals), hi = Math.max(...allVals);
-        if (opts.min != null) lo = opts.min;
-        if (opts.max != null) hi = opts.max;
-        if (hi === lo) { hi += 1; lo -= 1; }
-        const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
-        const n = xLabels.length;
-        const xAt = i => padL + (n <= 1 ? 0 : (i / (n - 1)) * (W - padL - padR));
-        const yAt = v => (H - padB) - ((v - lo) / (hi - lo)) * (H - padT - padB);
-
-        let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="150" role="img" aria-label="${esc(opts.aria || 'Line chart')}">`;
-        svg += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="rgba(255,255,255,.08)"/>`;
-        svg += `<line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="rgba(255,255,255,.08)"/>`;
-        series.forEach(s => {
-            let d = '', started = false;
-            s.points.forEach((p, i) => {
-                if (p == null) { started = false; return; }
-                d += `${started ? 'L' : 'M'} ${xAt(i).toFixed(1)} ${yAt(p.v).toFixed(1)} `;
-                started = true;
-            });
-            svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
-            // end dot + label on last valid point
-            let lastIdx = -1;
-            for (let i = s.points.length - 1; i >= 0; i--) { if (s.points[i] != null) { lastIdx = i; break; } }
-            if (lastIdx >= 0) {
-                const p = s.points[lastIdx];
-                svg += `<circle cx="${xAt(lastIdx).toFixed(1)}" cy="${yAt(p.v).toFixed(1)}" r="3.5" fill="${s.color}" stroke="#0c0e14" stroke-width="1.5"/>`;
-            }
-        });
-        // x-axis labels (thin them out if crowded)
-        const step = Math.ceil(n / 6);
-        xLabels.forEach((lab, i) => {
-            if (i % step !== 0 && i !== n - 1) return;
-            svg += `<text x="${xAt(i).toFixed(1)}" y="${H - 8}" fill="#656d76" font-size="8" font-family="Inter, sans-serif" text-anchor="middle">${esc(lab)}</text>`;
-        });
-        svg += `</svg>`;
-        return svg;
-    }
+    // ── Line-chart series palette (shared by every ECharts line chart) ──
+    // Charts themselves are built with Apache ECharts via window.ChartHelpers
+    // (see CHART-UPGRADE-GUIDE.md) — hand-rolled SVG is no longer used.
+    const CHART_COLORS = ['#a97e38', '#7c5cff', '#3d8fc9', '#4cd97b', '#ef4d4d'];
 
     // ════════════════════════════════════════════════════════════════
     // Shell HTML — mirrors stats-page-mockup.html (minus its own header /
@@ -532,6 +490,74 @@
     }
     const escHtml = s => esc(s);
 
+    // ── Shared multi-series line chart (Spec Meta + Meta Evolution) ──
+    // series: [{ name, color, data:[num|null] }], xLabels: []. Returns an
+    // ECharts option following CHART-UPGRADE-GUIDE §4 (2px lines, ≥8px
+    // ringed markers, 10% area, legend only when 2+ series).
+    function multiLineOption(series, xLabels, opts) {
+        opts = opts || {};
+        const CH = window.ChartHelpers;
+        const multi = series.length > 1;
+        const ecSeries = series.map(s => ({
+            name: s.name,
+            type: 'line',
+            data: s.data,
+            smooth: true,
+            connectNulls: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            lineStyle: { width: 2, color: s.color },
+            itemStyle: { color: s.color, borderColor: CH.SURFACE, borderWidth: 2 },
+            areaStyle: multi ? undefined : { color: s.color, opacity: 0.1 },
+            emphasis: { focus: 'series', lineStyle: { width: 3 } }
+        }));
+        return {
+            backgroundColor: 'transparent',
+            color: series.map(s => s.color),
+            grid: { left: 40, right: 18, top: 34, bottom: multi ? 56 : 30 },
+            legend: multi ? CH.baseLegend('line') : { show: false },
+            xAxis: CH.baseCategoryAxis(xLabels, false),
+            yAxis: CH.baseValueAxis({ formatter: '{value}%', min: opts.min, max: opts.max }),
+            tooltip: CH.baseTooltip('line', '%'),
+            toolbox: CH.baseToolbox(),
+            dataZoom: [{ type: 'inside' }],
+            animationEasing: 'cubicOut', animationDuration: 1000,
+            series: ecSeries
+        };
+    }
+
+    // Render a titled chart-card whose canvas is filled by an ECharts
+    // multi-line instance, with a working ⛶ fullscreen button. `id` must
+    // be unique on the page. Returns the card HTML; call wireLineChart()
+    // after the panel's innerHTML is set to actually init the chart.
+    let _lineChartRegistry = [];
+    function lineChartCard(id, title, sub, series, xLabels, note, opts) {
+        _lineChartRegistry.push({ id, title, series, xLabels, opts: opts || {} });
+        return `
+            <div class="chart-card">
+                <div class="chart-head">
+                    <div><h3>${esc(title)}</h3><span class="chart-sub">${esc(sub)}</span></div>
+                    <div class="chart-head-actions"><button class="chart-expand-btn" data-line-fs="${id}">⛶ Fullscreen</button></div>
+                </div>
+                <div class="chart-canvas" id="${id}"></div>
+                ${note ? `<p class="chart-note">${note}</p>` : ''}
+            </div>`;
+    }
+    // Init every line-chart card queued since the last call, and wire their
+    // fullscreen buttons. Call once after panel.innerHTML is set.
+    function wireLineCharts(panel) {
+        const CH = window.ChartHelpers;
+        if (!CH) return;
+        const queued = _lineChartRegistry;
+        _lineChartRegistry = [];
+        queued.forEach(q => {
+            const optFn = () => multiLineOption(q.series, q.xLabels, q.opts);
+            CH.initChart(q.id, optFn);
+            const btn = panel.querySelector(`[data-line-fs="${q.id}"]`);
+            if (btn) btn.addEventListener('click', () => CH.openFullscreen(q.title, optFn));
+        });
+    }
+
     // ════════════════════════════════════════════════════════════════
     // Meta Evolution — how a slot's item popularity shifts over time.
     // PvE: Early/Mid/Late within a phase (WCL_COHORTS). PvP: week-by-week
@@ -578,25 +604,20 @@
         });
         const topItems = (late.slots[slot] || []).slice().sort((a, b) => b.popularity - a.popularity).slice(0, 3);
         const series = topItems.map((it, i) => ({
-            label: it.name,
+            name: it.name,
             color: CHART_COLORS[i],
-            points: stages.map(st => stageItems[st][it.id] != null ? { v: stageItems[st][it.id] } : null)
+            data: stages.map(st => stageItems[st][it.id] != null ? stageItems[st][it.id] : null)
         }));
-        const legend = series.map(s =>
-            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
-        ).join('');
 
         panel.innerHTML = `
             <div class="pve-only">
                 <div class="section-label">How the meta shifted this phase</div>
                 <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
-                <div class="chart-card">
-                    <div class="chart-head"><h3>${esc(slot)} slot — ${esc(S.spec)} ${esc(S.class)}</h3><span class="chart-sub">Early → Mid → Late, Phase ${esc(S.phase)}</span></div>
-                    <div class="chart-svg-wrap">${lineChart(series, ['Early', 'Mid', 'Late'], { aria: `${slot} popularity across cohorts` })}</div>
-                    <div class="chart-legend">${legend}</div>
-                    <p class="chart-note">Early/Mid/Late split the phase's logs into equal-count thirds by parse date — it captures how gearing shifted <em>within</em> the phase as more raiders cleared content.</p>
-                </div>
+                ${lineChartCard('evoPve', `${slot} slot — ${S.spec} ${S.class}`,
+                    `Early → Mid → Late, Phase ${S.phase}`, series, ['Early', 'Mid', 'Late'],
+                    `Early/Mid/Late split the phase's logs into equal-count thirds by parse date — it captures how gearing shifted <em>within</em> the phase as more raiders cleared content.`)}
             </div>`;
+        wireLineCharts(panel);
         wireEvoSlotSelect(panel);
     }
 
@@ -612,25 +633,20 @@
         const slot = S.metaEvoSlot;
         const items = (evo.slots[slot] || []).slice(0, 3);
         const series = items.map((it, i) => ({
-            label: it.name,
+            name: it.name,
             color: CHART_COLORS[i],
-            points: it.series.map(v => v != null ? { v } : null)
+            data: it.series.map(v => v != null ? v : null)
         }));
-        const legend = series.map(s =>
-            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
-        ).join('');
 
         panel.innerHTML = `
             <div class="pvp-only">
                 <div class="section-label">How the meta shifted, week by week</div>
                 <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
-                <div class="chart-card">
-                    <div class="chart-head"><h3>${esc(slot)} slot — ${esc(S.spec)} ${esc(S.class)} (arena)</h3><span class="chart-sub">${esc(evo.dates[0])} → ${esc(evo.dates[evo.dates.length - 1])}, weekly</span></div>
-                    <div class="chart-svg-wrap">${lineChart(series, evo.dates, { aria: `${slot} popularity week by week` })}</div>
-                    <div class="chart-legend">${legend}</div>
-                    <p class="chart-note">The arena crowd re-gears within weeks, not phases — so crossovers show up here much faster than in the raid-log (PvE) version.</p>
-                </div>
+                ${lineChartCard('evoPvp', `${slot} slot — ${S.spec} ${S.class} (arena)`,
+                    `${evo.dates[0]} → ${evo.dates[evo.dates.length - 1]}, weekly`, series, evo.dates,
+                    `The arena crowd re-gears within weeks, not phases — so crossovers show up here much faster than in the raid-log (PvE) version.`)}
             </div>`;
+        wireLineCharts(panel);
         wireEvoSlotSelect(panel);
     }
 
@@ -752,6 +768,7 @@
         }
 
         panel.innerHTML = caveat + pveCaveat + pveHtml + pvpHtml;
+        wireLineCharts(panel);
     }
 
     // PvE spec-share trend across phases (top 3 specs of the selected phase).
@@ -769,26 +786,19 @@
         const series = topSpecs.map((key, i) => {
             const [cls, spec] = key.split('|');
             return {
-                label: `${spec} ${cls}`,
+                name: `${spec} ${cls}`,
                 color: CHART_COLORS[i],
-                cls,
-                points: phaseIds.map(pid => {
+                data: phaseIds.map(pid => {
                     const v = shareByPhaseSpec[`${pid}|${key}`];
-                    return v != null ? { v } : null;
+                    return v != null ? v : null;
                 })
             };
         });
-        const legend = series.map(s =>
-            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
-        ).join('');
-        return `
-            <div class="section-label">How it's shifted — across the phases (PvE)</div>
-            <div class="chart-card">
-                <div class="chart-head"><h3>Spec share, phase by phase</h3><span class="chart-sub">Phase ${esc(phaseIds[0])} → ${esc(phaseIds[phaseIds.length - 1])}</span></div>
-                <div class="chart-svg-wrap">${lineChart(series, phaseIds.map(p => 'P' + p), { aria: 'PvE spec share across phases' })}</div>
-                <div class="chart-legend">${legend}</div>
-                <p class="chart-note">Only ${phaseIds.length} data points total, so read this as a broad trend — PvP mode gives you a week-by-week pulse instead.</p>
-            </div>`;
+        return `<div class="section-label">How it's shifted — across the phases (PvE)</div>` +
+            lineChartCard('specTrendPve', 'Spec share, phase by phase',
+            `Phase ${phaseIds[0]} → ${phaseIds[phaseIds.length - 1]}`,
+            series, phaseIds.map(p => 'P' + p),
+            `Only ${phaseIds.length} data points total, so read this as a broad trend — PvP mode gives you a week-by-week pulse instead.`);
     }
 
     // PvP spec-share trend across the 21 weekly snapshots (top 3 specs).
@@ -796,22 +806,15 @@
         const dates = data.specMeta.pvp.all.dates;
         const top = ranked.slice(0, 3);
         const series = top.map((r, i) => ({
-            label: `${r.spec} ${r.class}`,
+            name: `${r.spec} ${r.class}`,
             color: CHART_COLORS[i],
-            cls: r.class,
-            points: r.series.map(v => v != null ? { v } : null)
+            data: r.series.map(v => v != null ? v : null)
         }));
-        const legend = series.map(s =>
-            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
-        ).join('');
-        return `
-            <div class="section-label">How it's shifted — last ${dates.length} weeks (PvP, top of the ladder)</div>
-            <div class="chart-card">
-                <div class="chart-head"><h3>Spec share of the top of the ladder</h3><span class="chart-sub">${esc(dates[0])} → ${esc(dates[dates.length - 1])}</span></div>
-                <div class="chart-svg-wrap">${lineChart(series, dates, { aria: 'PvP spec share across weekly snapshots' })}</div>
-                <div class="chart-legend">${legend}</div>
-                <p class="chart-note">21 real weekly snapshots — a steady multi-week climb is a genuine trend, not noise.</p>
-            </div>`;
+        return `<div class="section-label">How it's shifted — last ${dates.length} weeks (PvP, top of the ladder)</div>` +
+            lineChartCard('specTrendPvp', 'Spec share of the top of the ladder',
+            `${dates[0]} → ${dates[dates.length - 1]}`,
+            series, dates,
+            `${dates.length} real weekly snapshots — a steady multi-week climb is a genuine trend, not noise.`);
     }
 
     // ── Spec chip row (Mode → Class → Spec) ─────────────────────────
