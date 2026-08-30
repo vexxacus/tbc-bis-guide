@@ -193,6 +193,81 @@
 
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
+
+    // ════════════════════════════════════════════════════════════════
+    // All-Time — records that span every phase / snapshot recorded so far.
+    //   PvE: most-used gear for the picked spec + most dominant specs ever.
+    //   PvP: highest-rated specs ever + most-used arena gear all-time.
+    // Reads STATS_DATA.allTime. See mockup #panel-alltime.
+    // ════════════════════════════════════════════════════════════════
+    function atItem(rank, name, sub, value) {
+        return `
+        <div class="alltime-item">
+            <div class="at-rank">${rank}</div>
+            <div class="at-main"><div class="at-name">${name}</div><div class="at-sub">${sub}</div></div>
+            <div class="at-value">${esc(value)}</div>
+        </div>`;
+    }
+    function phasePills(phaseNums) {
+        return (phaseNums || []).map(p => `<span class="phase-pill">P${p}</span>`).join('');
+    }
+    function renderAllTime(panel) {
+        const data = D();
+        if (!data || !data.allTime) { panel.innerHTML = soon('All-Time'); return; }
+        const at = data.allTime;
+
+        // ── PvE ──────────────────────────────────────────────────────
+        let pveGearCard = '';
+        if (S.class) {
+            const specs = specsForClass('pve', S.class, S.phase);
+            const spec = (S.spec && specs.includes(S.spec)) ? S.spec : specs[0];
+            const key = spec ? `${S.class}|${spec}` : null;
+            const rec = key && at.pve[key];
+            if (rec && rec.mostUsedItems.length) {
+                const rows = rec.mostUsedItems.slice(0, 5).map((it, i) => {
+                    const n = it.phasesSeenIn.length;
+                    const sub = `${phasePills(it.phasesSeenIn)}seen in ${n} phase${n === 1 ? '' : 's'}`;
+                    const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener">${esc(it.name)}</a>`;
+                    return atItem(i + 1, name, sub, `avg ${it.avgPopularity}%`);
+                }).join('');
+                pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — ${esc(spec)} ${esc(S.class)}</h3>${rows}</div>`;
+            }
+        }
+        if (!pveGearCard) {
+            pveGearCard = `<div class="alltime-card"><h3>🏅 Most used gear — all-time</h3><p class="empty-note" style="margin:0;">Pick a class and spec above to see its longest-standing BiS gear across every phase.</p></div>`;
+        }
+        const totalPhases = data.meta.phases.length;
+        const specRows = (at.pveSpecs || []).slice(0, 5).map((s, i) => {
+            const color = CLASS_COLORS[s.class] || 'var(--text-muted)';
+            let sub;
+            if (s.leads > 0) sub = `led the pick-rate in ${s.leads} of ${totalPhases} phase${totalPhases === 1 ? '' : 's'}`;
+            else sub = 'never led, but always ranked';
+            const name = `<span style="color:${color};">${esc(s.spec)} ${esc(s.class)}</span>`;
+            return atItem(i + 1, name, sub, `avg ${s.avgShare}%`);
+        }).join('');
+        const pveSpecCard = specRows ? `<div class="alltime-card"><h3>👑 Most dominant spec — all phases</h3>${specRows}</div>` : '';
+
+        // ── PvP ──────────────────────────────────────────────────────
+        const ratedRows = (at.pvp.highestRatedSpecs || []).slice(0, 5).map((s, i) => {
+            const color = CLASS_COLORS[s.class] || 'var(--text-muted)';
+            const name = `<span style="color:${color};">${esc(s.spec)} ${esc(s.class)} — ${esc(s.bracket)}</span>`;
+            return atItem(i + 1, name, `peak on ${esc(s.dateOfPeak)}`, s.peakRating.toLocaleString('en-US'));
+        }).join('');
+        const pvpRatedCard = ratedRows ? `<div class="alltime-card"><h3>⚡ Highest rated specs ever recorded</h3>${ratedRows}</div>` : '';
+
+        const gearRows = (at.pvp.mostUsedGear || []).slice(0, 5).map((it, i) => {
+            const name = `<a class="at-name-link" href="${whLink(it.id)}" target="_blank" rel="noopener">${esc(it.name)}</a>`;
+            return atItem(i + 1, name, `tracked since ${esc(it.since)}`, `avg ${it.avgPopularity}%`);
+        }).join('');
+        const pvpGearCard = gearRows ? `<div class="alltime-card"><h3>🏅 Most used arena gear — all-time</h3>${gearRows}</div>` : '';
+
+        panel.innerHTML = `
+            <div class="section-label">Across every ${S.mode === 'pvp' ? 'weekly snapshot' : 'phase'} recorded so far</div>
+            <div class="alltime-grid">
+                <div class="pve-only">${pveGearCard}${pveSpecCard}</div>
+                <div class="pvp-only">${pvpRatedCard}${pvpGearCard}</div>
+            </div>`;
+    }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
 
     // ════════════════════════════════════════════════════════════════
