@@ -174,7 +174,17 @@
             _fsOverlay.classList.add('open');
             if (_fsChart) _fsChart.dispose();
             _fsChart = ec.init(_fsCanvas);
-            _fsChart.setOption(optionFn());
+            // The inline cards keep their plots clean; the roomy fullscreen view
+            // is where we surface a download (save-as-image) control.
+            const opt = optionFn() || {};
+            if (!opt.toolbox) {
+                opt.toolbox = {
+                    right: 6, top: 0, itemSize: 16,
+                    feature: { saveAsImage: { title: 'Save as image', backgroundColor: '#0c0e14' } },
+                    iconStyle: { borderColor: '#656d76' }
+                };
+            }
+            _fsChart.setOption(opt);
             requestAnimationFrame(() => _fsChart.resize());
         });
     }

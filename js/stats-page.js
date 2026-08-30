@@ -477,12 +477,11 @@
         return {
             backgroundColor: 'transparent',
             color: classes.map(c => CH.CLASS_COLORS[c]),
-            grid: { left: 38, right: 12, top: 34, bottom: 56 },
+            grid: { left: 38, right: 12, top: 16, bottom: 56 },
             legend: CH.baseLegend('rect'),
             xAxis: CH.baseCategoryAxis(labels, !isPvp),
             yAxis: CH.baseValueAxis({ max: 100, formatter: '{value}%' }),
             tooltip: CH.baseTooltip('shadow', '%'),
-            toolbox: CH.baseToolbox(),
             dataZoom: [{ type: 'inside' }],
             animationEasing: 'cubicOut', animationDuration: 900,
             series
@@ -549,7 +548,7 @@
         const values = src.map(p => p.score);
         return {
             backgroundColor: 'transparent',
-            grid: { left: 38, right: 16, top: 34, bottom: 30 },
+            grid: { left: 38, right: 16, top: 16, bottom: 30 },
             xAxis: CH.baseCategoryAxis(labels, false),
             yAxis: CH.baseValueAxis({ formatter: '{value}' }),
             tooltip: {
@@ -565,7 +564,6 @@
                         <div style="font-size:12px;color:#e6edf3;margin-bottom:4px;">Index <strong style="color:#a97e38;">${p.value}</strong></div>${top}`;
                 }
             },
-            toolbox: CH.baseToolbox(),
             dataZoom: [{ type: 'inside' }],
             series: [{
                 type: 'line', data: values, smooth: true, symbol: 'circle', symbolSize: 8,
@@ -669,12 +667,11 @@
         return {
             backgroundColor: 'transparent',
             color: series.map(s => s.color),
-            grid: { left: 40, right: 18, top: 34, bottom: multi ? 56 : 30 },
+            grid: { left: 40, right: 18, top: 16, bottom: multi ? 56 : 30 },
             legend: multi ? CH.baseLegend('line') : { show: false },
             xAxis: CH.baseCategoryAxis(xLabels, false),
             yAxis: CH.baseValueAxis({ formatter: '{value}%', min: opts.min, max: opts.max }),
             tooltip: CH.baseTooltip('line', '%'),
-            toolbox: CH.baseToolbox(),
             dataZoom: [{ type: 'inside' }],
             animationEasing: 'cubicOut', animationDuration: 1000,
             series: ecSeries

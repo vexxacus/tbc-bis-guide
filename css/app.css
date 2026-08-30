@@ -3910,12 +3910,10 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 /* ─── Overview layer ────────────────────────────────────────────── */
 .stats-page .overview-intro { font-size: .78rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
 .stats-page .overview-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-.stats-page .overview-grid .ov-half { grid-column: 1 / -1; }
-@media (min-width: 760px) {
-    .stats-page .overview-grid { grid-template-columns: 1fr 1fr; }
-    .stats-page .overview-grid .ov-full { grid-column: 1 / -1; }
-    .stats-page .overview-grid .ov-half { grid-column: auto; }
-}
+.stats-page .overview-grid .ov-half,
+.stats-page .overview-grid .ov-full { grid-column: 1 / -1; }
+/* Single-column: every overview card spans the full width and stacks
+   vertically — the half-width cards got too cramped side by side. */
 .stats-page .ov-card { background: var(--surface-elev-1); border: 1px solid rgba(255,255,255,.04); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-soft), var(--surface-inset-hi); }
 .stats-page .ov-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .stats-page .ov-card-head h3 { font-size: .92rem; font-weight: 700; }
