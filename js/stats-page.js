@@ -44,6 +44,52 @@
     const D = () => (typeof window !== 'undefined' && window.STATS_DATA) || null;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+    // ── Item helpers (reuse the site-wide ICONS / ITEM_QUALITY globals) ──
+    const ICON_CDN = 'https://wow.zamimg.com/images/wow/icons/medium';
+    const QUALITY_NAME = { 0: 'poor', 1: 'common', 2: 'uncommon', 3: 'rare', 4: 'epic', 5: 'legendary' };
+    function iconUrl(id) {
+        const name = (typeof ICONS !== 'undefined' && ICONS[id]) || 'inv_misc_questionmark';
+        return `${ICON_CDN}/${name}.jpg`;
+    }
+    function qualityOf(id, fallback) {
+        if (typeof ITEM_QUALITY !== 'undefined' && ITEM_QUALITY[id] != null) return QUALITY_NAME[ITEM_QUALITY[id]] || (fallback || 'epic');
+        return fallback || 'epic';
+    }
+    const whLink = id => `https://www.wowhead.com/tbc/item=${id}`;
+    // Popularity → tier label used in the mockup (gold/strong/viable/niche).
+    function tierLabel(pop) {
+        if (pop >= 70) return 'gold';
+        if (pop >= 40) return 'strong';
+        if (pop >= 15) return 'viable';
+        return 'niche';
+    }
+
+    // ── Spec discovery from the loaded data globals ─────────────────
+    // Returns ['Arms','Fury',…] available for a class in the current mode.
+    function specsForClass(mode, cls, phase) {
+        if (!cls) return [];
+        const set = new Set();
+        if (mode === 'pve') {
+            const wcl = (typeof WCL_DATA !== 'undefined') ? WCL_DATA : null;
+            if (wcl) {
+                const phaseData = wcl.phases[phase] || {};
+                for (const key of Object.keys(phaseData)) {
+                    const [c, s] = key.split('|');
+                    if (c === cls) set.add(s);
+                }
+            }
+        } else {
+            const pvp = (typeof PVP_DATA !== 'undefined') ? PVP_DATA : null;
+            if (pvp) {
+                for (const key of Object.keys(pvp.specs)) {
+                    const [c, s] = key.split('|');
+                    if (c === cls) set.add(s);
+                }
+            }
+        }
+        return [...set].sort();
+    }
+
     // ════════════════════════════════════════════════════════════════
     // Shell HTML — mirrors stats-page-mockup.html (minus its own header /
     // footer / mockup banner; the app's global header + footer wrap this).
@@ -90,6 +136,7 @@
 
             <div class="filter-bar">
                 <div class="chip-row" id="classChips">${classChips}</div>
+                <div class="chip-row hidden" id="specChips"></div>
                 <div class="segmented" id="phaseSeg">${phaseButtons}</div>
                 <div class="segmented hidden" id="bracketSeg">${bracketButtons}</div>
             </div>
@@ -142,11 +189,104 @@
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
     function renderOverview(p)  { p.innerHTML = soon('Overview charts'); }
-    function renderUsage(p)     { p.innerHTML = soon('Item Usage'); }
     function renderSpecMeta(p)  { p.innerHTML = soon('Spec Meta'); }
     function renderEvolution(p) { p.innerHTML = soon('Meta Evolution'); }
     function renderPlayers(p)   { p.innerHTML = soon('Top Players'); }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
+
+    // ── Spec chip row (Mode → Class → Spec) ─────────────────────────
+    // Shown once a class is picked. Tabs that need a specific spec
+    // (Item Usage, Meta Evolution) read S.spec; others ignore it.
+    function renderSpecChips() {
+        const row = document.getElementById('specChips');
+        if (!row) return;
+        const specs = specsForClass(S.mode, S.class, S.phase);
+        if (!S.class || !specs.length) {
+            row.classList.add('hidden');
+            row.innerHTML = '';
+            return;
+        }
+        // Keep current spec if still valid, else default to first.
+        if (!specs.includes(S.spec)) S.spec = specs[0];
+        row.classList.remove('hidden');
+        const rgb = CLASS_RGB[S.class] || '139,148,158';
+        row.innerHTML = specs.map(sp =>
+            `<button class="class-chip spec-chip${sp === S.spec ? ' active' : ''}" data-spec="${esc(sp)}" style="--chip-rgb:${rgb};">${esc(sp)}</button>`
+        ).join('');
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // Item Usage — slot-by-slot popularity bars (mirrors .usage-row in
+    // the mockup). PvE reads WCL_DATA, PvP reads PVP_DATA.
+    // ════════════════════════════════════════════════════════════════
+    const SLOT_ORDER = ['Head', 'Neck', 'Shoulders', 'Back', 'Chest', 'Wrist', 'Hands',
+        'Waist', 'Legs', 'Feet', 'Ring', 'Ring 2', 'Trinket', 'Trinket 2',
+        'Main Hand', 'Off Hand', 'Two Hand', 'Weapon', 'Ranged', 'Relic'];
+    function slotSort(a, b) {
+        const ia = SLOT_ORDER.indexOf(a), ib = SLOT_ORDER.indexOf(b);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    }
+
+    function renderUsage(panel) {
+        if (!S.class) {
+            panel.innerHTML = `<p class="empty-note">Pick a class above to see what its top players actually run.</p>`;
+            return;
+        }
+        const specs = specsForClass(S.mode, S.class, S.phase);
+        if (!specs.length || !S.spec) {
+            panel.innerHTML = `<p class="empty-note">No data recorded for ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+            return;
+        }
+        const specKey = `${S.class}|${S.spec}`;
+        let spec, sub, count;
+        if (S.mode === 'pve') {
+            const wcl = (typeof WCL_DATA !== 'undefined') ? WCL_DATA : null;
+            spec = wcl && wcl.phases[S.phase] && wcl.phases[S.phase][specKey];
+            count = spec ? spec.totalPlayers : 0;
+            sub = `Phase ${S.phase} · ${count} players analyzed`;
+        } else {
+            const pvp = (typeof PVP_DATA !== 'undefined') ? PVP_DATA : null;
+            spec = pvp && pvp.specs[specKey];
+            count = spec ? spec.playerCount : 0;
+            sub = `Arena ladder · ${count} players analyzed`;
+        }
+        if (!spec || !spec.slots) {
+            panel.innerHTML = `<p class="empty-note">No gear data for ${esc(S.spec)} ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+            return;
+        }
+
+        // Flatten to one "top item per slot" list, plus the runners-up.
+        const slots = Object.keys(spec.slots).sort(slotSort);
+        const rows = [];
+        for (const slot of slots) {
+            const items = (spec.slots[slot] || []).slice().sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+            items.forEach((it, idx) => rows.push({ ...it, slot, isTop: idx === 0 }));
+        }
+        if (!rows.length) {
+            panel.innerHTML = `<p class="empty-note">No gear data for this combination yet.</p>`;
+            return;
+        }
+
+        const list = rows.map(it => {
+            const q = qualityOf(it.id, it.quality);
+            const qClass = (q === 'epic' || q === 'rare' || q === 'legendary' || q === 'uncommon') ? q : 'epic';
+            const pop = it.popularity || 0;
+            return `
+            <a class="usage-row${it.isTop ? ' is-top' : ''}" data-quality="${qClass}" href="${whLink(it.id)}" target="_blank" rel="noopener" data-wowhead="item=${it.id}&domain=tbc">
+                <img class="usage-icon q-${qClass}" src="${iconUrl(it.id)}" alt="" loading="lazy" width="38" height="38">
+                <div class="usage-main">
+                    <div class="usage-name">${esc(it.name)}</div>
+                    <div class="usage-slot">${esc(it.slot)}</div>
+                    <div class="usage-bar-track"><div class="usage-bar-fill" style="width:${pop}%;"></div></div>
+                </div>
+                <div class="usage-pct"><div class="pct-num">${pop}%</div><div class="pct-sub">${tierLabel(pop)}</div></div>
+            </a>`;
+        }).join('');
+
+        panel.innerHTML = `
+            <div class="section-label">${esc(S.spec)} ${esc(S.class)} — ${esc(sub)}</div>
+            <div class="usage-list">${list}</div>`;
+    }
 
     // ── Highlights strip ────────────────────────────────────────────
     function renderHighlights(mode) {
@@ -185,6 +325,7 @@
         if (!isPvp && S.tab === 'players') { switchPanel('overview'); }
 
         renderHighlights(mode);
+        renderSpecChips();
         renderActivePanel();
     }
 
@@ -207,11 +348,23 @@
         if (chips) chips.addEventListener('click', e => {
             const btn = e.target.closest('.class-chip');
             if (!btn) return;
-            document.querySelectorAll('.stats-page .class-chip').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#classChips .class-chip').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             S.class = btn.dataset.class || '';
             S.spec = '';
             document.body.dataset.class = S.class || '';
+            renderSpecChips();
+            renderActivePanel();
+        });
+
+        // Spec chips (Mode → Class → Spec)
+        const specChips = document.getElementById('specChips');
+        if (specChips) specChips.addEventListener('click', e => {
+            const btn = e.target.closest('.spec-chip');
+            if (!btn) return;
+            document.querySelectorAll('#specChips .spec-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            S.spec = btn.dataset.spec || '';
             renderActivePanel();
         });
 
@@ -223,6 +376,7 @@
             [...phaseSeg.children].forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             S.phase = btn.dataset.phase;
+            renderSpecChips();
             renderActivePanel();
         });
         const bracketSeg = document.getElementById('bracketSeg');

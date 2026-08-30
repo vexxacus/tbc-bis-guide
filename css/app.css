@@ -3863,6 +3863,7 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .class-chip:hover { transform: translateY(-1px); background: var(--surface-elev-2); }
 .stats-page .class-chip .cc-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 800; color: #0c0e14; flex-shrink: 0; }
 .stats-page .class-chip.active { border-color: rgba(var(--chip-rgb), .5); background: rgba(var(--chip-rgb), .12); color: var(--text-primary); box-shadow: 0 0 12px rgba(var(--chip-rgb), .25); }
+.stats-page .spec-chip { padding: 6px 14px; }
 .stats-page .segmented { display: flex; gap: 6px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; }
 .stats-page .segmented button {
     flex: 1; border: none; background: transparent; color: var(--text-secondary); font-family: inherit;
@@ -3970,6 +3971,7 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
     position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius);
     border: 1px solid rgba(255,255,255,.04); box-shadow: var(--shadow-soft);
     transition: box-shadow var(--transition), transform var(--transition-spring); background: var(--surface-elev-1);
+    text-decoration: none; color: inherit;
 }
 .stats-page .usage-row:hover { transform: translateY(-1px); }
 .stats-page .usage-row[data-quality="epic"] { background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(163,53,238,.07), transparent 70%), var(--surface-elev-1); }
