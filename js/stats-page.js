@@ -236,9 +236,118 @@
     // ── Phase B placeholder renderers (filled in Phase C) ────────────
     const soon = label => `<p class="empty-note">🚧 ${label} — coming in the next build step.</p>`;
     function renderOverview(p)  { p.innerHTML = soon('Overview charts'); }
-    function renderEvolution(p) { p.innerHTML = soon('Meta Evolution'); }
     function renderPlayers(p)   { p.innerHTML = soon('Top Players'); }
     function renderAllTime(p)   { p.innerHTML = soon('All-Time'); }
+
+    // ════════════════════════════════════════════════════════════════
+    // Meta Evolution — how a slot's item popularity shifts over time.
+    // PvE: Early/Mid/Late within a phase (WCL_COHORTS). PvP: week-by-week
+    // (STATS_DATA.metaEvolution.pvp). See STATS-PAGE-DESIGN.md §5.
+    // ════════════════════════════════════════════════════════════════
+    function renderEvolution(panel) {
+        if (!S.class) {
+            panel.innerHTML = `<p class="empty-note">Pick a class and spec above to see how its gear meta shifted over time.</p>`;
+            return;
+        }
+        const specs = specsForClass(S.mode, S.class, S.phase);
+        if (!specs.length || !S.spec) {
+            panel.innerHTML = `<p class="empty-note">No data recorded for ${esc(S.class)} in this ${S.mode === 'pve' ? 'phase' : 'bracket'} yet.</p>`;
+            return;
+        }
+        const specKey = `${S.class}|${S.spec}`;
+        if (S.mode === 'pve') renderEvolutionPve(panel, specKey);
+        else renderEvolutionPvp(panel, specKey);
+    }
+
+    function evoSlotSelect(slots, current) {
+        const opts = slots.map(s => `<option value="${esc(s)}"${s === current ? ' selected' : ''}>${esc(s)}</option>`).join('');
+        return `<select class="ov-slot-select" id="evoSlotSelect">${opts}</select>`;
+    }
+
+    function renderEvolutionPve(panel, specKey) {
+        const coh = (typeof WCL_COHORTS !== 'undefined') ? WCL_COHORTS : null;
+        const spec = coh && coh.phases[S.phase] && coh.phases[S.phase][specKey];
+        if (!spec) {
+            panel.innerHTML = `<div class="pve-only"><p class="empty-note">No cohort data for ${esc(S.spec)} ${esc(S.class)} in Phase ${esc(S.phase)} yet.</p></div>`;
+            return;
+        }
+        const stages = ['early', 'mid', 'late'];
+        const late = spec.late || spec.mid || spec.early;
+        const slots = Object.keys(late.slots).sort(slotSort);
+        if (!S.metaEvoSlot || !slots.includes(S.metaEvoSlot)) S.metaEvoSlot = slots[0];
+        const slot = S.metaEvoSlot;
+
+        const stageItems = {};
+        stages.forEach(st => {
+            stageItems[st] = {};
+            const sd = spec[st];
+            if (sd && sd.slots[slot]) sd.slots[slot].forEach(it => stageItems[st][it.id] = it.popularity);
+        });
+        const topItems = (late.slots[slot] || []).slice().sort((a, b) => b.popularity - a.popularity).slice(0, 3);
+        const series = topItems.map((it, i) => ({
+            label: it.name,
+            color: CHART_COLORS[i],
+            points: stages.map(st => stageItems[st][it.id] != null ? { v: stageItems[st][it.id] } : null)
+        }));
+        const legend = series.map(s =>
+            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
+        ).join('');
+
+        panel.innerHTML = `
+            <div class="pve-only">
+                <div class="section-label">How the meta shifted this phase</div>
+                <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
+                <div class="chart-card">
+                    <div class="chart-head"><h3>${esc(slot)} slot — ${esc(S.spec)} ${esc(S.class)}</h3><span class="chart-sub">Early → Mid → Late, Phase ${esc(S.phase)}</span></div>
+                    <div class="chart-svg-wrap">${lineChart(series, ['Early', 'Mid', 'Late'], { aria: `${slot} popularity across cohorts` })}</div>
+                    <div class="chart-legend">${legend}</div>
+                    <p class="chart-note">Early/Mid/Late split the phase's logs into equal-count thirds by parse date — it captures how gearing shifted <em>within</em> the phase as more raiders cleared content.</p>
+                </div>
+            </div>`;
+        wireEvoSlotSelect(panel);
+    }
+
+    function renderEvolutionPvp(panel, specKey) {
+        const data = D();
+        const evo = data && data.metaEvolution && data.metaEvolution.pvp[specKey];
+        if (!evo) {
+            panel.innerHTML = `<div class="pvp-only"><p class="empty-note">No weekly arena history for ${esc(S.spec)} ${esc(S.class)} yet.</p></div>`;
+            return;
+        }
+        const slots = Object.keys(evo.slots).sort(slotSort);
+        if (!S.metaEvoSlot || !slots.includes(S.metaEvoSlot)) S.metaEvoSlot = slots[0];
+        const slot = S.metaEvoSlot;
+        const items = (evo.slots[slot] || []).slice(0, 3);
+        const series = items.map((it, i) => ({
+            label: it.name,
+            color: CHART_COLORS[i],
+            points: it.series.map(v => v != null ? { v } : null)
+        }));
+        const legend = series.map(s =>
+            `<div class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.label)}</div>`
+        ).join('');
+
+        panel.innerHTML = `
+            <div class="pvp-only">
+                <div class="section-label">How the meta shifted, week by week</div>
+                <div class="evo-toolbar">${evoSlotSelect(slots, slot)}</div>
+                <div class="chart-card">
+                    <div class="chart-head"><h3>${esc(slot)} slot — ${esc(S.spec)} ${esc(S.class)} (arena)</h3><span class="chart-sub">${esc(evo.dates[0])} → ${esc(evo.dates[evo.dates.length - 1])}, weekly</span></div>
+                    <div class="chart-svg-wrap">${lineChart(series, evo.dates, { aria: `${slot} popularity week by week` })}</div>
+                    <div class="chart-legend">${legend}</div>
+                    <p class="chart-note">The arena crowd re-gears within weeks, not phases — so crossovers show up here much faster than in the raid-log (PvE) version.</p>
+                </div>
+            </div>`;
+        wireEvoSlotSelect(panel);
+    }
+
+    function wireEvoSlotSelect(panel) {
+        const sel = panel.querySelector('#evoSlotSelect');
+        if (sel) sel.addEventListener('change', e => {
+            S.metaEvoSlot = e.target.value;
+            renderEvolution(panel);
+        });
+    }
 
     // ════════════════════════════════════════════════════════════════
     // Spec Meta — representation tier list + how-it-shifted trend.

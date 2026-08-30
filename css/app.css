@@ -4024,6 +4024,7 @@ body[data-mode="pvp"] .stats-page .pve-only { display: none !important; }
 .stats-page .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .stats-page .chart-svg-wrap { margin-top: 10px; }
 .stats-page .chart-note { font-size: .68rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+.stats-page .evo-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 
 /* ─── Top players table ─────────────────────────────────────────── */
 .stats-page .lb-table { display: flex; flex-direction: column; gap: 6px; }
