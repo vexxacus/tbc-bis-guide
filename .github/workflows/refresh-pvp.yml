@@ -78,10 +78,17 @@ jobs:
           node fetch-sockets.js
           node fetch-icons.js
 
+      # Rebuild the /stats page dataset so its PvP side (item usage, spec meta,
+      # arena leaderboards) reflects this week's refreshed pvp-data.js /
+      # pvp-history.json. The PvE side is unchanged here — it's rebuilt manually
+      # whenever a raid phase's WCL data is updated.
+      - name: Rebuild stats page data
+        run: node build-stats-data.js
+
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json; then
+          if git diff --quiet js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json js/stats-data.js; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -92,11 +99,12 @@ jobs:
         run: |
           # js files are served immutable (max-age=1y), so a content change is invisible
           # to returning visitors unless the ?v= query string also changes. Bump all
-          # three data files to this week's refresh date.
+          # data files to this week's refresh date.
           V=$(date -u '+%Y%m%d')
           sed -i -E "s#(/js/pvp-data\.js\?v=)[^\"']+#\1$V#" index.html
           sed -i -E "s#(/js/icons\.js\?v=)[^\"']+#\1$V#" index.html
           sed -i -E "s#(/js/item-sockets\.js\?v=)[^\"']+#\1$V#" index.html
+          sed -i -E "s#(/js/stats-data\.js\?v=)[^\"']+#\1$V#" index.html
 
       - name: Commit & push updated PvP data
         if: steps.changes.outputs.changed == 'true'
@@ -106,7 +114,7 @@ jobs:
           # Cache files (.icon-cache.json/.socket-cache.json) ride along so the next
           # weekly run only fetches genuinely-new item IDs instead of cold-fetching
           # thousands from Wowhead.
-          git add js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json index.html .icon-cache.json .socket-cache.json
+          git add js/pvp-data.js js/icons.js js/item-sockets.js pvp-history.json index.html .icon-cache.json .socket-cache.json js/stats-data.js
           git commit -m "chore: auto-refresh PvP BiS data $(date -u '+%Y-%m-%d')"
           git push
 

@@ -3006,7 +3006,13 @@
         if (_pvpHistoryPromise) return _pvpHistoryPromise;
         // Served from jsDelivr (free CDN, brotli, off Firebase's egress quota); the
         // weekly CI commit updates @main automatically. Falls back to the local copy.
-        const CDN = 'https://cdn.jsdelivr.net/gh/vexxacus/tbc-bis-guide@main/pvp-history.json';
+        // Daily cache-bust: jsDelivr ignores unknown query params (serves the same
+        // file from its warm edge), but the browser treats ?d=YYYY-MM-DD as a new URL,
+        // so it re-fetches at most once per day instead of reusing jsDelivr's long
+        // max-age response — which otherwise kept showing last week's snapshot until
+        // the browser cache expired.
+        const day = new Date().toISOString().slice(0, 10);
+        const CDN = `https://cdn.jsdelivr.net/gh/vexxacus/tbc-bis-guide@main/pvp-history.json?d=${day}`;
         const fetchJson = url => fetch(url).then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
         _pvpHistoryPromise = fetchJson(CDN)
             .catch(() => fetchJson('/pvp-history.json'))
@@ -5961,7 +5967,7 @@
 
     // Footer link clicks — SPA navigation
     document.addEventListener('click', e => {
-        const link = e.target.closest('.footer-link[data-page]');
+        const link = e.target.closest('.footer-link[data-page], .stats-promo-banner[data-page]');
         if (!link) return;
         e.preventDefault();
         const page = link.dataset.page;

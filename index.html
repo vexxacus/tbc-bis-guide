@@ -64,7 +64,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://wow.zamimg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css?v=20260830e">
+    <link rel="stylesheet" href="/css/app.css?v=20260831a">
     <!-- Wowhead Tooltip Script (TBC Classic) -->
     <script>const whTooltips = {colorLinks: false, iconizeLinks: false, iconSize: 'small', renameLinks: false};</script>
     <script src="https://wow.zamimg.com/js/tooltips.js"></script>
@@ -168,6 +168,17 @@
                     <span>Druid</span>
                 </a>
             </div>
+
+            <!-- Stats & Meta promo — routes to /stats via SPA (data-page) -->
+            <a class="stats-promo-banner" href="/stats" data-page="stats">
+                <div class="spb-icon">📊</div>
+                <div class="spb-text">
+                    <div class="spb-eyebrow"><span class="spb-badge">NEW</span> Stats &amp; Meta</div>
+                    <div class="spb-title">See what top players actually run</div>
+                    <div class="spb-sub">Item usage, spec meta &amp; arena leaderboards — <span class="spb-live"><span class="spb-live-dot"></span>arena ladder refreshes weekly</span> from WarcraftLogs &amp; Ironforge.pro</div>
+                </div>
+                <div class="spb-arrow">›</div>
+            </a>
         </section>
 
         <!-- Step 2: Spec Select -->
@@ -273,6 +284,8 @@
     <footer class="site-footer" id="siteFooter">
         <div class="footer-inner">
             <div class="footer-links">
+                <a href="/stats" class="footer-link footer-link-stats" data-page="stats">Stats</a>
+                <span class="footer-sep">·</span>
                 <a href="/gems" class="footer-link" data-page="gems">Gems</a>
                 <span class="footer-sep">·</span>
                 <a href="/enchants" class="footer-link" data-page="enchants">Enchants</a>
@@ -320,7 +333,7 @@
     <script src="/js/guides.js?v=20260601d"></script>
     <script src="/js/chart-helpers.js?v=20260830f"></script>
     <script src="/js/stats-page.js?v=20260830f"></script>
-    <script src="/js/app.js?v=20260813a"></script>
+    <script src="/js/app.js?v=20260831a"></script>
     <script src="/js/affiliate.js?v=20260825c"></script>
     <script src="/js/kofi.js?v=20260825c"></script>
 </body>

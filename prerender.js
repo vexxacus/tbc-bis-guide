@@ -84,7 +84,7 @@ const PHASE_SLUG_MAP = {
 
 // Static / guide pages (mirror STATIC_PAGES keys in js/app.js). Each needs a
 // title + description entry in seoForRoute's 'static' case and a sitemap entry.
-const STATIC_SLUGS = ['about', 'privacy', 'feedback', 'gems', 'enchants', 'attunements', 'stat-priority'];
+const STATIC_SLUGS = ['about', 'privacy', 'feedback', 'gems', 'enchants', 'attunements', 'stat-priority', 'stats'];
 
 function toSlug(str) {
     return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -507,12 +507,14 @@ function seoForRoute(route, fullUrl) {
             const titleMap = {
                 about:    'About — TBC Classic BiS Guide',
                 privacy:  'Privacy Policy — TBC Classic BiS Guide',
-                feedback: 'Feedback & Roadmap — TBC Classic BiS Guide'
+                feedback: 'Feedback & Roadmap — TBC Classic BiS Guide',
+                stats:    'TBC Classic Stats & Meta — What Top Players Actually Run'
             };
             const descMap = {
                 about:    'About the TBC Classic Best in Slot Guide — sources, methodology, and contact.',
                 privacy:  'Privacy policy for tbc-bis-guide.com.',
-                feedback: 'Send feedback, request new features, or view the public roadmap for TBC BiS Guide.'
+                feedback: 'Send feedback, request new features, or view the public roadmap for TBC BiS Guide.',
+                stats:    'Real item usage, spec meta, and arena leaderboards for TBC Classic — see what the top raiders and highest-rated arena players actually run, sourced from WarcraftLogs and Ironforge.pro.'
             };
             // Guide pages (gems, …) source title/desc from the shared GUIDES module.
             const guide = GUIDES[route.page];
